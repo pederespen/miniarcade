@@ -87,12 +87,6 @@ export default function SlideMASTER() {
             gridSize={gridSize}
             onReset={resetGame}
           />
-          <button
-            onClick={resetGame}
-            className="mt-6 bg-indigo-700 hover:bg-indigo-600 text-white py-2 px-6 rounded"
-          >
-            New Game
-          </button>
         </div>
       )}
     </div>
