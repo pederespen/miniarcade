@@ -3,6 +3,13 @@ import Link from "next/link";
 export default function Home() {
   const games = [
     {
+      id: "slidemaster",
+      title: "SlideMASTER",
+      description:
+        "Solve sliding tile puzzles with your own images! Rearrange the tiles to complete the picture.",
+      imageUrl: "/images/slidemaster.png",
+    },
+    {
       id: "game1",
       title: "Game 1",
       description:
