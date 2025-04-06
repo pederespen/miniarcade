@@ -26,9 +26,7 @@ export default function ShuffleMaster() {
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       {!gameStarted ? (
-        <div className="bg-indigo-800 rounded-lg p-6 shadow-lg">
-          <h2 className="text-2xl font-bold text-cyan-400 mb-4">Game Setup</h2>
-
+        <div className="bg-black rounded-lg p-6 shadow-lg">
           <div className="mb-6">
             <label className="block text-indigo-100 mb-2">Grid Size</label>
             <div className="flex space-x-4">

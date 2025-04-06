@@ -26,7 +26,6 @@ export default function ShuffleMasterGame({
   const [isLoading, setIsLoading] = useState(true);
   const [moves, setMoves] = useState(0);
   const [isSolved, setIsSolved] = useState(false);
-  const [showNumbers, setShowNumbers] = useState(false);
 
   const totalTiles = gridSize * gridSize;
 
@@ -230,50 +229,36 @@ export default function ShuffleMasterGame({
 
   return (
     <div className="flex flex-col items-center">
-      <div className="flex justify-end w-full max-w-sm mb-4">
-        <button
-          onClick={() => setShowNumbers(!showNumbers)}
-          className="text-indigo-300 hover:text-indigo-100 text-sm"
-        >
-          {showNumbers ? "Hide Numbers" : "Show Numbers"}
-        </button>
-      </div>
-
       <div
-        className="relative bg-indigo-900 rounded-lg overflow-hidden shadow-lg"
+        className="relative bg-black rounded-lg overflow-hidden shadow-lg border-2 border-white"
         style={{
           width: `${gridSize * tileSize}px`,
           height: `${gridSize * tileSize}px`,
         }}
       >
         {tiles.map((tile, index) => {
-          // Render both filled and empty tiles
+          // Only render non-empty tiles
+          if (tile.isEmpty) return null;
+
           return (
             <div
               key={tile.id}
-              onClick={() => !tile.isEmpty && moveTile(index)}
+              onClick={() => moveTile(index)}
               className={`absolute cursor-pointer transition-all duration-150 ${
                 isSolved ? "opacity-100" : "hover:opacity-90"
               }`}
               style={{
                 width: `${tileSize}px`,
                 height: `${tileSize}px`,
-                backgroundColor: tile.isEmpty ? "black" : undefined,
-                backgroundImage: !tile.isEmpty ? `url(${imageUrl})` : "none",
-                backgroundSize: !tile.isEmpty
-                  ? `${gridSize * tileSize}px ${gridSize * tileSize}px`
-                  : undefined,
-                ...(!tile.isEmpty ? getBackgroundPosition(tile.id) : {}),
+                backgroundImage: `url(${imageUrl})`,
+                backgroundSize: `${gridSize * tileSize}px ${
+                  gridSize * tileSize
+                }px`,
+                ...getBackgroundPosition(tile.id),
                 ...getTilePosition(tile.currentPos),
                 boxShadow: "inset 0 0 0 1px rgba(0, 0, 0, 0.3)",
               }}
-            >
-              {showNumbers && !tile.isEmpty && (
-                <span className="absolute bottom-1 right-1 bg-black/50 text-white text-xs px-1 rounded">
-                  {tile.id + 1}
-                </span>
-              )}
-            </div>
+            />
           );
         })}
       </div>
