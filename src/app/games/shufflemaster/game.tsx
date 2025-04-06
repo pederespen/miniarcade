@@ -11,17 +11,17 @@ interface Tile {
   isEmpty: boolean;
 }
 
-interface SlideGameProps {
+interface ShuffleGameProps {
   imageUrl: string;
   gridSize: number;
   onReset: () => void;
 }
 
-export default function SlideGame({
+export default function ShuffleMasterGame({
   imageUrl,
   gridSize,
   onReset,
-}: SlideGameProps) {
+}: ShuffleGameProps) {
   const [tiles, setTiles] = useState<Tile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [moves, setMoves] = useState(0);

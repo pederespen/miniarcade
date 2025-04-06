@@ -3,11 +3,11 @@ import Link from "next/link";
 export default function Home() {
   const games = [
     {
-      id: "slidemaster",
-      title: "SlideMASTER",
+      id: "shufflemaster",
+      title: "ShuffleMaster",
       description:
         "Solve sliding tile puzzles with your own images! Rearrange the tiles to complete the picture.",
-      imageUrl: "/images/slidemaster.png",
+      imageUrl: "/images/shufflemaster.png",
     },
     {
       id: "game1",
@@ -22,13 +22,6 @@ export default function Home() {
       description:
         "This is a placeholder for game 2. Description would go here.",
       imageUrl: "/images/game2.png",
-    },
-    {
-      id: "game3",
-      title: "Game 3",
-      description:
-        "This is a placeholder for game 3. Description would go here.",
-      imageUrl: "/images/game3.png",
     },
   ];
 

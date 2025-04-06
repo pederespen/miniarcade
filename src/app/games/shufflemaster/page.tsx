@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import SlideGame from "./SlideGame";
-import ImageUploader from "./ImageUploader";
+import Image from "next/image";
+import ShuffleMasterGame from "./game";
+import ImageUploader from "./image-uploader";
 
-export default function SlideMASTER() {
+export default function ShuffleMaster() {
   const [userImage, setUserImage] = useState<string | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [gridSize, setGridSize] = useState(4); // Default 4x4
@@ -25,7 +26,7 @@ export default function SlideMASTER() {
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <h1 className="text-3xl font-bold text-center text-cyan-400 mb-8">
-        SlideMASTER
+        ShuffleMaster
       </h1>
 
       {!gameStarted ? (
@@ -58,11 +59,13 @@ export default function SlideMASTER() {
           {userImage && (
             <div className="mb-6">
               <h3 className="text-indigo-100 mb-2">Preview:</h3>
-              <div className="w-48 h-48 mx-auto">
-                <img
+              <div className="w-48 h-48 mx-auto relative">
+                <Image
                   src={userImage}
                   alt="Uploaded image"
-                  className="w-full h-full object-cover rounded"
+                  fill
+                  className="object-cover rounded"
+                  sizes="(max-width: 768px) 100vw, 192px"
                 />
               </div>
             </div>
@@ -82,7 +85,7 @@ export default function SlideMASTER() {
         </div>
       ) : (
         <div className="flex flex-col items-center">
-          <SlideGame
+          <ShuffleMasterGame
             imageUrl={userImage!}
             gridSize={gridSize}
             onReset={resetGame}
