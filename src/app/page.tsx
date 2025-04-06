@@ -1,25 +1,27 @@
+import Link from "next/link";
+
 export default function Home() {
   const games = [
     {
-      id: "snake",
-      title: "Snake",
+      id: "game1",
+      title: "Game 1",
       description:
-        "Classic snake game. Eat the food and grow longer without hitting the walls or yourself.",
-      imageUrl: "/images/snake.png",
+        "This is a placeholder for game 1. Description would go here.",
+      imageUrl: "/images/game1.png",
     },
     {
-      id: "tetris",
-      title: "Tetris",
+      id: "game2",
+      title: "Game 2",
       description:
-        "Arrange falling blocks to create complete lines and score points.",
-      imageUrl: "/images/tetris.png",
+        "This is a placeholder for game 2. Description would go here.",
+      imageUrl: "/images/game2.png",
     },
     {
-      id: "pong",
-      title: "Pong",
+      id: "game3",
+      title: "Game 3",
       description:
-        "Classic two-player game. Hit the ball back and forth without missing.",
-      imageUrl: "/images/pong.png",
+        "This is a placeholder for game 3. Description would go here.",
+      imageUrl: "/images/game3.png",
     },
   ];
 
@@ -27,26 +29,26 @@ export default function Home() {
     <div className="container mx-auto p-6 flex-grow flex flex-col">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow">
         {games.map((game) => (
-          <div
+          <Link
             key={game.id}
-            className="bg-indigo-800 rounded-lg overflow-hidden shadow-lg hover:shadow-cyan-500/30 transition-all hover:scale-105 cursor-pointer flex flex-col h-full"
+            href={`/games/${game.id}`}
+            className="block h-full"
           >
-            <div className="h-60 bg-indigo-700 flex items-center justify-center">
-              {/* Placeholder for game images */}
-              <div className="text-7xl text-cyan-400">{game.title[0]}</div>
-            </div>
-            <div className="p-6 flex-grow flex flex-col justify-between">
-              <div>
-                <h3 className="text-2xl font-bold text-cyan-400 mb-3">
-                  {game.title}
-                </h3>
-                <p className="text-indigo-100 text-lg">{game.description}</p>
+            <div className="bg-indigo-800 rounded-lg overflow-hidden shadow-lg hover:shadow-cyan-500/30 transition-all hover:scale-105 cursor-pointer flex flex-col h-full">
+              <div className="h-60 bg-indigo-700 flex items-center justify-center">
+                {/* Placeholder for game images */}
+                <div className="text-7xl text-cyan-400">{game.title[0]}</div>
               </div>
-              <button className="mt-6 bg-cyan-600 hover:bg-cyan-500 text-white py-2 px-4 rounded-md transition-colors">
-                Play Now
-              </button>
+              <div className="p-6 flex-grow flex flex-col justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-cyan-400 mb-3">
+                    {game.title}
+                  </h3>
+                  <p className="text-indigo-100 text-lg">{game.description}</p>
+                </div>
+              </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
