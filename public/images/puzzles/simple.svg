@@ -1,0 +1,18 @@
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="800" fill="#1a1a2e"/>
+  
+  <!-- Large center circle -->
+  <circle cx="400" cy="400" r="200" fill="#16213e" stroke="#0f3460" stroke-width="10"/>
+  
+  <!-- Triangles -->
+  <polygon points="400,100 300,300 500,300" fill="#e94560"/>
+  <polygon points="400,700 300,500 500,500" fill="#e94560"/>
+  <polygon points="100,400 300,300 300,500" fill="#0f3460"/>
+  <polygon points="700,400 500,300 500,500" fill="#0f3460"/>
+  
+  <!-- Small circles at intersections -->
+  <circle cx="400" cy="100" r="30" fill="#f1c40f"/>
+  <circle cx="400" cy="700" r="30" fill="#f1c40f"/>
+  <circle cx="100" cy="400" r="30" fill="#f1c40f"/>
+  <circle cx="700" cy="400" r="30" fill="#f1c40f"/>
+</svg> 
