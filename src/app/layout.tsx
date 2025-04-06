@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,9 +19,14 @@ export default function RootLayout({
         <header className="p-3 shadow-lg">
           <div className="container mx-auto flex justify-center items-center">
             <Link href="/">
-              <h1 className="text-2xl font-bold text-cyan-400 cursor-pointer hover:text-cyan-300 transition-colors">
-                MiniArcade
-              </h1>
+              <Image
+                src="./miniarcade-logo-with-text.png"
+                alt="MiniArcade"
+                width={300}
+                height={100}
+                priority
+                className="mx-auto"
+              />
             </Link>
           </div>
         </header>

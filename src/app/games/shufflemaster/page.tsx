@@ -25,10 +25,6 @@ export default function ShuffleMaster() {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
-      <h1 className="text-3xl font-bold text-center text-cyan-400 mb-8">
-        ShuffleMaster
-      </h1>
-
       {!gameStarted ? (
         <div className="bg-indigo-800 rounded-lg p-6 shadow-lg">
           <h2 className="text-2xl font-bold text-cyan-400 mb-4">Game Setup</h2>
