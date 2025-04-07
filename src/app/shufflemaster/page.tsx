@@ -223,8 +223,8 @@ export default function ShuffleMaster() {
           )}
         </div>
       ) : (
-        <div className="flex flex-col items-center">
-          <div className="relative">
+        <div className="flex flex-col items-center w-full">
+          <div className="relative w-full max-w-2xl mx-auto">
             <ShuffleMasterGame
               imageUrl={userImage!}
               gridSize={gridSize}

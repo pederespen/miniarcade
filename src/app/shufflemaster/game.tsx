@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 // Set to true for testing (one move to solve), false for regular gameplay
 const DEV_MODE = true;
@@ -30,7 +30,81 @@ export default function ShuffleMasterGame({
   const [endTime, setEndTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
 
+  // Use a state initializer function to safely access window
+  const [boardSize, setBoardSize] = useState(() => {
+    // Safe check for window - only runs in browser
+    if (typeof window !== "undefined") {
+      // Start with a size that's likely close to final to minimize jumps
+      return Math.min(
+        window.innerWidth < 768 ? window.innerWidth * 0.9 : 550,
+        600
+      );
+    }
+    // Default fallback for server rendering
+    return 550;
+  });
+
+  const [sizingComplete, setSizingComplete] = useState(false);
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+
   const totalTiles = gridSize * gridSize;
+
+  // Calculate responsive board size
+  const updateBoardSize = useCallback(() => {
+    if (!gameContainerRef.current) return;
+
+    // Get the parent container width
+    const parentElement = gameContainerRef.current.parentElement;
+    if (!parentElement) return;
+
+    // Get the actual available width from the parent element
+    const containerWidth = parentElement.offsetWidth;
+
+    // Set minimum and maximum sizes
+    const minSize = Math.min(300, containerWidth * 0.9); // Min size, but not larger than 90% of container on small screens
+    const maxSize = 600; // Max size to prevent it from becoming too large
+
+    // Ensure board size stays within bounds
+    const newSize = Math.max(minSize, Math.min(containerWidth * 0.95, maxSize));
+
+    // Only update if the size difference is significant (prevents minor adjustments)
+    if (Math.abs(newSize - boardSize) > 10 || !sizingComplete) {
+      setBoardSize(newSize);
+      if (!sizingComplete) setSizingComplete(true);
+    }
+  }, [boardSize, sizingComplete]);
+
+  // Set up resize observer to detect container size changes
+  useEffect(() => {
+    if (!gameContainerRef.current) return;
+
+    // Create a ResizeObserver to watch the parent element's size
+    const resizeObserver = new ResizeObserver(() => {
+      updateBoardSize();
+    });
+
+    // Observe the parent element if it exists
+    const parentElement = gameContainerRef.current.parentElement;
+    if (parentElement) {
+      resizeObserver.observe(parentElement);
+
+      // Run initial size calculation immediately
+      updateBoardSize();
+    }
+
+    // Clean up on unmount
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [updateBoardSize]);
+
+  // Also listen for window resize events
+  useEffect(() => {
+    window.addEventListener("resize", updateBoardSize);
+    return () => {
+      window.removeEventListener("resize", updateBoardSize);
+    };
+  }, [updateBoardSize]);
 
   // Initialize timer when game starts
   useEffect(() => {
@@ -220,8 +294,8 @@ export default function ShuffleMasterGame({
     }
   };
 
-  // Calculate tile size based on container size
-  const tileSize = 300 / gridSize;
+  // Calculate tile size based on dynamic board size
+  const tileSize = boardSize / gridSize;
 
   // Calculate tile position for CSS
   const getTilePosition = (pos: number) => {
@@ -256,12 +330,16 @@ export default function ShuffleMasterGame({
   }
 
   return (
-    <div className="flex flex-col items-center">
+    <div
+      className="flex flex-col items-center w-full"
+      ref={gameContainerRef}
+      style={{ minHeight: `${boardSize + 20}px` }}
+    >
       <div
-        className="relative bg-black rounded-lg overflow-hidden shadow-lg border-2 border-white"
+        className="relative bg-black rounded-lg overflow-hidden shadow-lg border-2 border-white mx-auto"
         style={{
-          width: `${gridSize * tileSize}px`,
-          height: `${gridSize * tileSize}px`,
+          width: `${boardSize}px`,
+          height: `${boardSize}px`,
         }}
       >
         {tiles.map((tile, index) => {
@@ -279,9 +357,7 @@ export default function ShuffleMasterGame({
                 width: `${tileSize}px`,
                 height: `${tileSize}px`,
                 backgroundImage: `url(${imageUrl})`,
-                backgroundSize: `${gridSize * tileSize}px ${
-                  gridSize * tileSize
-                }px`,
+                backgroundSize: `${boardSize}px ${boardSize}px`,
                 ...getBackgroundPosition(tile.id),
                 ...getTilePosition(tile.currentPos),
                 boxShadow: "inset 0 0 0 1px rgba(0, 0, 0, 0.3)",
