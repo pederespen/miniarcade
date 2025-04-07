@@ -72,7 +72,7 @@ export default function ShuffleMaster() {
               {[3, 4, 5, 6, 7].map((size) => (
                 <button
                   key={size}
-                  className={`px-4 py-2 rounded ${
+                  className={`px-4 py-2 rounded cursor-pointer ${
                     gridSize === size
                       ? "bg-cyan-500 text-white"
                       : "bg-indigo-700 text-indigo-100 hover:bg-indigo-600"
@@ -89,7 +89,7 @@ export default function ShuffleMaster() {
             <div className="mb-6">
               <div className="flex border-b border-indigo-700 mb-4">
                 <button
-                  className={`py-2 px-4 ${
+                  className={`py-2 px-4 cursor-pointer ${
                     imageSource === "upload"
                       ? "text-cyan-400 border-b-2 border-cyan-400"
                       : "text-indigo-300 hover:text-indigo-100"
@@ -99,7 +99,7 @@ export default function ShuffleMaster() {
                   Upload Image
                 </button>
                 <button
-                  className={`py-2 px-4 ${
+                  className={`py-2 px-4 cursor-pointer ${
                     imageSource === "preset"
                       ? "text-cyan-400 border-b-2 border-cyan-400"
                       : "text-indigo-300 hover:text-indigo-100"
@@ -164,13 +164,13 @@ export default function ShuffleMaster() {
             <div className="flex flex-col items-center space-y-4">
               <button
                 onClick={startGame}
-                className="py-3 px-12 rounded-lg font-bold bg-cyan-500 hover:bg-cyan-600 text-white"
+                className="py-3 px-12 rounded-lg font-bold bg-cyan-500 hover:bg-cyan-600 text-white cursor-pointer"
               >
                 Start Game
               </button>
               <button
                 onClick={selectDifferentImage}
-                className="text-indigo-300 hover:text-indigo-100 underline text-sm"
+                className="text-indigo-300 hover:text-indigo-100 underline text-sm cursor-pointer"
               >
                 Select different image
               </button>

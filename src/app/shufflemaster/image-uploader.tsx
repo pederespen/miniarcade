@@ -103,7 +103,7 @@ export default function ImageUploader({ onImageUploaded }: ImageUploaderProps) {
         <div className="text-indigo-100 mb-2">
           <p>Drag and drop an image here</p>
           <p>or</p>
-          <button className="mt-2 px-4 py-2 bg-indigo-700 rounded hover:bg-indigo-600">
+          <button className="mt-2 px-4 py-2 bg-indigo-700 rounded hover:bg-indigo-600 cursor-pointer">
             Browse files
           </button>
         </div>

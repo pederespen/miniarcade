@@ -328,13 +328,13 @@ export default function ImageCropper({
       <div className="flex justify-end space-x-4 mt-4">
         <button
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded"
+          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded cursor-pointer"
         >
           Cancel
         </button>
         <button
           onClick={applyCrop}
-          className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded"
+          className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded cursor-pointer"
         >
           Apply Crop
         </button>

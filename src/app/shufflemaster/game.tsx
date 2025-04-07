@@ -26,8 +26,29 @@ export default function ShuffleMasterGame({
   const [isLoading, setIsLoading] = useState(true);
   const [moves, setMoves] = useState(0);
   const [isSolved, setIsSolved] = useState(false);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [endTime, setEndTime] = useState<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   const totalTiles = gridSize * gridSize;
+
+  // Initialize timer when game starts
+  useEffect(() => {
+    if (!isLoading && !isSolved && startTime === null) {
+      setStartTime(Date.now());
+    }
+  }, [isLoading, isSolved, startTime]);
+
+  // Update timer every second while game is in progress
+  useEffect(() => {
+    if (!isLoading && !isSolved && startTime !== null) {
+      const interval = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isLoading, isSolved, startTime]);
 
   // Check if the puzzle is solvable (using inversion count)
   const isSolvable = useCallback((tiles: Tile[], size: number) => {
@@ -110,6 +131,9 @@ export default function ShuffleMasterGame({
     setIsLoading(true);
     setMoves(0);
     setIsSolved(false);
+    setStartTime(null);
+    setEndTime(null);
+    setElapsedTime(0);
 
     const initialTiles: Tile[] = [];
 
@@ -191,6 +215,7 @@ export default function ShuffleMasterGame({
       const solved = newTiles.every((tile) => tile.id === tile.currentPos);
       if (solved) {
         setIsSolved(true);
+        setEndTime(Date.now());
       }
     }
   };
@@ -219,8 +244,11 @@ export default function ShuffleMasterGame({
     };
   };
 
-  const playAgain = () => {
-    initializeGame();
+  // Format time in minutes and seconds
+  const formatTime = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
   if (isLoading) {
@@ -263,23 +291,43 @@ export default function ShuffleMasterGame({
         })}
       </div>
 
+      {/* Win popup modal */}
       {isSolved && (
-        <div className="mt-4 p-4 bg-cyan-500 text-white font-bold rounded-lg text-center">
-          <p className="mb-2">🎉 Puzzle Solved! 🎉</p>
-          <p>You completed it in {moves} moves!</p>
-          <div className="mt-4 flex space-x-4 justify-center">
-            <button
-              onClick={playAgain}
-              className="px-4 py-2 bg-indigo-700 hover:bg-indigo-600 text-white rounded"
-            >
-              Play Again
-            </button>
-            <button
-              onClick={onReset}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded"
-            >
-              New Image
-            </button>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fadeIn">
+          <div className="bg-indigo-900/90 border-2 border-cyan-400 rounded-lg shadow-lg p-6 max-w-md w-full mx-4 transform backdrop-blur-sm">
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-cyan-400 mb-4">
+                🎉 Puzzle Solved! 🎉
+              </h3>
+
+              <div className="bg-indigo-800/70 p-4 rounded-lg mb-4">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-center">
+                  <span className="text-indigo-200">Moves</span>
+                  <span className="text-indigo-200">Time</span>
+                  <span className="text-white font-bold text-xl">{moves}</span>
+                  <span className="text-white font-bold text-xl">
+                    {endTime && startTime
+                      ? formatTime(Math.floor((endTime - startTime) / 1000))
+                      : formatTime(elapsedTime)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={initializeGame}
+                  className="px-6 py-2 bg-indigo-700 hover:bg-indigo-600 text-white rounded-lg font-bold cursor-pointer"
+                >
+                  Play Again
+                </button>
+                <button
+                  onClick={onReset}
+                  className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg font-bold cursor-pointer"
+                >
+                  New Game
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
