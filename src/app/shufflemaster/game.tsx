@@ -15,12 +15,14 @@ interface ShuffleGameProps {
   imageUrl: string;
   gridSize: number;
   onReset: () => void;
+  onBoardSizeChange?: (size: number) => void;
 }
 
 export default function ShuffleMasterGame({
   imageUrl,
   gridSize,
   onReset,
+  onBoardSizeChange,
 }: ShuffleGameProps) {
   const [tiles, setTiles] = useState<Tile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,9 +72,12 @@ export default function ShuffleMasterGame({
     // Only update if the size difference is significant (prevents minor adjustments)
     if (Math.abs(newSize - boardSize) > 10 || !sizingComplete) {
       setBoardSize(newSize);
+      if (onBoardSizeChange) {
+        onBoardSizeChange(newSize);
+      }
       if (!sizingComplete) setSizingComplete(true);
     }
-  }, [boardSize, sizingComplete]);
+  }, [boardSize, sizingComplete, onBoardSizeChange]);
 
   // Set up resize observer to detect container size changes
   useEffect(() => {
@@ -330,11 +335,7 @@ export default function ShuffleMasterGame({
   }
 
   return (
-    <div
-      className="flex flex-col items-center w-full"
-      ref={gameContainerRef}
-      style={{ minHeight: `${boardSize + 20}px` }}
-    >
+    <div className="flex flex-col items-center w-full" ref={gameContainerRef}>
       <div
         className="relative bg-black rounded-lg overflow-hidden shadow-lg border-2 border-white mx-auto"
         style={{

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import ShuffleMasterGame from "./game";
 import ImageUploader from "./image-uploader";
@@ -31,12 +31,19 @@ export default function ShuffleMaster() {
   const [imageSource, setImageSource] = useState<"upload" | "preset">("upload");
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
   const [selectingImage, setSelectingImage] = useState(true);
+  const [gameBoardSize, setGameBoardSize] = useState<number>(500);
 
   // Refs for the tooltips
   const howToPlayTooltipRef = useRef<HTMLDivElement>(null);
   const helpTooltipRef = useRef<HTMLDivElement>(null);
   const howToPlayButtonRef = useRef<HTMLButtonElement>(null);
   const helpButtonRef = useRef<HTMLButtonElement>(null);
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+
+  // Handle board size changes
+  const handleBoardSizeChange = useCallback((size: number) => {
+    setGameBoardSize(size);
+  }, []);
 
   // Handle clicks outside tooltips
   useEffect(() => {
@@ -225,15 +232,18 @@ export default function ShuffleMaster() {
       ) : (
         <div className="flex flex-col items-center w-full">
           <div className="relative w-full max-w-2xl mx-auto">
-            <ShuffleMasterGame
-              imageUrl={userImage!}
-              gridSize={gridSize}
-              onReset={resetGame}
-            />
+            <div ref={gameContainerRef}>
+              <ShuffleMasterGame
+                imageUrl={userImage!}
+                gridSize={gridSize}
+                onReset={resetGame}
+                onBoardSizeChange={handleBoardSizeChange}
+              />
+            </div>
 
             <div
-              className="mt-2 flex justify-between w-full mx-auto"
-              style={{ maxWidth: "500px" }}
+              className="mt-1 flex justify-between w-full mx-auto"
+              style={{ maxWidth: `${gameBoardSize}px` }}
             >
               <div className="relative inline-block">
                 <button
