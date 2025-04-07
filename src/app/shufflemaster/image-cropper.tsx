@@ -49,49 +49,48 @@ export default function ImageCropper({
     img.src = imageUrl;
   }, [imageUrl]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  // Handle both mouse and touch events
+  const handleStart = (
+    clientX: number,
+    clientY: number,
+    isCorner = false,
+    corner?: string
+  ) => {
     if (!containerRef.current) return;
 
-    e.preventDefault();
     const rect = containerRef.current.getBoundingClientRect();
     const scaleX = imageSize.width / rect.width;
     const scaleY = imageSize.height / rect.height;
 
-    setIsDragging(true);
-    setDragStart({
-      x: (e.clientX - rect.left) * scaleX - crop.x,
-      y: (e.clientY - rect.top) * scaleY - crop.y,
-    });
+    if (isCorner && corner) {
+      setIsResizing(true);
+      setResizeCorner(corner);
+      setResizeStart({
+        x: clientX,
+        y: clientY,
+        size: cropSize,
+        cropX: crop.x,
+        cropY: crop.y,
+      });
+    } else {
+      setIsDragging(true);
+      setDragStart({
+        x: (clientX - rect.left) * scaleX - crop.x,
+        y: (clientY - rect.top) * scaleY - crop.y,
+      });
+    }
   };
 
-  const handleCornerMouseDown = (e: React.MouseEvent, corner: string) => {
-    if (!containerRef.current) return;
-
-    e.stopPropagation();
-    e.preventDefault();
-
-    setIsResizing(true);
-    setResizeCorner(corner);
-    setResizeStart({
-      x: e.clientX,
-      y: e.clientY,
-      size: cropSize,
-      cropX: crop.x,
-      cropY: crop.y,
-    });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMove = (clientX: number, clientY: number) => {
     if ((!isDragging && !isResizing) || !containerRef.current) return;
 
-    e.preventDefault();
     const rect = containerRef.current.getBoundingClientRect();
     const scaleX = imageSize.width / rect.width;
     const scaleY = imageSize.height / rect.height;
 
     if (isDragging) {
-      let newX = (e.clientX - rect.left) * scaleX - dragStart.x;
-      let newY = (e.clientY - rect.top) * scaleY - dragStart.y;
+      let newX = (clientX - rect.left) * scaleX - dragStart.x;
+      let newY = (clientY - rect.top) * scaleY - dragStart.y;
 
       // Constrain the crop area to the image boundaries
       newX = Math.max(0, Math.min(imageSize.width - cropSize, newX));
@@ -100,7 +99,7 @@ export default function ImageCropper({
       setCrop({ x: newX, y: newY });
     } else if (isResizing && resizeCorner) {
       // Calculate pixel change in the container's coordinate space
-      const deltaX = e.clientX - resizeStart.x;
+      const deltaX = clientX - resizeStart.x;
 
       // Convert to image coordinate space
       const scaledDeltaX = deltaX * (imageSize.width / rect.width);
@@ -179,10 +178,78 @@ export default function ImageCropper({
     }
   };
 
-  const handleMouseUp = () => {
+  const handleEnd = () => {
     setIsDragging(false);
     setIsResizing(false);
     setResizeCorner(null);
+  };
+
+  // Mouse event handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    handleStart(e.clientX, e.clientY);
+  };
+
+  const handleCornerMouseDown = (e: React.MouseEvent, corner: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    handleStart(e.clientX, e.clientY, true, corner);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    e.preventDefault();
+    handleMove(e.clientX, e.clientY);
+  };
+
+  const handleMouseUp = () => {
+    handleEnd();
+  };
+
+  // Touch event handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length !== 1) return;
+    // Always prevent default to stop page scrolling
+    e.preventDefault();
+    handleStart(e.touches[0].clientX, e.touches[0].clientY);
+  };
+
+  const handleCornerTouchStart = (e: React.TouchEvent, corner: string) => {
+    if (e.touches.length !== 1) return;
+    e.stopPropagation();
+    e.preventDefault();
+    handleStart(e.touches[0].clientX, e.touches[0].clientY, true, corner);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length !== 1) return;
+    // Always prevent default to stop page scrolling
+    e.preventDefault();
+    handleMove(e.touches[0].clientX, e.touches[0].clientY);
+  };
+
+  // Add passive: false to allow preventDefault in touchmove events
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Add non-passive touch event listeners to enable preventDefault
+    const handleTouchMoveCapture = (e: TouchEvent) => {
+      if (isDragging || isResizing) {
+        e.preventDefault();
+      }
+    };
+
+    container.addEventListener("touchmove", handleTouchMoveCapture, {
+      passive: false,
+    });
+
+    return () => {
+      container.removeEventListener("touchmove", handleTouchMoveCapture);
+    };
+  }, [isDragging, isResizing]);
+
+  const handleTouchEnd = () => {
+    handleEnd();
   };
 
   const applyCrop = () => {
@@ -228,7 +295,7 @@ export default function ImageCropper({
   }
 
   // Styles for the resize handles
-  const handleSize = 12;
+  const handleSize = 20; // Increased for better touch targets
   const handleOffset = -handleSize / 2;
   const resizeHandleStyle = {
     width: `${handleSize}px`,
@@ -236,18 +303,13 @@ export default function ImageCropper({
     position: "absolute" as const,
     background: "white",
     border: "2px solid rgb(34, 211, 238)",
-    borderRadius: "2px",
+    borderRadius: "50%", // Make circular for better touch targets
     zIndex: 10,
   };
 
   return (
     <div className="bg-black rounded-lg p-4 shadow-lg">
       <h3 className="text-xl font-bold text-cyan-400 mb-4">Crop Your Image</h3>
-
-      <div className="mb-4 text-indigo-100 text-sm">
-        Drag to adjust the crop area. Use the corner handles to resize. The
-        selection will remain square.
-      </div>
 
       <div
         ref={containerRef}
@@ -261,6 +323,10 @@ export default function ImageCropper({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
       >
         {/* Visible image */}
         <div className="relative w-full h-full">
@@ -293,6 +359,7 @@ export default function ImageCropper({
                 cursor: "nwse-resize",
               }}
               onMouseDown={(e) => handleCornerMouseDown(e, "topLeft")}
+              onTouchStart={(e) => handleCornerTouchStart(e, "topLeft")}
             />
             <div
               style={{
@@ -302,6 +369,7 @@ export default function ImageCropper({
                 cursor: "nesw-resize",
               }}
               onMouseDown={(e) => handleCornerMouseDown(e, "topRight")}
+              onTouchStart={(e) => handleCornerTouchStart(e, "topRight")}
             />
             <div
               style={{
@@ -311,6 +379,7 @@ export default function ImageCropper({
                 cursor: "nesw-resize",
               }}
               onMouseDown={(e) => handleCornerMouseDown(e, "bottomLeft")}
+              onTouchStart={(e) => handleCornerTouchStart(e, "bottomLeft")}
             />
             <div
               style={{
@@ -320,6 +389,7 @@ export default function ImageCropper({
                 cursor: "nwse-resize",
               }}
               onMouseDown={(e) => handleCornerMouseDown(e, "bottomRight")}
+              onTouchStart={(e) => handleCornerTouchStart(e, "bottomRight")}
             />
           </div>
         </div>
