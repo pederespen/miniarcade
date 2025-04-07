@@ -27,7 +27,7 @@ const presetImages = [
 export default function ShuffleMaster() {
   const [userImage, setUserImage] = useState<string | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
-  const [gridSize, setGridSize] = useState(4); // Default 4x4
+  const [gridSize, setGridSize] = useState(3); // Default 3x3
   const [imageSource, setImageSource] = useState<"upload" | "preset">("upload");
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
 
@@ -58,8 +58,8 @@ export default function ShuffleMaster() {
 
           <div className="mb-6">
             <label className="block text-indigo-100 mb-2">Grid Size</label>
-            <div className="flex space-x-4">
-              {[3, 4, 5].map((size) => (
+            <div className="flex flex-wrap gap-2">
+              {[3, 4, 5, 6, 7].map((size) => (
                 <button
                   key={size}
                   className={`px-4 py-2 rounded ${
