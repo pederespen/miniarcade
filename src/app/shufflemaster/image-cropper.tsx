@@ -21,7 +21,13 @@ export default function ImageCropper({
   const [isResizing, setIsResizing] = useState(false);
   const [resizeCorner, setResizeCorner] = useState<string | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, size: 0 });
+  const [resizeStart, setResizeStart] = useState({
+    x: 0,
+    y: 0,
+    size: 0,
+    cropX: 0,
+    cropY: 0,
+  });
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Load image dimensions when the component mounts
@@ -30,12 +36,14 @@ export default function ImageCropper({
     img.onload = () => {
       setImageSize({ width: img.width, height: img.height });
 
-      // Calculate initial crop position (centered)
-      const size = Math.min(img.width, img.height) / 2; // Start with half the available size
-      setCropSize(size);
+      // Base crop size on the smaller dimension to ensure it fits
+      const initialSize = Math.min(img.width, img.height) * 0.4;
+      setCropSize(initialSize);
+
+      // Center the crop box
       setCrop({
-        x: (img.width - size) / 2,
-        y: (img.height - size) / 2,
+        x: (img.width - initialSize) / 2,
+        y: (img.height - initialSize) / 2,
       });
     };
     img.src = imageUrl;
@@ -68,6 +76,8 @@ export default function ImageCropper({
       x: e.clientX,
       y: e.clientY,
       size: cropSize,
+      cropX: crop.x,
+      cropY: crop.y,
     });
   };
 
@@ -89,78 +99,83 @@ export default function ImageCropper({
 
       setCrop({ x: newX, y: newY });
     } else if (isResizing && resizeCorner) {
-      // Calculate the difference in cursor position
-      const dx = e.clientX - resizeStart.x;
-      const dy = e.clientY - resizeStart.y;
+      // Calculate pixel change in the container's coordinate space
+      const deltaX = e.clientX - resizeStart.x;
 
-      // Calculate resize delta based on which corner is being dragged
-      let delta;
+      // Convert to image coordinate space
+      const scaledDeltaX = deltaX * (imageSize.width / rect.width);
 
-      // Direction depends on which corner we're dragging
+      // Based on which corner, determine how to apply the change
+      let sizeDelta = 0;
+      let newCropX = resizeStart.cropX;
+      let newCropY = resizeStart.cropY;
+
       switch (resizeCorner) {
         case "topLeft":
-          delta = -Math.max(dx, dy); // Negative because dragging left/up shrinks
+          // For top-left, negative X/Y movement makes the selection bigger
+          // Simplify to just use X movement for more predictable behavior
+          sizeDelta = -scaledDeltaX;
+          // Update both X and Y position to maintain square
+          newCropX = resizeStart.cropX - sizeDelta;
+          newCropY = resizeStart.cropY - sizeDelta;
           break;
         case "topRight":
-          delta = Math.max(-dy, dx); // Y is negative, X is positive
+          // For top-right, X grows with drag, Y shrinks
+          sizeDelta = scaledDeltaX;
+          newCropY = resizeStart.cropY - sizeDelta;
           break;
         case "bottomLeft":
-          delta = Math.max(-dx, dy); // X is negative, Y is positive
+          // For bottom-left, simplify to just use X movement
+          sizeDelta = -scaledDeltaX;
+          newCropX = resizeStart.cropX - sizeDelta;
           break;
         case "bottomRight":
-        default:
-          delta = Math.max(dx, dy); // Positive because dragging right/down grows
+          // For bottom-right, both grow with drag
+          sizeDelta = scaledDeltaX;
           break;
       }
-
-      // Apply scaling to maintain proportion with actual image dimensions
-      const scaledDelta = delta * scaleX;
 
       // Calculate new size
-      let newSize = resizeStart.size + scaledDelta;
+      let newSize = resizeStart.size + sizeDelta;
 
-      // Limit minimum size to 50px (scaled to image dimensions)
-      const minSize = 50 * scaleX;
-      newSize = Math.max(minSize, newSize);
+      // Apply minimum size constraint
+      const minSize = 50 * (imageSize.width / rect.width); // 50px in image coordinates
+      if (newSize < minSize) {
+        newSize = minSize;
 
-      // Limit maximum size to fit within image
-      let newX = crop.x;
-      let newY = crop.y;
-
-      // Adjust position based on which corner is being resized
-      // This keeps the opposite corner anchored
-      switch (resizeCorner) {
-        case "topLeft":
-          newX = crop.x + (cropSize - newSize);
-          newY = crop.y + (cropSize - newSize);
-          break;
-        case "topRight":
-          newY = crop.y + (cropSize - newSize);
-          break;
-        case "bottomLeft":
-          newX = crop.x + (cropSize - newSize);
-          break;
-        // bottomRight doesn't need position adjustment
+        // Adjust position based on which corner we're dragging
+        if (resizeCorner === "topLeft") {
+          newCropX = resizeStart.cropX + resizeStart.size - minSize;
+          newCropY = resizeStart.cropY + resizeStart.size - minSize;
+        } else if (resizeCorner === "topRight") {
+          newCropY = resizeStart.cropY + resizeStart.size - minSize;
+        } else if (resizeCorner === "bottomLeft") {
+          newCropX = resizeStart.cropX + resizeStart.size - minSize;
+        }
       }
 
-      // Check image boundaries
-      if (newX < 0) {
-        newSize = cropSize + crop.x;
-        newX = 0;
-      }
-      if (newY < 0) {
-        newSize = cropSize + crop.y;
-        newY = 0;
-      }
-      if (newX + newSize > imageSize.width) {
-        newSize = imageSize.width - newX;
-      }
-      if (newY + newSize > imageSize.height) {
-        newSize = imageSize.height - newY;
+      // Apply image boundary constraints
+      if (newCropX < 0) {
+        newSize += newCropX; // Reduce size by overflow amount
+        newCropX = 0;
       }
 
+      if (newCropY < 0) {
+        newSize += newCropY; // Reduce size by overflow amount
+        newCropY = 0;
+      }
+
+      if (newCropX + newSize > imageSize.width) {
+        newSize = imageSize.width - newCropX;
+      }
+
+      if (newCropY + newSize > imageSize.height) {
+        newSize = imageSize.height - newCropY;
+      }
+
+      // Update crop state
       setCropSize(newSize);
-      setCrop({ x: newX, y: newY });
+      setCrop({ x: newCropX, y: newCropY });
     }
   };
 
@@ -220,7 +235,7 @@ export default function ImageCropper({
     height: `${handleSize}px`,
     position: "absolute" as const,
     background: "white",
-    border: "2px solid rgb(34, 211, 238)", // cyan-400
+    border: "2px solid rgb(34, 211, 238)",
     borderRadius: "2px",
     zIndex: 10,
   };
@@ -236,7 +251,7 @@ export default function ImageCropper({
 
       <div
         ref={containerRef}
-        className="relative mx-auto mb-4 cursor-move bg-gray-900 rounded overflow-hidden"
+        className="relative mx-auto mb-4 cursor-move bg-gray-900 rounded overflow-hidden flex items-center justify-center"
         style={{
           width: "100%",
           maxWidth: "500px",
@@ -258,14 +273,14 @@ export default function ImageCropper({
             unoptimized
           />
 
-          {/* Crop overlay */}
+          {/* Crop overlay - always square */}
           <div
             className="absolute border-2 border-cyan-400 shadow-lg"
             style={{
               left: `${(crop.x / imageSize.width) * 100}%`,
               top: `${(crop.y / imageSize.height) * 100}%`,
               width: `${(cropSize / imageSize.width) * 100}%`,
-              height: `${(cropSize / imageSize.height) * 100}%`,
+              aspectRatio: "1 / 1", // Force square aspect ratio
               boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
             }}
           >
