@@ -36,12 +36,12 @@ export default function ShuffleMasterGame({
     if (typeof window !== "undefined") {
       // Start with a size that's likely close to final to minimize jumps
       return Math.min(
-        window.innerWidth < 768 ? window.innerWidth * 0.9 : 550,
-        600
+        window.innerWidth < 768 ? window.innerWidth * 0.9 : 450,
+        500
       );
     }
     // Default fallback for server rendering
-    return 550;
+    return 450;
   });
 
   const [sizingComplete, setSizingComplete] = useState(false);
@@ -62,7 +62,7 @@ export default function ShuffleMasterGame({
 
     // Set minimum and maximum sizes
     const minSize = Math.min(300, containerWidth * 0.9); // Min size, but not larger than 90% of container on small screens
-    const maxSize = 600; // Max size to prevent it from becoming too large
+    const maxSize = 500; // Max size to prevent it from becoming too large
 
     // Ensure board size stays within bounds
     const newSize = Math.max(minSize, Math.min(containerWidth * 0.95, maxSize));

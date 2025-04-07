@@ -231,7 +231,10 @@ export default function ShuffleMaster() {
               onReset={resetGame}
             />
 
-            <div className="mt-2 flex justify-between">
+            <div
+              className="mt-2 flex justify-between w-full mx-auto"
+              style={{ maxWidth: "500px" }}
+            >
               <div className="relative inline-block">
                 <button
                   ref={howToPlayButtonRef}
@@ -276,7 +279,10 @@ export default function ShuffleMaster() {
                       }
                     }}
                   ></div>
-                  <div className="relative bg-indigo-900/80 backdrop-blur-sm text-white p-5 rounded-lg shadow-lg max-w-md mx-4 border border-cyan-500/30 z-10">
+                  <div
+                    className="relative bg-indigo-900/80 backdrop-blur-sm text-white p-5 rounded-lg shadow-lg max-w-md mx-auto border border-cyan-500/30 z-10"
+                    style={{ maxWidth: "min(500px, 90vw)" }}
+                  >
                     <button
                       className="absolute top-2 right-2 text-white hover:text-cyan-300 focus:outline-none cursor-pointer"
                       onClick={() => {
@@ -354,7 +360,10 @@ export default function ShuffleMaster() {
                       }
                     }}
                   ></div>
-                  <div className="relative bg-indigo-900/80 backdrop-blur-sm text-white p-5 rounded-lg shadow-lg mx-4 border border-cyan-500/30 z-10">
+                  <div
+                    className="relative bg-indigo-900/80 backdrop-blur-sm text-white p-5 rounded-lg shadow-lg mx-auto border border-cyan-500/30 z-10"
+                    style={{ width: "90%", maxWidth: "450px" }}
+                  >
                     <button
                       className="absolute top-2 right-2 text-white hover:text-cyan-300 focus:outline-none cursor-pointer"
                       onClick={() => {
@@ -372,13 +381,13 @@ export default function ShuffleMaster() {
                     <h3 className="font-bold text-cyan-400 mb-3 text-center text-xl">
                       Reference Image
                     </h3>
-                    <div className="w-52 h-52 relative mx-auto">
+                    <div className="w-[380px] h-[380px] max-w-[90%] max-h-[90vw] relative mx-auto">
                       <Image
                         src={userImage!}
                         alt="Original image"
                         fill
                         className="object-contain rounded"
-                        sizes="208px"
+                        sizes="(max-width: 768px) 90vw, 380px"
                       />
                     </div>
                   </div>
