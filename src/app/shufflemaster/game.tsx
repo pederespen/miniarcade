@@ -32,10 +32,10 @@ export default function ShuffleMasterGame({
   const [endTime, setEndTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  // Use a ref for the initial size calculation to avoid unnecessary state updates
-  const [boardSize, setBoardSize] = useState(450); // Start with a default
+  // Remove default size and add sizeCalculated state
+  const [boardSize, setBoardSize] = useState(0);
+  const [sizeCalculated, setSizeCalculated] = useState(false);
   const gameContainerRef = useRef<HTMLDivElement>(null);
-  const initialSizeCalculatedRef = useRef(false);
 
   const totalTiles = gridSize * gridSize;
 
@@ -57,31 +57,20 @@ export default function ShuffleMasterGame({
     // Ensure board size stays within bounds
     const newSize = Math.max(minSize, Math.min(containerWidth * 0.95, maxSize));
 
-    // Update the board size if it's the initial calculation or a significant change
-    if (
-      !initialSizeCalculatedRef.current ||
-      Math.abs(newSize - boardSize) > 5
-    ) {
+    // Update the board size if it's significantly different
+    if (Math.abs(newSize - boardSize) > 5 || !sizeCalculated) {
       setBoardSize(newSize);
+      setSizeCalculated(true);
       if (onBoardSizeChange) {
         onBoardSizeChange(newSize);
       }
-
-      if (!initialSizeCalculatedRef.current) {
-        initialSizeCalculatedRef.current = true;
-      }
     }
-  }, [boardSize, onBoardSizeChange]);
+  }, [boardSize, onBoardSizeChange, sizeCalculated]);
 
   // Force an immediate size calculation after the component is mounted
   useEffect(() => {
-    // Ensure we calculate the size right after first render
-    requestAnimationFrame(() => {
-      updateBoardSize();
-
-      // Calculate size again after a short delay to catch any layout changes
-      setTimeout(updateBoardSize, 50);
-    });
+    // Add a slight delay to ensure the parent is rendered
+    setTimeout(updateBoardSize, 0);
   }, [updateBoardSize]);
 
   // Set up resize observer to detect container size changes
@@ -330,8 +319,22 @@ export default function ShuffleMasterGame({
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
+  // Loading state needs the ref to be attached to properly calculate size
   if (isLoading) {
-    return <div className="text-white">Loading game...</div>;
+    return (
+      <div className="flex flex-col items-center w-full" ref={gameContainerRef}>
+        <div className="text-white">Loading game...</div>
+      </div>
+    );
+  }
+
+  // Don't render the board until we've calculated its size
+  if (!sizeCalculated || boardSize === 0) {
+    return (
+      <div className="flex flex-col items-center w-full" ref={gameContainerRef}>
+        <div className="text-white">Calculating board size...</div>
+      </div>
+    );
   }
 
   return (
@@ -341,7 +344,6 @@ export default function ShuffleMasterGame({
         style={{
           width: `${boardSize}px`,
           height: `${boardSize}px`,
-          transition: "width 0.2s, height 0.2s",
           maxWidth: "100%",
           aspectRatio: "1/1",
         }}
@@ -354,7 +356,7 @@ export default function ShuffleMasterGame({
             <div
               key={tile.id}
               onClick={() => moveTile(index)}
-              className={`absolute cursor-pointer transition-all duration-150 ${
+              className={`absolute cursor-pointer ${
                 isSolved ? "opacity-100" : "hover:opacity-90"
               }`}
               style={{
