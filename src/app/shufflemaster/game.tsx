@@ -32,22 +32,10 @@ export default function ShuffleMasterGame({
   const [endTime, setEndTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  // Use a state initializer function to safely access window
-  const [boardSize, setBoardSize] = useState(() => {
-    // Safe check for window - only runs in browser
-    if (typeof window !== "undefined") {
-      // Start with a size that's likely close to final to minimize jumps
-      return Math.min(
-        window.innerWidth < 768 ? window.innerWidth * 0.9 : 450,
-        500
-      );
-    }
-    // Default fallback for server rendering
-    return 450;
-  });
-
-  const [sizingComplete, setSizingComplete] = useState(false);
+  // Use a ref for the initial size calculation to avoid unnecessary state updates
+  const [boardSize, setBoardSize] = useState(450); // Start with a default
   const gameContainerRef = useRef<HTMLDivElement>(null);
+  const initialSizeCalculatedRef = useRef(false);
 
   const totalTiles = gridSize * gridSize;
 
@@ -63,38 +51,50 @@ export default function ShuffleMasterGame({
     const containerWidth = parentElement.offsetWidth;
 
     // Set minimum and maximum sizes
-    const minSize = Math.min(300, containerWidth * 0.9); // Min size, but not larger than 90% of container on small screens
-    const maxSize = 500; // Max size to prevent it from becoming too large
+    const minSize = Math.min(300, containerWidth * 0.9);
+    const maxSize = 500;
 
     // Ensure board size stays within bounds
     const newSize = Math.max(minSize, Math.min(containerWidth * 0.95, maxSize));
 
-    // Only update if the size difference is significant (prevents minor adjustments)
-    if (Math.abs(newSize - boardSize) > 10 || !sizingComplete) {
+    // Update the board size if it's the initial calculation or a significant change
+    if (
+      !initialSizeCalculatedRef.current ||
+      Math.abs(newSize - boardSize) > 5
+    ) {
       setBoardSize(newSize);
       if (onBoardSizeChange) {
         onBoardSizeChange(newSize);
       }
-      if (!sizingComplete) setSizingComplete(true);
+
+      if (!initialSizeCalculatedRef.current) {
+        initialSizeCalculatedRef.current = true;
+      }
     }
-  }, [boardSize, sizingComplete, onBoardSizeChange]);
+  }, [boardSize, onBoardSizeChange]);
+
+  // Force an immediate size calculation after the component is mounted
+  useEffect(() => {
+    // Ensure we calculate the size right after first render
+    requestAnimationFrame(() => {
+      updateBoardSize();
+
+      // Calculate size again after a short delay to catch any layout changes
+      setTimeout(updateBoardSize, 50);
+    });
+  }, [updateBoardSize]);
 
   // Set up resize observer to detect container size changes
   useEffect(() => {
     if (!gameContainerRef.current) return;
 
-    // Create a ResizeObserver to watch the parent element's size
     const resizeObserver = new ResizeObserver(() => {
       updateBoardSize();
     });
 
-    // Observe the parent element if it exists
     const parentElement = gameContainerRef.current.parentElement;
     if (parentElement) {
       resizeObserver.observe(parentElement);
-
-      // Run initial size calculation immediately
-      updateBoardSize();
     }
 
     // Clean up on unmount
@@ -341,6 +341,9 @@ export default function ShuffleMasterGame({
         style={{
           width: `${boardSize}px`,
           height: `${boardSize}px`,
+          transition: "width 0.2s, height 0.2s",
+          maxWidth: "100%",
+          aspectRatio: "1/1",
         }}
       >
         {tiles.map((tile, index) => {

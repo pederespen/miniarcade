@@ -198,15 +198,17 @@ export default function ShuffleMaster() {
         </div>
       ) : (
         <div className="flex flex-col items-center w-full">
-          <div className="relative w-full max-w-2xl mx-auto">
-            <div ref={gameContainerRef}>
-              <ShuffleMasterGame
-                imageUrl={userImage!}
-                gridSize={gridSize}
-                onReset={resetGame}
-                onBoardSizeChange={handleBoardSizeChange}
-              />
-            </div>
+          <div
+            className="relative w-full max-w-2xl mx-auto"
+            style={{ minHeight: "520px" }}
+            ref={gameContainerRef}
+          >
+            <ShuffleMasterGame
+              imageUrl={userImage!}
+              gridSize={gridSize}
+              onReset={resetGame}
+              onBoardSizeChange={handleBoardSizeChange}
+            />
 
             <div
               className="mt-1 flex justify-between w-full mx-auto"
