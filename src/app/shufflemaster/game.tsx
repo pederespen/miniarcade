@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 // Set to true for testing (one move to solve), false for regular gameplay
-const DEV_MODE = true;
+const DEV_MODE = false;
 
 interface Tile {
   id: number;

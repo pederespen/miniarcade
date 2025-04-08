@@ -153,11 +153,6 @@ export default function ShuffleMaster() {
                         sizes="(max-width: 768px) 100vw, 33vw"
                       />
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 p-2">
-                      <p className="text-xs text-white truncate text-center">
-                        {image.name}
-                      </p>
-                    </div>
                   </div>
                 ))}
               </div>
@@ -291,6 +286,11 @@ export default function ShuffleMaster() {
                       </li>
                       <li>Complete the puzzle in as few moves as possible</li>
                     </ul>
+                    <p className="text-xs text-cyan-300/70 mt-4 italic text-center">
+                      Hint: Try to complete one layer at a time from the top.
+                      When you have two layers left, complete it from left to
+                      right.
+                    </p>
                   </div>
                 </div>
               </div>
