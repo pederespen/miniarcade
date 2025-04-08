@@ -11,16 +11,14 @@ export default function Home() {
     },
     {
       id: "game1",
-      title: "Game 1",
-      description:
-        "This is a placeholder for game 1. Description would go here.",
+      title: "Coming Soon",
+      description: "🚧 🏗️ 👷",
       imageUrl: "/images/game1.png",
     },
     {
       id: "game2",
-      title: "Game 2",
-      description:
-        "This is a placeholder for game 2. Description would go here.",
+      title: "Coming Soon",
+      description: "🚧 🏗️ 👷",
       imageUrl: "/images/game2.png",
     },
   ];

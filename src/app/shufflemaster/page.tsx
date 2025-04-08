@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import ShuffleMasterGame from "./game";
-import ImageUploader from "./image-uploader";
 
 // Preset images for users to choose from
 const presetImages = [
@@ -28,7 +27,6 @@ export default function ShuffleMaster() {
   const [userImage, setUserImage] = useState<string | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [gridSize, setGridSize] = useState(3); // Default 3x3
-  const [imageSource, setImageSource] = useState<"upload" | "preset">("upload");
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
   const [selectingImage, setSelectingImage] = useState(true);
   const [gameBoardSize, setGameBoardSize] = useState<number>(500);
@@ -86,11 +84,6 @@ export default function ShuffleMaster() {
     };
   }, []);
 
-  const handleImageUploaded = (imageDataUrl: string) => {
-    setUserImage(imageDataUrl);
-    setSelectingImage(false);
-  };
-
   const handlePresetSelect = (imageUrl: string, id: number) => {
     setUserImage(imageUrl);
     setSelectedPresetId(id);
@@ -139,61 +132,35 @@ export default function ShuffleMaster() {
 
           {selectingImage ? (
             <div className="mb-6">
-              <div className="flex border-b border-indigo-700 mb-4">
-                <button
-                  className={`py-2 px-4 cursor-pointer ${
-                    imageSource === "upload"
-                      ? "text-cyan-400 border-b-2 border-cyan-400"
-                      : "text-indigo-300 hover:text-indigo-100"
-                  }`}
-                  onClick={() => setImageSource("upload")}
-                >
-                  Upload Image
-                </button>
-                <button
-                  className={`py-2 px-4 cursor-pointer ${
-                    imageSource === "preset"
-                      ? "text-cyan-400 border-b-2 border-cyan-400"
-                      : "text-indigo-300 hover:text-indigo-100"
-                  }`}
-                  onClick={() => setImageSource("preset")}
-                >
-                  Preset Images
-                </button>
-              </div>
-
-              {imageSource === "upload" ? (
-                <ImageUploader onImageUploaded={handleImageUploaded} />
-              ) : (
-                <div className="grid grid-cols-3 gap-4">
-                  {presetImages.map((image) => (
-                    <div
-                      key={image.id}
-                      className={`relative cursor-pointer rounded-lg overflow-hidden transition-all hover:opacity-90 ${
-                        selectedPresetId === image.id
-                          ? "ring-2 ring-cyan-400 transform scale-[1.02]"
-                          : ""
-                      }`}
-                      onClick={() => handlePresetSelect(image.url, image.id)}
-                    >
-                      <div className="aspect-square relative">
-                        <Image
-                          src={image.url}
-                          alt={image.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                        />
-                      </div>
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 p-2">
-                        <p className="text-xs text-white truncate text-center">
-                          {image.name}
-                        </p>
-                      </div>
+              <h3 className="text-indigo-100 mb-4">Select an Image</h3>
+              <div className="grid grid-cols-3 gap-4">
+                {presetImages.map((image) => (
+                  <div
+                    key={image.id}
+                    className={`relative cursor-pointer rounded-lg overflow-hidden transition-all hover:opacity-90 ${
+                      selectedPresetId === image.id
+                        ? "ring-2 ring-cyan-400 transform scale-[1.02]"
+                        : ""
+                    }`}
+                    onClick={() => handlePresetSelect(image.url, image.id)}
+                  >
+                    <div className="aspect-square relative">
+                      <Image
+                        src={image.url}
+                        alt={image.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
                     </div>
-                  ))}
-                </div>
-              )}
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 p-2">
+                      <p className="text-xs text-white truncate text-center">
+                        {image.name}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             userImage && (
