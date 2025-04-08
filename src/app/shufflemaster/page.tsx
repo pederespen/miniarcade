@@ -9,17 +9,17 @@ const presetImages = [
   {
     id: 1,
     name: "Simple Geometric",
-    url: "/images/puzzles/simple.svg",
+    url: "./images/puzzles/simple.svg",
   },
   {
     id: 2,
     name: "Landscape Scene",
-    url: "/images/puzzles/medium.svg",
+    url: "./images/puzzles/medium.svg",
   },
   {
     id: 3,
     name: "Space Adventure",
-    url: "/images/puzzles/complex.svg",
+    url: "./images/puzzles/complex.svg",
   },
 ];
 
