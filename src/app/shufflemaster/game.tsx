@@ -248,7 +248,7 @@ export default function ShuffleMasterGame({
 
     setTiles(shuffledTiles);
     setIsLoading(false);
-  }, [gridSize, totalTiles, devShuffleTiles, shuffleTiles]);
+  }, [totalTiles, devShuffleTiles, shuffleTiles]);
 
   // Initialize tiles
   useEffect(() => {
