@@ -118,39 +118,75 @@ export default function ShuffleMasterGame({
     }
   }, [isLoading, isSolved, startTime]);
 
-  // Check if the puzzle is solvable (using inversion count)
-  const isSolvable = useCallback((tiles: Tile[], size: number) => {
-    // Convert to 1D array without empty tile
-    const flatTiles = tiles.filter((t) => !t.isEmpty).map((t) => t.id);
+  // Fisher-Yates shuffle algorithm - for regular gameplay
+  const shuffleTiles = useCallback(
+    (tilesArray: Tile[]) => {
+      // Start with a solved puzzle (already in order)
+      // Then perform a series of random valid moves
 
-    // Count inversions
-    let inversions = 0;
-    for (let i = 0; i < flatTiles.length; i++) {
-      for (let j = i + 1; j < flatTiles.length; j++) {
-        if (flatTiles[i] > flatTiles[j]) {
-          inversions++;
-        }
+      // The number of random moves to perform - adjust based on grid size for appropriate difficulty
+      // More moves for larger puzzles
+      const numMoves = gridSize * gridSize * 20; // e.g., 180 moves for a 3x3, 320 for a 4x4
+
+      // Find the empty tile
+      const emptyTileIndex = tilesArray.findIndex((t) => t.isEmpty);
+      let emptyPos = tilesArray[emptyTileIndex].currentPos;
+
+      // Perform random valid moves
+      for (let i = 0; i < numMoves; i++) {
+        // Get valid adjacent positions to the empty tile
+        const validMoves = getValidMoves(emptyPos, gridSize);
+
+        // Choose a random valid move
+        const randomMoveIndex = Math.floor(Math.random() * validMoves.length);
+        const tileToMovePos = validMoves[randomMoveIndex];
+
+        // Find the tile at this position
+        const tileToMoveIndex = tilesArray.findIndex(
+          (t) => t.currentPos === tileToMovePos
+        );
+
+        // Swap positions
+        tilesArray[tileToMoveIndex].currentPos = emptyPos;
+        tilesArray[emptyTileIndex].currentPos = tileToMovePos;
+
+        // Update empty position for next iteration
+        emptyPos = tileToMovePos;
       }
+
+      return tilesArray;
+    },
+    [gridSize]
+  );
+
+  // Helper function to get valid moves for the empty tile
+  const getValidMoves = (emptyPos: number, size: number) => {
+    const row = Math.floor(emptyPos / size);
+    const col = emptyPos % size;
+    const validMoves: number[] = [];
+
+    // Check above
+    if (row > 0) {
+      validMoves.push(emptyPos - size);
     }
 
-    // Empty tile's row position from bottom (0-indexed)
-    const emptyTilePos = tiles.find((t) => t.isEmpty)!.currentPos;
-    const emptyRow = Math.floor(emptyTilePos / size);
-    const emptyRowFromBottom = size - 1 - emptyRow;
+    // Check below
+    if (row < size - 1) {
+      validMoves.push(emptyPos + size);
+    }
 
-    // For odd grid size, solvable if inversions even
-    if (size % 2 === 1) {
-      return inversions % 2 === 0;
+    // Check left
+    if (col > 0) {
+      validMoves.push(emptyPos - 1);
     }
-    // For even grid size, solvable if:
-    // (inversions odd && empty on even row from bottom) || (inversions even && empty on odd row from bottom)
-    else {
-      return (
-        (inversions % 2 === 1 && emptyRowFromBottom % 2 === 0) ||
-        (inversions % 2 === 0 && emptyRowFromBottom % 2 === 1)
-      );
+
+    // Check right
+    if (col < size - 1) {
+      validMoves.push(emptyPos + 1);
     }
-  }, []);
+
+    return validMoves;
+  };
 
   // Super simple test function - creates a solved puzzle with just the last two tiles swapped
   const devShuffleTiles = useCallback(
@@ -182,18 +218,6 @@ export default function ShuffleMasterGame({
     [totalTiles]
   );
 
-  // Fisher-Yates shuffle algorithm - for regular gameplay
-  const shuffleTiles = useCallback((tilesArray: Tile[]) => {
-    for (let i = tilesArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      // Swap positions, not IDs
-      const temp = tilesArray[i].currentPos;
-      tilesArray[i].currentPos = tilesArray[j].currentPos;
-      tilesArray[j].currentPos = temp;
-    }
-    return tilesArray;
-  }, []);
-
   // Use useCallback to prevent re-creation on every render
   const initializeGame = useCallback(() => {
     setIsLoading(true);
@@ -219,23 +243,12 @@ export default function ShuffleMasterGame({
       ? devShuffleTiles([...initialTiles])
       : shuffleTiles([...initialTiles]);
 
-    // Make sure the puzzle is solvable
-    if (!isSolvable(shuffledTiles, gridSize)) {
-      // Swap two non-empty tiles to make it solvable
-      const tile1 = shuffledTiles.findIndex((t) => !t.isEmpty);
-      const tile2 = shuffledTiles.findIndex(
-        (t, i) => !t.isEmpty && i !== tile1
-      );
-
-      // Swap their positions
-      const temp = shuffledTiles[tile1].currentPos;
-      shuffledTiles[tile1].currentPos = shuffledTiles[tile2].currentPos;
-      shuffledTiles[tile2].currentPos = temp;
-    }
+    // Since we're shuffling by making valid moves, the puzzle is guaranteed to be solvable
+    // No need for solvability check or fixes
 
     setTiles(shuffledTiles);
     setIsLoading(false);
-  }, [gridSize, totalTiles, devShuffleTiles, shuffleTiles, isSolvable]);
+  }, [gridSize, totalTiles, devShuffleTiles, shuffleTiles]);
 
   // Initialize tiles
   useEffect(() => {
