@@ -413,7 +413,7 @@ export default function ShuffleMasterGame({
                   onClick={initializeGame}
                   className="px-6 py-2 bg-indigo-700 hover:bg-indigo-600 text-white rounded-lg font-bold cursor-pointer"
                 >
-                  Play Again
+                  Shuffle
                 </button>
                 <button
                   onClick={onReset}
