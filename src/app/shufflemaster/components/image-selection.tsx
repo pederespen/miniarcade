@@ -39,9 +39,9 @@ export function ImageSelector({
   return (
     <div className="mb-6">
       {/* Tabs */}
-      <div className="flex border-b border-indigo-700 mb-4">
+      <div className="flex justify-center sm:justify-start border-b border-indigo-700 mb-4">
         <button
-          className={`py-2 px-4 font-medium ${
+          className={`flex-1 sm:flex-initial py-2 px-3 sm:px-4 text-sm sm:text-base font-medium ${
             activeTab === "presets"
               ? "text-cyan-500 border-b-2 border-cyan-500"
               : "text-indigo-300 hover:text-indigo-100"
@@ -51,7 +51,7 @@ export function ImageSelector({
           Preset Images
         </button>
         <button
-          className={`py-2 px-4 font-medium ${
+          className={`flex-1 sm:flex-initial py-2 px-3 sm:px-4 text-sm sm:text-base font-medium ${
             activeTab === "upload"
               ? "text-cyan-500 border-b-2 border-cyan-500"
               : "text-indigo-300 hover:text-indigo-100"
@@ -66,11 +66,11 @@ export function ImageSelector({
       {activeTab === "presets" ? (
         <div>
           <h3 className="text-indigo-100 mb-4">Select a Preset Image</h3>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="flex overflow-x-auto pb-4 sm:grid sm:grid-cols-3 gap-4">
             {presetImages.map((image) => (
               <div
                 key={image.id}
-                className={`relative cursor-pointer rounded-lg overflow-hidden transition-all hover:opacity-90 ${
+                className={`relative flex-shrink-0 w-[150px] sm:w-auto cursor-pointer rounded-lg overflow-hidden transition-all hover:opacity-90 ${
                   selectedPresetId === image.id
                     ? "ring-2 ring-cyan-400 transform scale-[1.02]"
                     : ""
@@ -83,7 +83,7 @@ export function ImageSelector({
                     alt={image.name}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    sizes="(max-width: 640px) 150px, (max-width: 768px) 33vw, 250px"
                   />
                 </div>
               </div>
@@ -135,11 +135,11 @@ export function GridSizeSelector({
   return (
     <div className="mb-6">
       <label className="block text-indigo-100 mb-2">Grid Size</label>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
         {[3, 4, 5, 6, 7].map((size) => (
           <button
             key={size}
-            className={`px-4 py-2 rounded cursor-pointer ${
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded cursor-pointer transition-colors ${
               gridSize === size
                 ? "bg-cyan-500 text-white"
                 : "bg-indigo-700 text-indigo-100 hover:bg-indigo-600"
