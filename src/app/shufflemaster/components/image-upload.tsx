@@ -82,8 +82,14 @@ export function ImageUpload({
     // Set canvas size to the crop dimensions
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
-    canvas.width = completedCrop.width;
-    canvas.height = completedCrop.height;
+
+    // Use larger dimensions to maintain quality, especially on mobile
+    canvas.width = completedCrop.width * scaleX;
+    canvas.height = completedCrop.height * scaleY;
+
+    // Set canvas properties for better quality
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
 
     // Draw the cropped image
     ctx.drawImage(
@@ -94,8 +100,8 @@ export function ImageUpload({
       completedCrop.height * scaleY,
       0,
       0,
-      completedCrop.width,
-      completedCrop.height
+      canvas.width,
+      canvas.height
     );
 
     // Convert to data URL and pass to parent
@@ -116,14 +122,12 @@ export function ImageUpload({
         };
       },
       "image/jpeg",
-      0.95 // Quality
+      1.0 // Increased quality to maximum (1.0)
     );
   }, [completedCrop, onImageCropped]);
 
   return (
     <div className="flex flex-col items-center">
-      <h3 className="text-indigo-100 mb-4">Choose Image to Upload</h3>
-
       {!imgSrc ? (
         <div className="mb-4 w-full max-w-md">
           <label className="flex flex-col items-center justify-center w-full h-44 border-2 border-indigo-400 border-dashed rounded-lg cursor-pointer bg-indigo-800/30 hover:bg-indigo-800/50">
@@ -176,9 +180,6 @@ export function ImageUpload({
               />
             </ReactCrop>
           </div>
-          <p className="text-indigo-300 text-sm mb-4 text-center">
-            Drag the crop box to select a square portion of your image
-          </p>
           <div className="flex space-x-4">
             <button
               type="button"
@@ -194,7 +195,7 @@ export function ImageUpload({
               className="py-2 px-4 rounded bg-cyan-500 text-white hover:bg-cyan-600 disabled:opacity-50"
               disabled={!completedCrop || isLoading}
             >
-              {isLoading ? "Processing..." : "Use This Image"}
+              {isLoading ? "Processing..." : "Select"}
             </button>
           </div>
         </div>
