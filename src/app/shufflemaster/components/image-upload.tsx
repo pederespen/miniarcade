@@ -161,13 +161,13 @@ export function ImageUpload({
         </div>
       ) : (
         <div className="flex flex-col items-center mb-4 w-full">
-          <div className="max-w-md w-full mb-4 overflow-hidden bg-indigo-900/30 p-4 rounded-lg">
+          <div className="max-w-md w-full mb-4 overflow-hidden bg-indigo-900/30 p-4 rounded-lg flex justify-center">
             <ReactCrop
               crop={crop}
               onChange={(c: Crop) => setCrop(c)}
               onComplete={(c: PixelCrop) => setCompletedCrop(c)}
               aspect={1}
-              className="max-w-full h-auto"
+              className="max-w-full max-h-[256px] overflow-auto"
             >
               {/* Need to use a regular img tag for ReactCrop to work with refs */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -175,7 +175,7 @@ export function ImageUpload({
                 ref={imgRef}
                 src={imgSrc}
                 alt="Upload"
-                className="max-w-full h-auto"
+                className="max-w-full max-h-[256px] object-contain"
                 onLoad={onImageLoad}
               />
             </ReactCrop>

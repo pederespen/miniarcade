@@ -29,10 +29,6 @@ export function GameSetup({
 }) {
   return (
     <div className="bg-black rounded-lg p-6 shadow-lg">
-      <h2 className="text-xl text-cyan-400 font-bold mb-6">
-        ShuffleMaster Setup
-      </h2>
-
       <GridSizeSelector
         gridSize={gridSize}
         onGridSizeChange={onGridSizeChange}

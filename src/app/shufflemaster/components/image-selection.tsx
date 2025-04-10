@@ -109,14 +109,15 @@ export function SelectedImageDisplay({
   isCustomImage?: boolean;
 }) {
   return (
-    <div className="mb-6 flex flex-col items-center">
-      <div className="w-64 h-64 mx-auto relative mb-4 rounded-lg overflow-hidden border-2 border-indigo-500">
+    <div className="mb-6 flex flex-col items-center justify-center">
+      <div className="w-auto h-auto max-w-[256px] max-h-[256px] mx-auto relative mb-4 rounded-lg overflow-hidden border-2 border-indigo-500">
         <Image
           src={imageUrl}
           alt="Selected image"
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 256px"
+          width={192}
+          height={192}
+          className="object-contain"
+          sizes="256px"
           unoptimized={isCustomImage} // Skip Next.js optimization for data URLs
         />
       </div>
