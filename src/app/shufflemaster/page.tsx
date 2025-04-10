@@ -12,6 +12,7 @@ export default function ShuffleMaster() {
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
   const [selectingImage, setSelectingImage] = useState(true);
   const [gameBoardSize, setGameBoardSize] = useState<number>(500);
+  const [isCustomImage, setIsCustomImage] = useState(false);
 
   // Use custom tooltip hooks
   const {
@@ -36,6 +37,8 @@ export default function ShuffleMaster() {
   const handlePresetSelect = (imageUrl: string, id: number) => {
     setUserImage(imageUrl);
     setSelectedPresetId(id);
+    // Check if this is a custom image (id = -1)
+    setIsCustomImage(id === -1);
     setSelectingImage(false);
   };
 
@@ -48,12 +51,14 @@ export default function ShuffleMaster() {
     setUserImage(null);
     setSelectedPresetId(null);
     setSelectingImage(true);
+    setIsCustomImage(false);
   };
 
   const selectDifferentImage = () => {
     setUserImage(null);
     setSelectedPresetId(null);
     setSelectingImage(true);
+    setIsCustomImage(false);
   };
 
   return (
@@ -68,6 +73,7 @@ export default function ShuffleMaster() {
           selectingImage={selectingImage}
           onStartGame={startGame}
           onSelectDifferentImage={selectDifferentImage}
+          isCustomImage={isCustomImage}
         />
       ) : (
         userImage && (
@@ -85,6 +91,7 @@ export default function ShuffleMaster() {
             helpButtonRef={helpButtonRef}
             toggleHelpTooltip={toggleHelpTooltip}
             hideHelpTooltip={hideHelpTooltip}
+            isCustomImage={isCustomImage}
           />
         )
       )}

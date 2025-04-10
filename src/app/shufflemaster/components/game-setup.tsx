@@ -15,6 +15,7 @@ export function GameSetup({
   selectingImage,
   onStartGame,
   onSelectDifferentImage,
+  isCustomImage = false,
 }: {
   gridSize: number;
   onGridSizeChange: (size: number) => void;
@@ -24,9 +25,14 @@ export function GameSetup({
   selectingImage: boolean;
   onStartGame: () => void;
   onSelectDifferentImage: () => void;
+  isCustomImage?: boolean;
 }) {
   return (
     <div className="bg-black rounded-lg p-6 shadow-lg">
+      <h2 className="text-xl text-cyan-400 font-bold mb-6">
+        ShuffleMaster Setup
+      </h2>
+
       <GridSizeSelector
         gridSize={gridSize}
         onGridSizeChange={onGridSizeChange}
@@ -38,7 +44,12 @@ export function GameSetup({
           selectedPresetId={selectedPresetId}
         />
       ) : (
-        userImage && <SelectedImageDisplay imageUrl={userImage} />
+        userImage && (
+          <SelectedImageDisplay
+            imageUrl={userImage}
+            isCustomImage={isCustomImage}
+          />
+        )
       )}
 
       {userImage && !selectingImage && (

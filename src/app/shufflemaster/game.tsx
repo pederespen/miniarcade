@@ -11,6 +11,7 @@ export default function ShuffleMasterGame({
   gridSize,
   onReset,
   onBoardSizeChange,
+  isCustomImage = false,
 }: ShuffleGameProps) {
   // Get responsive board size
   const { boardSize, sizeCalculated, containerRef } = useBoardSize({
@@ -57,6 +58,7 @@ export default function ShuffleMasterGame({
         imageUrl={imageUrl}
         isSolved={isSolved}
         onMoveTile={moveTile}
+        isCustomImage={isCustomImage}
       />
 
       {/* Win popup modal */}

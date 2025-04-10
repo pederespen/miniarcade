@@ -11,6 +11,7 @@ export interface ShuffleGameProps {
   gridSize: number;
   onReset: () => void;
   onBoardSizeChange?: (size: number) => void;
+  isCustomImage?: boolean;
 }
 
 // For game development/testing

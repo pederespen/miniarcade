@@ -17,6 +17,7 @@ export function GamePlay({
   helpButtonRef,
   toggleHelpTooltip,
   hideHelpTooltip,
+  isCustomImage = false,
 }: {
   userImage: string;
   gridSize: number;
@@ -35,6 +36,7 @@ export function GamePlay({
     otherTooltipRef?: React.RefObject<HTMLDivElement | null>
   ) => void;
   hideHelpTooltip: () => void;
+  isCustomImage?: boolean;
 }) {
   const gameContainerRef = useRef<HTMLDivElement>(null);
 
@@ -50,6 +52,7 @@ export function GamePlay({
           gridSize={gridSize}
           onReset={onReset}
           onBoardSizeChange={onBoardSizeChange}
+          isCustomImage={isCustomImage}
         />
         <GameplayControls
           howToPlayTooltipRef={howToPlayTooltipRef}

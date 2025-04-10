@@ -7,6 +7,7 @@ interface GameBoardProps {
   imageUrl: string;
   isSolved: boolean;
   onMoveTile: (tileIndex: number) => void;
+  isCustomImage?: boolean;
 }
 
 export default function GameBoard({
@@ -16,6 +17,7 @@ export default function GameBoard({
   imageUrl,
   isSolved,
   onMoveTile,
+  isCustomImage = false,
 }: GameBoardProps) {
   // Calculate tile size based on board size
   const tileSize = boardSize / gridSize;
