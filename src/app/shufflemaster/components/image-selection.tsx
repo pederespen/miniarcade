@@ -6,18 +6,18 @@ import { ImageUpload } from "./image-upload";
 export const presetImages = [
   {
     id: 1,
-    name: "Simple Geometric",
-    url: "./images/puzzles/simple.svg",
+    name: "preset_1",
+    url: "./images/puzzles/preset_1.svg",
   },
   {
     id: 2,
-    name: "Landscape Scene",
-    url: "./images/puzzles/medium.svg",
+    name: "preset_2",
+    url: "./images/puzzles/preset_2.svg",
   },
   {
     id: 3,
-    name: "Space Adventure",
-    url: "./images/puzzles/complex.svg",
+    name: "Preset_3",
+    url: "./images/puzzles/preset_3.svg",
   },
 ];
 

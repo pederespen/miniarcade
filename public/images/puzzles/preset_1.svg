@@ -1,0 +1,112 @@
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Light background -->
+  <rect width="800" height="800" fill="#e8f4f8"/>
+  
+  <!-- Large central flower -->
+  <circle cx="400" cy="400" r="80" fill="#ffcc29"/>
+  <circle cx="400" cy="400" r="50" fill="#ff6b6b"/>
+  
+  <!-- Petals for central flower -->
+  <ellipse cx="400" cy="280" rx="70" ry="90" fill="#ff85a1"/>
+  <ellipse cx="400" cy="520" rx="70" ry="90" fill="#ff85a1"/>
+  <ellipse cx="280" cy="400" rx="90" ry="70" fill="#ff85a1"/>
+  <ellipse cx="520" cy="400" rx="90" ry="70" fill="#ff85a1"/>
+  <ellipse cx="310" cy="310" rx="80" ry="80" fill="#ff85a1"/>
+  <ellipse cx="490" cy="310" rx="80" ry="80" fill="#ff85a1"/>
+  <ellipse cx="310" cy="490" rx="80" ry="80" fill="#ff85a1"/>
+  <ellipse cx="490" cy="490" rx="80" ry="80" fill="#ff85a1"/>
+  
+  <!-- Stem -->
+  <rect x="395" y="480" width="10" height="150" fill="#7bc86c"/>
+  
+  <!-- Leaf 1 -->
+  <ellipse cx="350" cy="560" rx="40" ry="25" fill="#7bc86c" transform="rotate(-20, 350, 560)"/>
+  
+  <!-- Leaf 2 -->
+  <ellipse cx="450" cy="530" rx="40" ry="25" fill="#7bc86c" transform="rotate(20, 450, 530)"/>
+  
+  <!-- Smaller flower 1 -->
+  <g transform="translate(200, 220)">
+    <circle cx="0" cy="0" r="40" fill="#ff90b3"/>
+    <circle cx="0" cy="0" r="25" fill="#ffcc29"/>
+    <!-- Petals -->
+    <ellipse cx="0" cy="-50" rx="25" ry="40" fill="#ff90b3"/>
+    <ellipse cx="0" cy="50" rx="25" ry="40" fill="#ff90b3"/>
+    <ellipse cx="-50" cy="0" rx="40" ry="25" fill="#ff90b3"/>
+    <ellipse cx="50" cy="0" rx="40" ry="25" fill="#ff90b3"/>
+    <ellipse cx="-35" cy="-35" rx="30" ry="30" fill="#ff90b3"/>
+    <ellipse cx="35" cy="-35" rx="30" ry="30" fill="#ff90b3"/>
+    <ellipse cx="-35" cy="35" rx="30" ry="30" fill="#ff90b3"/>
+    <ellipse cx="35" cy="35" rx="30" ry="30" fill="#ff90b3"/>
+  </g>
+  
+  <!-- Smaller flower 2 -->
+  <g transform="translate(650, 300)">
+    <circle cx="0" cy="0" r="45" fill="#c1d3fe"/>
+    <circle cx="0" cy="0" r="25" fill="#ffcc29"/>
+    <!-- Petals -->
+    <ellipse cx="0" cy="-55" rx="25" ry="45" fill="#c1d3fe"/>
+    <ellipse cx="0" cy="55" rx="25" ry="45" fill="#c1d3fe"/>
+    <ellipse cx="-55" cy="0" rx="45" ry="25" fill="#c1d3fe"/>
+    <ellipse cx="55" cy="0" rx="45" ry="25" fill="#c1d3fe"/>
+    <ellipse cx="-40" cy="-40" rx="35" ry="35" fill="#c1d3fe"/>
+    <ellipse cx="40" cy="-40" rx="35" ry="35" fill="#c1d3fe"/>
+    <ellipse cx="-40" cy="40" rx="35" ry="35" fill="#c1d3fe"/>
+    <ellipse cx="40" cy="40" rx="35" ry="35" fill="#c1d3fe"/>
+  </g>
+  
+  <!-- Smaller flower 3 -->
+  <g transform="translate(250, 600)">
+    <circle cx="0" cy="0" r="45" fill="#8de5a1"/>
+    <circle cx="0" cy="0" r="25" fill="#ffcc29"/>
+    <!-- Petals -->
+    <ellipse cx="0" cy="-55" rx="25" ry="45" fill="#8de5a1"/>
+    <ellipse cx="0" cy="55" rx="25" ry="45" fill="#8de5a1"/>
+    <ellipse cx="-55" cy="0" rx="45" ry="25" fill="#8de5a1"/>
+    <ellipse cx="55" cy="0" rx="45" ry="25" fill="#8de5a1"/>
+    <ellipse cx="-40" cy="-40" rx="35" ry="35" fill="#8de5a1"/>
+    <ellipse cx="40" cy="-40" rx="35" ry="35" fill="#8de5a1"/>
+    <ellipse cx="-40" cy="40" rx="35" ry="35" fill="#8de5a1"/>
+    <ellipse cx="40" cy="40" rx="35" ry="35" fill="#8de5a1"/>
+  </g>
+  
+  <!-- Butterfly -->
+  <g transform="translate(600, 600)">
+    <!-- Body -->
+    <ellipse cx="0" cy="0" rx="12" ry="50" fill="#333333"/>
+    
+    <!-- Left wing -->
+    <path d="M0,0 C-30,-40 -80,-60 -100,-20 C-110,20 -60,40 0,0" fill="#b28dff" stroke="#9966ff" stroke-width="2"/>
+    <path d="M0,0 C-20,-20 -60,-30 -70,0 C-60,20 -30,20 0,0" fill="#d4b3ff" stroke="none"/>
+    
+    <!-- Right wing -->
+    <path d="M0,0 C30,-40 80,-60 100,-20 C110,20 60,40 0,0" fill="#b28dff" stroke="#9966ff" stroke-width="2"/>
+    <path d="M0,0 C20,-20 60,-30 70,0 C60,20 30,20 0,0" fill="#d4b3ff" stroke="none"/>
+    
+    <!-- Antennae -->
+    <path d="M0,-40 C-5,-60 -15,-60 -20,-55" fill="none" stroke="#333333" stroke-width="2"/>
+    <path d="M0,-40 C5,-60 15,-60 20,-55" fill="none" stroke="#333333" stroke-width="2"/>
+    <circle cx="-20" cy="-55" r="3" fill="#333333"/>
+    <circle cx="20" cy="-55" r="3" fill="#333333"/>
+  </g>
+  
+  <!-- Small butterfly -->
+  <g transform="translate(150, 350) scale(0.6)">
+    <!-- Body -->
+    <ellipse cx="0" cy="0" rx="10" ry="40" fill="#333333"/>
+    
+    <!-- Left wing -->
+    <path d="M0,0 C-30,-40 -70,-50 -80,-20 C-90,10 -50,30 0,0" fill="#ff85a1" stroke="#ff6b6b" stroke-width="2"/>
+    <path d="M0,0 C-20,-20 -50,-25 -60,0 C-50,15 -30,15 0,0" fill="#ffb6c1" stroke="none"/>
+    
+    <!-- Right wing -->
+    <path d="M0,0 C30,-40 70,-50 80,-20 C90,10 50,30 0,0" fill="#ff85a1" stroke="#ff6b6b" stroke-width="2"/>
+    <path d="M0,0 C20,-20 50,-25 60,0 C50,15 30,15 0,0" fill="#ffb6c1" stroke="none"/>
+    
+    <!-- Antennae -->
+    <path d="M0,-30 C-5,-50 -10,-50 -15,-45" fill="none" stroke="#333333" stroke-width="2"/>
+    <path d="M0,-30 C5,-50 10,-50 15,-45" fill="none" stroke="#333333" stroke-width="2"/>
+    <circle cx="-15" cy="-45" r="3" fill="#333333"/>
+    <circle cx="15" cy="-45" r="3" fill="#333333"/>
+  </g>
+</svg> 
