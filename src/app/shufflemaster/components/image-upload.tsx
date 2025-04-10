@@ -165,6 +165,8 @@ export function ImageUpload({
               aspect={1}
               className="max-w-full h-auto"
             >
+              {/* Need to use a regular img tag for ReactCrop to work with refs */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 ref={imgRef}
                 src={imgSrc}
