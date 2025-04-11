@@ -10,14 +10,14 @@ export function drawBackground(
   // Clear canvas
   ctx.clearRect(0, 0, boardSize.width, boardSize.height);
 
-  // Base wall color - slightly warmer than before
+  // Base wall color - lighter and more muted
   const wallGradient = ctx.createLinearGradient(0, 0, 0, boardSize.height);
-  wallGradient.addColorStop(0, "#f8f6f4");
-  wallGradient.addColorStop(1, "#e5e2dd");
+  wallGradient.addColorStop(0, "#faf9f7"); // Lighter
+  wallGradient.addColorStop(1, "#efeae5"); // More muted
   ctx.fillStyle = wallGradient;
   ctx.fillRect(0, 0, boardSize.width, boardSize.height);
 
-  // Floor at the bottom (carpet)
+  // Floor at the bottom (carpet) - more muted
   const floorHeight = boardSize.height * 0.15;
   const carpetGradient = ctx.createLinearGradient(
     0,
@@ -25,18 +25,18 @@ export function drawBackground(
     0,
     boardSize.height
   );
-  carpetGradient.addColorStop(0, "#4a6b8a");
-  carpetGradient.addColorStop(1, "#345170");
+  carpetGradient.addColorStop(0, "rgba(100, 130, 160, 0.3)"); // More transparent blue
+  carpetGradient.addColorStop(1, "rgba(70, 100, 130, 0.4)"); // More transparent dark blue
   ctx.fillStyle = carpetGradient;
   ctx.fillRect(0, boardSize.height - floorHeight, boardSize.width, floorHeight);
 
-  // Add carpet texture/pattern
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
-  ctx.lineWidth = 1;
+  // Add carpet texture/pattern - more subtle
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.03)"; // Reduced opacity
+  ctx.lineWidth = 0.5; // Thinner lines
   for (
     let y = boardSize.height - floorHeight + 5;
     y < boardSize.height;
-    y += 8
+    y += 10 // Increased spacing
   ) {
     ctx.beginPath();
     ctx.moveTo(0, y);
@@ -44,9 +44,12 @@ export function drawBackground(
     ctx.stroke();
   }
 
-  // Wall/floor divider (baseboard)
-  ctx.fillStyle = "#d0d0d0";
+  // Wall/floor divider (baseboard) - lighter
+  ctx.fillStyle = "rgba(208, 208, 208, 0.4)"; // More transparent
   ctx.fillRect(0, boardSize.height - floorHeight - 5, boardSize.width, 5);
+
+  // Use global alpha to make everything more faded
+  ctx.globalAlpha = 0.6; // Set all elements to 60% opacity
 
   // Add some office background elements (distant cubicles or furniture)
   // Filing cabinet
@@ -85,34 +88,17 @@ export function drawBackground(
   // Window with view
   drawWindow(ctx, boardSize.width * 0.15, boardSize.height * 0.2, 90, 70);
 
-  // Add subtle wall texture
-  ctx.strokeStyle = "rgba(0, 0, 0, 0.03)";
-  ctx.lineWidth = 1;
+  // Reset global alpha for other game elements
+  ctx.globalAlpha = 1.0;
 
-  // Create a subtle grid pattern for the wall
-  const gridSize = 40;
-  for (let y = 0; y < boardSize.height - floorHeight; y += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(boardSize.width, y);
-    ctx.stroke();
-  }
-
-  for (let x = 0; x < boardSize.width; x += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, boardSize.height - floorHeight);
-    ctx.stroke();
-  }
-
-  // Add some shading around the edges to create depth
+  // Add some shading around the edges to create depth (keep this at full opacity)
   const edgeGradient = ctx.createLinearGradient(
     0,
     0,
     boardSize.width * 0.3,
     boardSize.height * 0.3
   );
-  edgeGradient.addColorStop(0, "rgba(0, 0, 0, 0.2)");
+  edgeGradient.addColorStop(0, "rgba(0, 0, 0, 0.1)"); // Lighter shadow
   edgeGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
   ctx.fillStyle = edgeGradient;
   ctx.fillRect(0, 0, boardSize.width, boardSize.height);
@@ -128,10 +114,10 @@ function drawFilingCabinet(
   width: number,
   height: number
 ): void {
-  // Cabinet body
+  // Cabinet body - more muted colors
   const cabinetGradient = ctx.createLinearGradient(x, y, x + width, y + height);
-  cabinetGradient.addColorStop(0, "#9e9e9e");
-  cabinetGradient.addColorStop(1, "#757575");
+  cabinetGradient.addColorStop(0, "#b0b0b0"); // Lighter gray
+  cabinetGradient.addColorStop(1, "#909090"); // Lighter gray
 
   ctx.fillStyle = cabinetGradient;
   ctx.fillRect(x, y, width, height);
@@ -142,17 +128,17 @@ function drawFilingCabinet(
   for (let i = 0; i < 3; i++) {
     const drawerY = y + i * drawerHeight;
 
-    // Drawer face
-    ctx.fillStyle = "#bdbdbd";
+    // Drawer face - lighter
+    ctx.fillStyle = "#c9c9c9"; // Lighter gray
     ctx.fillRect(x + 2, drawerY + 2, width - 4, drawerHeight - 4);
 
-    // Drawer handle
-    ctx.fillStyle = "#616161";
+    // Drawer handle - lighter
+    ctx.fillStyle = "#a0a0a0"; // Lighter gray
     ctx.fillRect(x + width / 2 - 10, drawerY + drawerHeight / 2 - 3, 20, 6);
   }
 
-  // Add shadow
-  ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+  // Add shadow - more subtle
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; // More transparent shadow
   ctx.fillRect(x, y + height - 5, width, 5);
 }
 
@@ -166,10 +152,10 @@ function drawBookshelf(
   width: number,
   height: number
 ): void {
-  // Bookshelf body
+  // Bookshelf body - more muted colors
   const shelfGradient = ctx.createLinearGradient(x, y, x + width, y + height);
-  shelfGradient.addColorStop(0, "#8d6e63");
-  shelfGradient.addColorStop(1, "#6d4c41");
+  shelfGradient.addColorStop(0, "#b0a090"); // Lighter brown
+  shelfGradient.addColorStop(1, "#a08070"); // Lighter brown
 
   ctx.fillStyle = shelfGradient;
   ctx.fillRect(x, y, width, height);
@@ -181,51 +167,81 @@ function drawBookshelf(
 
   for (let i = 1; i <= shelfCount; i++) {
     const shelfY = y + i * shelfSpacing;
-    ctx.fillStyle = "#5d4037";
+    ctx.fillStyle = "#a09080"; // Lighter brown
     ctx.fillRect(x, shelfY, width, shelfThickness);
 
-    // Add books on each shelf
-    drawBooks(ctx, x + 5, shelfY - 20, width - 10, 20);
+    // Add books on each shelf with fixed positioning
+    drawBooksFixed(ctx, x + 5, shelfY - 20, width - 10, 20, i);
   }
 
-  // Add shadow
-  ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+  // Add shadow - more subtle
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; // More transparent shadow
   ctx.fillRect(x, y + height - 5, width, 5);
 }
 
 /**
- * Draws books on a shelf
+ * Draws books on a shelf with fixed positions and muted colors
  */
-function drawBooks(
+function drawBooksFixed(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   width: number,
-  height: number
+  height: number,
+  shelfIndex: number
 ): void {
-  const bookColors = [
-    "#e53935",
-    "#1e88e5",
-    "#43a047",
-    "#fdd835",
-    "#8e24aa",
-    "#fb8c00",
+  // Predefined book widths and more muted colors per shelf
+  const bookConfigurations = [
+    // First shelf - more muted colors
+    [
+      { width: 12, color: "#f08080" }, // Muted red
+      { width: 8, color: "#90c0e0" }, // Muted blue
+      { width: 15, color: "#90c090" }, // Muted green
+      { width: 10, color: "#f0e090" }, // Muted yellow
+      { width: 14, color: "#c090c0" }, // Muted purple
+      { width: 12, color: "#e0a080" }, // Muted orange
+      { width: 9, color: "#a0b0b8" }, // Muted blue grey
+    ],
+    // Second shelf - more muted colors
+    [
+      { width: 10, color: "#e0a080" }, // Muted orange
+      { width: 15, color: "#90c0e0" }, // Muted blue
+      { width: 8, color: "#c090c0" }, // Muted purple
+      { width: 12, color: "#90c090" }, // Muted green
+      { width: 14, color: "#f08080" }, // Muted red
+      { width: 10, color: "#f0e090" }, // Muted yellow
+    ],
+    // Third shelf - more muted colors
+    [
+      { width: 14, color: "#90c0e0" }, // Muted blue
+      { width: 10, color: "#90c090" }, // Muted green
+      { width: 12, color: "#f08080" }, // Muted red
+      { width: 8, color: "#f0e090" }, // Muted yellow
+      { width: 15, color: "#e0a080" }, // Muted orange
+      { width: 10, color: "#c090c0" }, // Muted purple
+      { width: 11, color: "#a0b0b8" }, // Muted blue grey
+    ],
   ];
+
+  // Use appropriate configuration based on shelf index (1-based)
+  const books =
+    bookConfigurations[(shelfIndex - 1) % bookConfigurations.length];
+
   let currentX = x;
 
-  while (currentX < x + width - 5) {
-    const bookWidth = 5 + Math.random() * 15;
-    if (currentX + bookWidth > x + width) break;
+  for (const book of books) {
+    // Check if we still have room on the shelf
+    if (currentX + book.width > x + width) break;
 
-    const colorIndex = Math.floor(Math.random() * bookColors.length);
-    ctx.fillStyle = bookColors[colorIndex];
-    ctx.fillRect(currentX, y, bookWidth, height);
+    // Draw the book
+    ctx.fillStyle = book.color;
+    ctx.fillRect(currentX, y, book.width, height);
 
-    // Book spine details
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    // Book spine details - more subtle
+    ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; // More transparent
     ctx.fillRect(currentX, y, 1, height);
 
-    currentX += bookWidth;
+    currentX += book.width + 1; // Add 1px gap between books
   }
 }
 
@@ -239,30 +255,30 @@ function drawDesk(
   width: number,
   height: number
 ): void {
-  // Desk top
+  // Desk top - lighter colors
   const deskGradient = ctx.createLinearGradient(x, y, x + width, y + height);
-  deskGradient.addColorStop(0, "#d7ccc8");
-  deskGradient.addColorStop(1, "#bcaaa4");
+  deskGradient.addColorStop(0, "#e0d0c8"); // Lighter brown
+  deskGradient.addColorStop(1, "#d0c0b8"); // Lighter brown
 
   ctx.fillStyle = deskGradient;
   ctx.fillRect(x, y, width, height);
 
-  // Desk leg left
-  ctx.fillStyle = "#a1887f";
+  // Desk leg left - lighter
+  ctx.fillStyle = "#c0b0a8"; // Lighter brown
   ctx.fillRect(x + 10, y + height, 10, 30);
 
   // Desk leg right
   ctx.fillRect(x + width - 20, y + height, 10, 30);
 
-  // Add some desk items
+  // Add some desk items - lighter
   // Monitor
-  ctx.fillStyle = "#424242";
+  ctx.fillStyle = "#808080"; // Lighter gray
   ctx.fillRect(x + 30, y - 30, 40, 25);
-  ctx.fillStyle = "#212121";
+  ctx.fillStyle = "#606060"; // Lighter gray
   ctx.fillRect(x + 45, y - 5, 10, 5);
 
   // Desk pad
-  ctx.fillStyle = "#78909c";
+  ctx.fillStyle = "#a0b0b8"; // Lighter blue-gray
   ctx.fillRect(x + 80, y + 5, 40, 25);
 }
 
@@ -275,30 +291,30 @@ function drawClock(
   y: number,
   radius: number
 ): void {
-  // Clock face
+  // Clock face - unchanged but will be affected by globalAlpha
   ctx.fillStyle = "#fafafa";
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.fill();
 
-  // Clock outline
-  ctx.strokeStyle = "#757575";
-  ctx.lineWidth = 2;
+  // Clock outline - lighter
+  ctx.strokeStyle = "#a0a0a0"; // Lighter gray
+  ctx.lineWidth = 1.5; // Slightly thinner
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Clock hands
+  // Clock hands - lighter
   // Hour hand
-  ctx.strokeStyle = "#424242";
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#808080"; // Lighter gray
+  ctx.lineWidth = 2; // Slightly thinner
   ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.lineTo(x + radius * 0.5, y + radius * 0.3);
   ctx.stroke();
 
   // Minute hand
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1.5; // Slightly thinner
   ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.lineTo(x - radius * 0.2, y - radius * 0.7);
@@ -315,20 +331,20 @@ function drawPictureFrame(
   width: number,
   height: number
 ): void {
-  // Frame
-  ctx.fillStyle = "#a1887f";
+  // Frame - lighter
+  ctx.fillStyle = "#c0b0a8"; // Lighter brown
   ctx.fillRect(x - 3, y - 3, width + 6, height + 6);
 
-  // Picture
+  // Picture - more muted colors
   const pictureGradient = ctx.createLinearGradient(x, y, x + width, y + height);
-  pictureGradient.addColorStop(0, "#bbdefb");
-  pictureGradient.addColorStop(0.7, "#64b5f6");
-  pictureGradient.addColorStop(1, "#1976d2");
+  pictureGradient.addColorStop(0, "#d0e0f0"); // Lighter blue
+  pictureGradient.addColorStop(0.7, "#a0c0e0"); // Lighter blue
+  pictureGradient.addColorStop(1, "#80a0d0"); // Lighter blue
 
   ctx.fillStyle = pictureGradient;
   ctx.fillRect(x, y, width, height);
 
-  // Picture details (mountains)
+  // Picture details (mountains) - unchanged but will be affected by globalAlpha
   ctx.fillStyle = "#ffffff";
   ctx.beginPath();
   ctx.moveTo(x + width * 0.2, y + height * 0.6);
@@ -354,29 +370,29 @@ function drawWindow(
   width: number,
   height: number
 ): void {
-  // Window frame
+  // Window frame - unchanged but will be affected by globalAlpha
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(x, y, width, height);
 
-  // Window view (sky)
+  // Window view (sky) - more muted colors
   const skyGradient = ctx.createLinearGradient(
     x + 5,
     y + 5,
     x + 5,
     y + height - 5
   );
-  skyGradient.addColorStop(0, "#64b5f6");
-  skyGradient.addColorStop(1, "#bbdefb");
+  skyGradient.addColorStop(0, "#a0c8f0"); // Lighter blue
+  skyGradient.addColorStop(1, "#d0e0f0"); // Lighter blue
 
   ctx.fillStyle = skyGradient;
   ctx.fillRect(x + 5, y + 5, width - 10, height - 10);
 
-  // Window divisions
-  ctx.fillStyle = "#e0e0e0";
+  // Window divisions - lighter
+  ctx.fillStyle = "#e8e8e8"; // Lighter gray
   ctx.fillRect(x + width / 2, y, 3, height);
   ctx.fillRect(x, y + height / 2, width, 3);
 
-  // Clouds
+  // Clouds - unchanged but will be affected by globalAlpha
   ctx.fillStyle = "#ffffff";
   // Cloud 1
   ctx.beginPath();

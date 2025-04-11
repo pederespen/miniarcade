@@ -6,13 +6,16 @@ import GameBoard from "./game-board";
 import useBoardSize from "../hooks/use-board-size";
 import useGameLogic from "../hooks/use-game-logic";
 
+// Set to true only during development, false for production
+const DEV_MODE = false;
+
 export default function GamePlay({
   onBoardSizeChange,
   highScore,
   setHighScore,
 }: GamePlayProps) {
-  // Add debug state
-  const [debugMode, setDebugMode] = useState(false);
+  // Use DEV_MODE constant instead of UI toggle
+  const [debugMode] = useState(DEV_MODE);
 
   // Use refs to avoid re-renders that cause update depth issues
   const gameContainerRef = useRef<HTMLDivElement>(null);
@@ -51,9 +54,9 @@ export default function GamePlay({
         e.preventDefault();
       }
 
-      // Toggle debug mode with D key
-      if (e.code === "KeyD" || e.key === "d") {
-        setDebugMode((prev) => !prev);
+      // Keep debug mode toggle for development but only if DEV_MODE is true
+      if (DEV_MODE && (e.code === "KeyD" || e.key === "d")) {
+        // No longer needed as we're not toggling debug mode
         e.preventDefault();
       }
     };
@@ -73,31 +76,13 @@ export default function GamePlay({
 
   return (
     <div className="flex flex-col items-center w-full space-y-4">
-      <div className="flex justify-end w-full max-w-xl">
-        <div className="flex space-x-3">
-          <button
-            onClick={() => setDebugMode((prev) => !prev)}
-            className={`${
-              debugMode
-                ? "bg-yellow-500 hover:bg-yellow-600"
-                : "bg-gray-500 hover:bg-gray-600"
-            } text-white font-bold py-2 px-4 rounded`}
-            title="Toggle debug mode (shortcut: D key)"
-          >
-            Debug {debugMode ? "On" : "Off"}
-          </button>
-
-          <button
-            onClick={handleReset}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded"
-          >
-            Restart
-          </button>
-        </div>
-      </div>
+      {/* Removed buttons section entirely */}
 
       {/* Aspect ratio container - 4:3 ratio maintained */}
-      <div className="relative w-full max-w-xl" style={{ touchAction: "none" }}>
+      <div
+        className="relative w-full max-w-xl mt-10"
+        style={{ touchAction: "none" }}
+      >
         {/* Fixed aspect ratio container (4:3) using padding technique */}
         <div className="relative w-full" style={{ paddingBottom: "75%" }}>
           <div

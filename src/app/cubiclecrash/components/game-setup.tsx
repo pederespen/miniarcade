@@ -4,11 +4,7 @@ import { GameSetupProps } from "../types";
 
 export default function GameSetup({ onStartGame, highScore }: GameSetupProps) {
   return (
-    <div className="flex flex-col items-center space-y-8">
-      <h1 className="text-3xl md:text-4xl font-bold text-cyan-400 mb-6">
-        Cubicle Crash
-      </h1>
-
+    <div className="flex flex-col items-center space-y-8 mt-10">
       <div className="bg-indigo-800 p-6 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-2xl font-semibold text-cyan-400 mb-4">
           Game Instructions
