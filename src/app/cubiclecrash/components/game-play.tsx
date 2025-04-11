@@ -82,10 +82,10 @@ export default function GamePlay({
 
   return (
     <div className="flex flex-col items-center w-full space-y-4">
-      <div className="flex justify-between w-full max-w-xl">
+      <div className="flex flex-col md:flex-row justify-between w-full max-w-xl">
         <button
           onClick={handleMainMenu}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mb-2 md:mb-0"
         >
           Main Menu
         </button>
@@ -112,48 +112,59 @@ export default function GamePlay({
         </div>
       </div>
 
-      <div
-        className="relative w-full max-w-xl flex justify-center"
-        style={{ touchAction: "manipulation" }}
-      >
-        <div
-          ref={gameContainerRef}
-          className="w-full flex justify-center"
-          onClick={handleJump}
-          style={{ cursor: "pointer" }}
-        >
-          <GameBoard
-            airplane={airplane}
-            obstacles={obstacles}
-            boardSize={boardSize}
-            score={score}
-            gameOver={gameOver}
-            debug={debugMode}
-          />
-        </div>
-
-        {!isPlaying && !gameOver && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
-            <div className="text-center p-6 rounded-lg">
-              <h2 className="text-2xl font-bold text-white mb-4">
-                Cubicle Crash
-              </h2>
-              <p className="text-cyan-200 mb-6">
-                Click or tap to start flying!
-              </p>
-              <button
-                onClick={handleJump}
-                className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full"
-              >
-                Start Flying
-              </button>
-            </div>
+      {/* Aspect ratio container - 4:3 ratio maintained */}
+      <div className="relative w-full max-w-xl" style={{ touchAction: "none" }}>
+        {/* Fixed aspect ratio container (4:3) using padding technique */}
+        <div className="relative w-full" style={{ paddingBottom: "75%" }}>
+          <div
+            ref={gameContainerRef}
+            className="absolute inset-0 flex justify-center items-center"
+            onClick={handleJump}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              handleJump();
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <GameBoard
+              airplane={airplane}
+              obstacles={obstacles}
+              boardSize={boardSize}
+              score={score}
+              gameOver={gameOver}
+              debug={debugMode}
+            />
           </div>
-        )}
+
+          {!isPlaying && !gameOver && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
+              <div className="text-center p-6 rounded-lg">
+                <h2 className="text-2xl font-bold text-white mb-4">
+                  Cubicle Crash
+                </h2>
+                <p className="text-cyan-200 mb-6">
+                  {window.innerWidth <= 768
+                    ? "Tap to start flying!"
+                    : "Click or tap to start flying!"}
+                </p>
+                <button
+                  onClick={handleJump}
+                  className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full"
+                >
+                  Start Flying
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="text-center text-indigo-100 space-y-2">
-        <p>Click or tap the screen to make the paper airplane fly!</p>
+        <p>
+          {window.innerWidth <= 768
+            ? "Tap the screen to fly!"
+            : "Click or tap the screen to make the paper airplane fly!"}
+        </p>
         <p>
           Current Score: {score} | High Score: {highScore}
         </p>

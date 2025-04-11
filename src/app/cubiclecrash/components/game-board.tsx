@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { Airplane, Obstacle, GameBoardSize } from "../types";
+import { Airplane, GameBoardSize, Obstacle } from "../types";
 
 interface GameBoardProps {
   airplane: Airplane;
@@ -21,6 +21,34 @@ export default function GameBoard({
   debug = false,
 }: GameBoardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Set up canvas with correct dimensions
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Set the actual canvas dimensions to match the logical dimensions
+    canvas.width = boardSize.width;
+    canvas.height = boardSize.height;
+
+    // Apply pixel density adjustments for high DPI screens
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      const pixelRatio = window.devicePixelRatio || 1;
+      if (pixelRatio > 1) {
+        const displayWidth = canvas.width;
+        const displayHeight = canvas.height;
+
+        canvas.width = displayWidth * pixelRatio;
+        canvas.height = displayHeight * pixelRatio;
+
+        canvas.style.width = `${displayWidth}px`;
+        canvas.style.height = `${displayHeight}px`;
+
+        ctx.scale(pixelRatio, pixelRatio);
+      }
+    }
+  }, [boardSize.width, boardSize.height]);
 
   // Draw the game
   useEffect(() => {
@@ -334,7 +362,17 @@ export default function GameBoard({
       ref={canvasRef}
       width={boardSize.width}
       height={boardSize.height}
-      className="border border-indigo-700 rounded-lg shadow-lg"
+      className="rounded-lg shadow-lg"
+      style={{
+        touchAction: "none",
+        maxWidth: "100%",
+        maxHeight: "100%",
+        width: "auto",
+        height: "auto",
+        objectFit: "contain",
+        display: "block",
+        margin: "auto",
+      }}
     />
   );
 }

@@ -19,14 +19,37 @@ export default function useBoardSize({ onSizeChange }: UseBoardSizeProps = {}) {
       return;
     }
 
+    // We'll use the container's width and height directly
+    // since our container now has a fixed aspect ratio
     const containerWidth = containerRef.current.clientWidth;
+    const containerHeight = containerRef.current.clientHeight;
 
+    // Always enforce the 4:3 aspect ratio (this is already ensured by the container's CSS)
+    const aspectRatio = 4 / 3;
+
+    // Determine appropriate size based on the container
+    let width, height;
+
+    // Use the container's dimensions, but cap at a maximum size for desktop
     const maxWidth = 640;
-    const width = Math.min(containerWidth || maxWidth, maxWidth);
+    width = Math.min(containerWidth, maxWidth);
+    height = width / aspectRatio;
 
-    const height = Math.floor(width * 0.75);
+    // Ensure the height fits within the container
+    if (height > containerHeight) {
+      height = containerHeight;
+      width = height * aspectRatio;
+    }
 
-    const newSize = { width, height };
+    // Ensure minimum dimensions
+    width = Math.max(width, 300);
+    height = Math.max(height, 225);
+
+    const newSize = {
+      width: Math.floor(width),
+      height: Math.floor(height),
+    };
+
     setBoardSize(newSize);
     setSizeCalculated(true);
 
@@ -36,16 +59,30 @@ export default function useBoardSize({ onSizeChange }: UseBoardSizeProps = {}) {
   };
 
   useEffect(() => {
+    // Initial calculation
     calculateBoardSize();
 
     const handleResize = () => {
       calculateBoardSize();
     };
 
+    // Calculate on resize and orientation change
     window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+
+    // Set up a mutation observer to detect changes to the container
+    const resizeObserver = new ResizeObserver(() => {
+      calculateBoardSize();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+      resizeObserver.disconnect();
     };
   }, []);
 

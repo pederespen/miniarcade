@@ -1,6 +1,6 @@
 "use client";
 
-import { GameSetupProps, Difficulty } from "../types";
+import { Difficulty, GameSetupProps } from "../types";
 
 export default function GameSetup({
   difficulty,

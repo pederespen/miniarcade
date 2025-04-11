@@ -34,13 +34,31 @@ export default function useGameLogic({
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
 
   // Game settings based on difficulty
-  const difficultySettings = {
+  const difficultySettings: Record<
+    Difficulty,
+    {
+      gravity: number;
+      jumpPower: number;
+      obstacleSpeed: number;
+      spawnRate: number;
+    }
+  > = {
     easy: { gravity: 0.3, jumpPower: -6, obstacleSpeed: 3, spawnRate: 1800 },
     medium: { gravity: 0.4, jumpPower: -7, obstacleSpeed: 4, spawnRate: 1500 },
     hard: { gravity: 0.5, jumpPower: -8, obstacleSpeed: 5, spawnRate: 1200 },
   };
 
-  const settings = difficultySettings[difficulty];
+  // Scale settings based on board size
+  const baseHeight = 480; // Reference height for scaling
+  const scaleFactor = boardSize.height / baseHeight;
+
+  // Apply scale factor to difficulty settings
+  const settings = {
+    gravity: difficultySettings[difficulty].gravity * scaleFactor,
+    jumpPower: difficultySettings[difficulty].jumpPower * scaleFactor,
+    obstacleSpeed: difficultySettings[difficulty].obstacleSpeed * scaleFactor,
+    spawnRate: difficultySettings[difficulty].spawnRate,
+  };
 
   // References for animation frame and timers
   const animationFrameRef = useRef<number | null>(null);
@@ -488,20 +506,24 @@ export default function useGameLogic({
       Math.floor(Math.random() * obstacleTypes.length)
     ] as Obstacle["type"];
 
-    // Size based on type - reduced by ~20% for smaller canvas
-    let width = 55; // Was 70
-    let height = 48; // Was 60
+    // Base sizes for reference board size
+    let baseWidth = 70;
+    let baseHeight = 60;
 
     if (type === "drawer") {
-      width = 95; // Was 120
-      height = 32; // Was 40
+      baseWidth = 120;
+      baseHeight = 40;
     } else if (type === "monitor") {
-      width = 64; // Was 80
-      height = 56; // Was 70
+      baseWidth = 80;
+      baseHeight = 70;
     } else if (type === "fan") {
-      width = 48; // Was 60
-      height = 48; // Was 60
+      baseWidth = 60;
+      baseHeight = 60;
     }
+
+    // Scale obstacle size based on board size
+    const width = Math.floor(baseWidth * scaleFactor);
+    const height = Math.floor(baseHeight * scaleFactor);
 
     // Randomize y position - ensure better vertical spacing
     const minY = height * 1.2; // Add some margin from top
@@ -519,7 +541,7 @@ export default function useGameLogic({
     };
 
     setObstacles((prev) => [...prev, newObstacle]);
-  }, [boardSize.width, boardSize.height]);
+  }, [boardSize.width, boardSize.height, scaleFactor]);
 
   // Start the game - need to define this before handleJump can reference it
   const startGame = useCallback(() => {
@@ -539,14 +561,20 @@ export default function useGameLogic({
       cancelAnimationFrame(animationFrameRef.current);
     }
 
-    // Reset airplane with smaller size for the reduced canvas
+    // Scale airplane size based on board size
+    const baseAirplaneWidth = 60;
+    const baseAirplaneHeight = 30;
+    const airplaneWidth = Math.floor(baseAirplaneWidth * scaleFactor);
+    const airplaneHeight = Math.floor(baseAirplaneHeight * scaleFactor);
+
+    // Reset airplane with size scaled to the canvas
     setAirplane({
-      x: 80, // Position it a bit more to the left on the smaller canvas
+      x: Math.floor(80 * scaleFactor), // Position scaled relative to board size
       y: boardSize.height / 2,
-      width: 48, // 20% smaller than 60
-      height: 24, // 20% smaller than 30
+      width: airplaneWidth,
+      height: airplaneHeight,
       rotation: 0,
-      velocity: 0.1, // Small initial velocity
+      velocity: 0.1 * scaleFactor, // Scale initial velocity
     });
 
     // Clear obstacles
@@ -558,7 +586,7 @@ export default function useGameLogic({
 
     // Start game loop
     animationFrameRef.current = requestAnimationFrame(gameLoop);
-  }, [boardSize.height, settings, spawnObstacle, gameLoop]);
+  }, [boardSize.height, settings, spawnObstacle, gameLoop, scaleFactor]);
 
   // Handle player jump - now startGame is defined before this function
   const handleJump = useCallback(() => {
