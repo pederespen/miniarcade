@@ -5,7 +5,7 @@ import { Difficulty, GameBoardSize } from "./types";
 import GameSetup from "./components/game-setup";
 import GamePlay from "./components/game-play";
 
-export default function PaperPlane() {
+export default function CubiclecrashGame() {
   const [gameStarted, setGameStarted] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>("medium"); // easy, medium, hard
   const [gameBoardSize, setGameBoardSize] = useState<GameBoardSize>({

@@ -10,11 +10,11 @@ export default function Home() {
       imageUrl: "/images/shufflemaster.png",
     },
     {
-      id: "paperplane",
-      title: "Paper Plane",
+      id: "cubiclecrash",
+      title: "Cubicle Crash",
       description:
         "Navigate your paper airplane through office obstacles! How far can you fly?",
-      imageUrl: "/images/paperplane.png",
+      imageUrl: "/images/cubiclecrash.png",
     },
     {
       id: "game2",

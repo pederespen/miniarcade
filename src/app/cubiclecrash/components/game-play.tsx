@@ -136,7 +136,7 @@ export default function GamePlay({
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
             <div className="text-center p-6 rounded-lg">
               <h2 className="text-2xl font-bold text-white mb-4">
-                Paper Plane
+                Cubicle Crash
               </h2>
               <p className="text-cyan-200 mb-6">
                 Click or tap to start flying!
