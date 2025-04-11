@@ -7,17 +7,17 @@ export const presetImages = [
   {
     id: 1,
     name: "preset_1",
-    url: "./images/puzzles/preset_1.svg",
+    url: "/images/puzzles/preset_1.svg",
   },
   {
     id: 2,
     name: "preset_2",
-    url: "./images/puzzles/preset_2.svg",
+    url: "/images/puzzles/preset_2.svg",
   },
   {
     id: 3,
     name: "Preset_3",
-    url: "./images/puzzles/preset_3.svg",
+    url: "/images/puzzles/preset_3.svg",
   },
 ];
 
