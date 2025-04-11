@@ -102,6 +102,19 @@ export function drawCoffee(
   );
   ctx.fill();
 
+  // Add black border around the mug body for better visibility
+  ctx.strokeStyle = "#333333";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(
+    obstacle.x + obstacle.width * 0.25,
+    obstacle.y + obstacle.height * 0.2,
+    obstacle.width * 0.5,
+    obstacle.height * 0.7,
+    5
+  );
+  ctx.stroke();
+
   // Mug handle
   ctx.beginPath();
   ctx.arc(
@@ -114,6 +127,20 @@ export function drawCoffee(
   );
   ctx.strokeStyle = "#D4D4D4";
   ctx.lineWidth = 6;
+  ctx.stroke();
+
+  // Add black border around the handle for better visibility
+  ctx.strokeStyle = "#333333";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(
+    obstacle.x + obstacle.width * 0.75 + 2,
+    obstacle.y + obstacle.height * 0.5,
+    obstacle.width * 0.16,
+    -Math.PI * 0.5,
+    Math.PI * 0.5,
+    false
+  );
   ctx.stroke();
 
   // Coffee liquid
