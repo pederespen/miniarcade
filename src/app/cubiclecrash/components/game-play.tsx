@@ -7,7 +7,6 @@ import useBoardSize from "../hooks/use-board-size";
 import useGameLogic from "../hooks/use-game-logic";
 
 export default function GamePlay({
-  difficulty,
   onBoardSizeChange,
   highScore,
   setHighScore,
@@ -33,7 +32,6 @@ export default function GamePlay({
     handleJump,
     resetGame,
   } = useGameLogic({
-    difficulty,
     boardSize,
     highScore,
     setHighScore,

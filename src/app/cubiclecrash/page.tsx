@@ -47,7 +47,6 @@ export default function CubiclecrashGame() {
         <GameSetup onStartGame={startGame} highScore={highScore} />
       ) : (
         <GamePlay
-          difficulty="medium"
           onBoardSizeChange={handleBoardSizeChange}
           highScore={highScore}
           setHighScore={setHighScore}

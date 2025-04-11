@@ -1,15 +1,19 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Airplane, Obstacle, GameBoardSize, Difficulty } from "../types";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { Airplane, Obstacle, GameBoardSize } from "../types";
 
 interface UseGameLogicProps {
-  difficulty: Difficulty;
   boardSize: GameBoardSize;
   setHighScore: (score: number) => void;
   highScore: number;
 }
 
+// Constants for progressive difficulty
+const SPEED_INCREASE_THRESHOLD = 3; // Every 3 points (adjusted for actual scoring behavior)
+const SPEED_INCREASE_FACTOR = 1.05; // 5% increase per threshold (adjusted for more gradual progression)
+const SPAWN_RATE_DECREASE_FACTOR = 0.92; // 8% decrease per threshold
+const MAX_DIFFICULTY_TIER = 15; // Cap difficulty increases at a higher level
+
 export default function useGameLogic({
-  difficulty,
   boardSize,
   setHighScore,
   highScore,
@@ -33,36 +37,56 @@ export default function useGameLogic({
 
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
 
-  // Game settings based on difficulty
-  const difficultySettings: Record<
-    Difficulty,
-    {
-      gravity: number;
-      jumpPower: number;
-      obstacleSpeed: number;
-      spawnRate: number;
-    }
-  > = {
-    easy: { gravity: 0.3, jumpPower: -6, obstacleSpeed: 3, spawnRate: 1800 },
-    medium: { gravity: 0.4, jumpPower: -7, obstacleSpeed: 4, spawnRate: 1500 },
-    hard: { gravity: 0.5, jumpPower: -8, obstacleSpeed: 5, spawnRate: 1200 },
-  };
+  // Store difficulty tier state
+  const [difficultyTier, setDifficultyTier] = useState(0);
 
-  // Scale settings based on board size
+  // Refs to track the latest obstacle ID that triggered a score and the current score
+  // This ensures we don't double-count obstacles regardless of state updates
+  const lastScoringObstacleRef = useRef<number | null>(null);
+  const scoreRef = useRef(0);
+
+  // Fixed game settings - base values
   const baseHeight = 480; // Reference height for scaling
   const scaleFactor = boardSize.height / baseHeight;
 
-  // Apply scale factor to difficulty settings
-  const settings = {
-    gravity: difficultySettings[difficulty].gravity * scaleFactor,
-    jumpPower: difficultySettings[difficulty].jumpPower * scaleFactor,
-    obstacleSpeed: difficultySettings[difficulty].obstacleSpeed * scaleFactor,
-    spawnRate: difficultySettings[difficulty].spawnRate,
-  };
+  // Base settings - wrapped in useMemo to prevent recreation on every render
+  const baseSettings = useMemo(
+    () => ({
+      gravity: 0.4 * scaleFactor,
+      jumpPower: -7 * scaleFactor,
+      obstacleSpeed: 4 * scaleFactor,
+      spawnRate: 1500,
+    }),
+    [scaleFactor]
+  );
+
+  // Derive current settings based on difficulty tier
+  const settings = useCallback(() => {
+    const speedMultiplier = Math.pow(
+      SPEED_INCREASE_FACTOR,
+      Math.min(difficultyTier, MAX_DIFFICULTY_TIER)
+    );
+    const spawnRateMultiplier = Math.pow(
+      SPAWN_RATE_DECREASE_FACTOR,
+      Math.floor(difficultyTier / 2)
+    );
+
+    return {
+      gravity: baseSettings.gravity,
+      jumpPower: baseSettings.jumpPower,
+      obstacleSpeed: baseSettings.obstacleSpeed * speedMultiplier,
+      spawnRate: baseSettings.spawnRate * spawnRateMultiplier,
+    };
+  }, [baseSettings, difficultyTier]);
+
+  // Current settings value
+  const currentSettings = settings();
 
   // References for animation frame and timers
   const animationFrameRef = useRef<number | null>(null);
   const obstacleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Store the current spawn rate to detect changes
+  const currentSpawnRateRef = useRef(currentSettings.spawnRate);
 
   // Initialize the game state - using a ref to prevent dependency issues
   const gameStateRef = useRef(gameState);
@@ -513,9 +537,12 @@ export default function useGameLogic({
   const gameLoop = useCallback(() => {
     if (gameStateRef.current.gameOver) return;
 
+    // Get latest settings
+    const latestSettings = settings();
+
     // Update airplane with physics
     setAirplane((prev) => {
-      const newVelocity = prev.velocity + settings.gravity;
+      const newVelocity = prev.velocity + latestSettings.gravity;
       const newY = prev.y + newVelocity;
       let newRotation = prev.rotation + 1;
 
@@ -542,19 +569,54 @@ export default function useGameLogic({
 
     // Update obstacles with simplified state access
     setObstacles((prev) => {
+      let scoredThisFrame = false;
+
       const updatedObstacles = prev.map((obstacle) => {
         // Move obstacle
-        const newX = obstacle.x - settings.obstacleSpeed;
+        const newX = obstacle.x - latestSettings.obstacleSpeed;
         let { passed } = obstacle;
 
-        // Check if passed
-        if (!passed && newX + obstacle.width < airplane.x) {
+        // Check if obstacle just passed the airplane and we haven't scored from it before
+        if (
+          !passed &&
+          newX + obstacle.width < airplane.x &&
+          lastScoringObstacleRef.current !== obstacle.id &&
+          !scoredThisFrame
+        ) {
+          // Mark this obstacle as passed
           passed = true;
-          // Update score with a callback to avoid stale state
+          scoredThisFrame = true;
+
+          // Store the ID of this obstacle so we never count it again
+          lastScoringObstacleRef.current = obstacle.id;
+
+          // Increment our score counter (separate from React state)
+          scoreRef.current += 1;
+
+          console.log(
+            `Obstacle ${obstacle.id} passed, score now ${scoreRef.current}`
+          );
+
+          // Update difficulty tier based on current score
+          const newDifficultyTier = Math.floor(
+            scoreRef.current / SPEED_INCREASE_THRESHOLD
+          );
+          if (newDifficultyTier > difficultyTier) {
+            setDifficultyTier(newDifficultyTier);
+            console.log(`Difficulty increased to tier ${newDifficultyTier}`);
+          }
+
+          // Sync the React state with our score counter
           setGameState((prevState) => ({
             ...prevState,
-            score: prevState.score + 1,
+            score: scoreRef.current,
           }));
+        } else if (!passed && newX + obstacle.width < airplane.x) {
+          // If we already scored this frame, just mark as passed without counting
+          passed = true;
+          console.log(
+            `Obstacle ${obstacle.id} passed but not counted (already scored this frame)`
+          );
         }
 
         // Create updated obstacle state
@@ -566,7 +628,7 @@ export default function useGameLogic({
 
     // Continue the loop
     animationFrameRef.current = requestAnimationFrame(gameLoop);
-  }, [settings, boardSize.height, airplane, handleGameOver]);
+  }, [boardSize.height, airplane, handleGameOver, settings, difficultyTier]);
 
   // Spawn obstacles - declare early for use in startGame
   const spawnObstacle = useCallback(() => {
@@ -614,14 +676,46 @@ export default function useGameLogic({
     setObstacles((prev) => [...prev, newObstacle]);
   }, [boardSize.width, boardSize.height, scaleFactor]);
 
+  // Detect changes in spawn rate and update the timer
+  useEffect(() => {
+    // Don't update if the game is over or not active
+    if (gameStateRef.current.gameOver || !gameStateRef.current.isActive) return;
+
+    const latestSettings = settings();
+
+    // Only update if the spawn rate has changed and we have a timer
+    if (
+      latestSettings.spawnRate !== currentSpawnRateRef.current &&
+      obstacleTimerRef.current
+    ) {
+      console.log(
+        `Spawn rate updated: ${currentSpawnRateRef.current}ms -> ${latestSettings.spawnRate}ms`
+      );
+      currentSpawnRateRef.current = latestSettings.spawnRate;
+
+      // Clear and restart the timer with the new spawn rate
+      clearInterval(obstacleTimerRef.current);
+      obstacleTimerRef.current = setInterval(
+        spawnObstacle,
+        latestSettings.spawnRate
+      );
+    }
+  }, [difficultyTier, settings, spawnObstacle]);
+
   // Start the game - need to define this before handleJump can reference it
   const startGame = useCallback(() => {
-    // Reset game state
+    // Reset game state and difficulty
+    scoreRef.current = 0;
+    lastScoringObstacleRef.current = null;
+
     setGameState({
       isActive: true,
       gameOver: false,
       score: 0,
     });
+
+    setDifficultyTier(0);
+    currentSpawnRateRef.current = baseSettings.spawnRate;
 
     // Clear any existing timers
     if (obstacleTimerRef.current) {
@@ -651,13 +745,26 @@ export default function useGameLogic({
     // Clear obstacles
     setObstacles([]);
 
+    // Get initial settings
+    const initialSettings = settings();
+
     // Start obstacle spawning
     spawnObstacle(); // Spawn one immediately
-    obstacleTimerRef.current = setInterval(spawnObstacle, settings.spawnRate);
+    obstacleTimerRef.current = setInterval(
+      spawnObstacle,
+      initialSettings.spawnRate
+    );
 
     // Start game loop
     animationFrameRef.current = requestAnimationFrame(gameLoop);
-  }, [boardSize.height, settings, spawnObstacle, gameLoop, scaleFactor]);
+  }, [
+    boardSize.height,
+    settings,
+    spawnObstacle,
+    gameLoop,
+    scaleFactor,
+    baseSettings.spawnRate,
+  ]);
 
   // Handle player jump - now startGame is defined before this function
   const handleJump = useCallback(() => {
@@ -669,12 +776,14 @@ export default function useGameLogic({
       return;
     }
 
+    const latestSettings = settings();
+
     setAirplane((prev) => ({
       ...prev,
-      velocity: settings.jumpPower,
+      velocity: latestSettings.jumpPower,
       rotation: -20,
     }));
-  }, [settings.jumpPower, startGame]);
+  }, [settings, startGame]);
 
   // Collision detection effect - separate from the game loop to avoid state updates during render
   useEffect(() => {

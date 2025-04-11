@@ -1,5 +1,3 @@
-export type Difficulty = "easy" | "medium" | "hard";
-
 export interface GameBoardSize {
   width: number;
   height: number;
@@ -11,7 +9,6 @@ export interface GameSetupProps {
 }
 
 export interface GamePlayProps {
-  difficulty: Difficulty;
   onBoardSizeChange: (size: GameBoardSize) => void;
   highScore: number;
   setHighScore: (score: number) => void;
