@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { GameBoardSize } from "../types";
 
 interface UseBoardSizeProps {
@@ -13,7 +13,7 @@ export default function useBoardSize({ onSizeChange }: UseBoardSizeProps = {}) {
   const [sizeCalculated, setSizeCalculated] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const calculateBoardSize = () => {
+  const calculateBoardSize = useCallback(() => {
     if (!containerRef.current) {
       setSizeCalculated(true);
       return;
@@ -56,7 +56,7 @@ export default function useBoardSize({ onSizeChange }: UseBoardSizeProps = {}) {
     if (onSizeChange) {
       onSizeChange(newSize);
     }
-  };
+  }, [onSizeChange]);
 
   useEffect(() => {
     // Initial calculation
@@ -84,7 +84,7 @@ export default function useBoardSize({ onSizeChange }: UseBoardSizeProps = {}) {
       window.removeEventListener("orientationchange", handleResize);
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [calculateBoardSize]);
 
   return {
     boardSize,
