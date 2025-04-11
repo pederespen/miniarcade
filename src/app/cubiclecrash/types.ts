@@ -6,16 +6,12 @@ export interface GameBoardSize {
 }
 
 export interface GameSetupProps {
-  difficulty: Difficulty;
-  onDifficultyChange: (difficulty: Difficulty) => void;
   onStartGame: () => void;
   highScore: number;
 }
 
 export interface GamePlayProps {
   difficulty: Difficulty;
-  onReset: () => void;
-  gameBoardSize: GameBoardSize;
   onBoardSizeChange: (size: GameBoardSize) => void;
   highScore: number;
   setHighScore: (score: number) => void;

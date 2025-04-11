@@ -8,7 +8,6 @@ import useGameLogic from "../hooks/use-game-logic";
 
 export default function GamePlay({
   difficulty,
-  onReset,
   onBoardSizeChange,
   highScore,
   setHighScore,
@@ -46,12 +45,6 @@ export default function GamePlay({
     setTimeout(() => resetGame(), 0);
   }, [resetGame]);
 
-  // Safely handle the main menu click
-  const handleMainMenu = useCallback(() => {
-    // Use setTimeout to avoid potential React state update conflicts
-    setTimeout(() => onReset(), 0);
-  }, [onReset]);
-
   // Add keyboard controls
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -82,14 +75,7 @@ export default function GamePlay({
 
   return (
     <div className="flex flex-col items-center w-full space-y-4">
-      <div className="flex flex-col md:flex-row justify-between w-full max-w-xl">
-        <button
-          onClick={handleMainMenu}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mb-2 md:mb-0"
-        >
-          Main Menu
-        </button>
-
+      <div className="flex justify-end w-full max-w-xl">
         <div className="flex space-x-3">
           <button
             onClick={() => setDebugMode((prev) => !prev)}
@@ -120,11 +106,14 @@ export default function GamePlay({
             ref={gameContainerRef}
             className="absolute inset-0 flex justify-center items-center"
             onClick={handleJump}
-            onTouchStart={(e) => {
-              e.preventDefault();
+            onTouchStart={() => {
+              // Don't call preventDefault() as modern browsers handle touch events as passive by default
               handleJump();
             }}
-            style={{ cursor: "pointer" }}
+            style={{
+              cursor: "pointer",
+              touchAction: "none", // This tells the browser we'll handle all touch actions
+            }}
           >
             <GameBoard
               airplane={airplane}
@@ -137,16 +126,11 @@ export default function GamePlay({
           </div>
 
           {!isPlaying && !gameOver && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
               <div className="text-center p-6 rounded-lg">
                 <h2 className="text-2xl font-bold text-white mb-4">
                   Cubicle Crash
                 </h2>
-                <p className="text-cyan-200 mb-6">
-                  {window.innerWidth <= 768
-                    ? "Tap to start flying!"
-                    : "Click or tap to start flying!"}
-                </p>
                 <button
                   onClick={handleJump}
                   className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full"
@@ -156,29 +140,27 @@ export default function GamePlay({
               </div>
             </div>
           )}
-        </div>
-      </div>
 
-      <div className="text-center text-indigo-100 space-y-2">
-        <p>
-          {window.innerWidth <= 768
-            ? "Tap the screen to fly!"
-            : "Click or tap the screen to make the paper airplane fly!"}
-        </p>
-        <p>
-          Current Score: {score} | High Score: {highScore}
-        </p>
-        {gameOver && (
-          <div className="mt-6 font-bold text-xl">
-            <p className="text-cyan-400">Game Over!</p>
-            <button
-              onClick={handleReset}
-              className="mt-2 bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-6 rounded-full"
-            >
-              Try Again
-            </button>
-          </div>
-        )}
+          {gameOver && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-lg">
+              <div className="text-center p-6 rounded-lg">
+                <h2 className="text-2xl font-bold text-cyan-400 mb-4">
+                  Game Over!
+                </h2>
+                <div className="mb-6 text-white">
+                  <p className="text-xl mb-2">Score: {score}</p>
+                  <p className="text-lg">High Score: {highScore}</p>
+                </div>
+                <button
+                  onClick={handleReset}
+                  className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full cursor-pointer"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

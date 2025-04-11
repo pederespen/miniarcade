@@ -337,24 +337,6 @@ export default function GameBoard({
     ctx.font = "bold 24px sans-serif";
     ctx.textAlign = "left";
     ctx.fillText(`Score: ${score}`, 20, 40);
-
-    // Draw game over
-    if (gameOver) {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-      ctx.fillRect(0, 0, boardSize.width, boardSize.height);
-
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 40px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("GAME OVER", boardSize.width / 2, boardSize.height / 2 - 20);
-
-      ctx.font = "bold 30px sans-serif";
-      ctx.fillText(
-        `Score: ${score}`,
-        boardSize.width / 2,
-        boardSize.height / 2 + 30
-      );
-    }
   }, [airplane, obstacles, boardSize, score, gameOver, debug]);
 
   return (
