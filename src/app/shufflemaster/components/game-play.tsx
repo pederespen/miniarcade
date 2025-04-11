@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import ShuffleMasterGame from "../game";
-import { GameplayControls } from "../components/tooltips";
+import { GameplayControls } from "./tooltips";
 
 // GamePlay Component
 export function GamePlay({
