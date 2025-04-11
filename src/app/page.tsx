@@ -10,10 +10,11 @@ export default function Home() {
       imageUrl: "/images/shufflemaster.png",
     },
     {
-      id: "game1",
-      title: "Coming Soon",
-      description: "🚧 🏗️ 👷",
-      imageUrl: "/images/game1.png",
+      id: "paperplane",
+      title: "Paper Plane",
+      description:
+        "Navigate your paper airplane through office obstacles! How far can you fly?",
+      imageUrl: "/images/paperplane.png",
     },
     {
       id: "game2",
