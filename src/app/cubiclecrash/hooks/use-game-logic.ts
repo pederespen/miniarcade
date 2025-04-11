@@ -124,24 +124,24 @@ export default function useGameLogic({
       case "drawer":
         return {
           x: obstacle.x + obstacle.width * 0.05,
-          y: obstacle.y + obstacle.height * 0.25,
+          y: obstacle.y + obstacle.height * 0.15,
           width: obstacle.width * 0.9,
-          height: obstacle.height * 0.5,
+          height: obstacle.height * 0.6,
         };
 
       case "coffee":
         return {
-          x: obstacle.x + obstacle.width * 0.2,
+          x: obstacle.x + obstacle.width * 0.25 - 2,
           y: obstacle.y + obstacle.height * 0.2,
-          width: obstacle.width * 0.6,
-          height: obstacle.height * 0.6,
+          width: obstacle.width * 0.5 + 4,
+          height: obstacle.height * 0.7,
         };
 
       case "monitor":
         return {
-          x: obstacle.x + obstacle.width * 0.1,
-          y: obstacle.y + obstacle.height * 0.1,
-          width: obstacle.width * 0.8,
+          x: obstacle.x + obstacle.width * 0.125,
+          y: obstacle.y + obstacle.height * 0.125,
+          width: obstacle.width * 0.75,
           height: obstacle.height * 0.7,
         };
 
@@ -312,10 +312,10 @@ export default function useGameLogic({
       switch (obstacle.type) {
         case "fan": {
           // For circular objects, we'll use a circular hitbox
-          const radius = obstacle.width * 0.37; // Slightly larger radius (was 0.35)
+          const radius = obstacle.width * 0.37;
           const center: CircleHitbox = {
             x: obstacle.x + obstacle.width / 2,
-            y: obstacle.y + obstacle.height / 2,
+            y: obstacle.y + obstacle.height / 3,
             radius: radius,
           };
 
@@ -357,14 +357,14 @@ export default function useGameLogic({
           const plantHitbox: PlantHitbox = {
             pot: {
               x: obstacle.x + obstacle.width * 0.25,
-              y: obstacle.y + obstacle.height * 0.5,
+              y: obstacle.y + obstacle.height * 0.5 + 5,
               width: obstacle.width * 0.5,
-              height: obstacle.height * 0.5,
+              height: obstacle.height * 0.5 - 5,
             },
             foliage: {
               x: obstacle.x + obstacle.width * 0.5,
               y: obstacle.y + obstacle.height * 0.3,
-              radius: obstacle.width * 0.35, // Slightly larger radius (was 0.3)
+              radius: obstacle.width * 0.4,
             },
           };
 
@@ -389,6 +389,77 @@ export default function useGameLogic({
             );
 
           return potCollision || foliageCollision;
+        }
+
+        case "coffee": {
+          // Handle coffee mug with two parts: main body and handle
+          // Main mug body (rectangle)
+          const mugBody: RectHitbox = {
+            x: obstacle.x + obstacle.width * 0.25 - 2,
+            y: obstacle.y + obstacle.height * 0.2,
+            width: obstacle.width * 0.5 + 4,
+            height: obstacle.height * 0.7,
+          };
+
+          // Check collision with mug body
+          const bodyCollision =
+            pointInRectangle(p1, mugBody) ||
+            pointInRectangle(p2, mugBody) ||
+            pointInRectangle(p3, mugBody) ||
+            edges.some((edge) => lineRectIntersect(edge, mugBody));
+
+          // Mug handle (circular arc)
+          const handleCenter: CircleHitbox = {
+            x: obstacle.x + obstacle.width * 0.75 + 2,
+            y: obstacle.y + obstacle.height * 0.5,
+            radius: obstacle.width * 0.16,
+          };
+
+          // Check collision with handle
+          const handleCollision =
+            distance(p1, handleCenter) < handleCenter.radius ||
+            distance(p2, handleCenter) < handleCenter.radius ||
+            distance(p3, handleCenter) < handleCenter.radius ||
+            edges.some((edge) =>
+              lineCircleIntersect(edge, handleCenter, handleCenter.radius)
+            );
+
+          return bodyCollision || handleCollision;
+        }
+
+        case "monitor": {
+          // Handle monitor with screen and stand
+          // Monitor screen (main part)
+          const screen: RectHitbox = {
+            x: obstacle.x + obstacle.width * 0.125,
+            y: obstacle.y + obstacle.height * 0.125,
+            width: obstacle.width * 0.75,
+            height: obstacle.height * 0.7,
+          };
+
+          // Monitor stand
+          const stand: RectHitbox = {
+            x: obstacle.x + obstacle.width * 0.5 - obstacle.width * 0.0625,
+            y: obstacle.y + obstacle.height * 0.8,
+            width: obstacle.width * 0.125,
+            height: obstacle.height * 0.17,
+          };
+
+          // Check collision with screen
+          const screenCollision =
+            pointInRectangle(p1, screen) ||
+            pointInRectangle(p2, screen) ||
+            pointInRectangle(p3, screen) ||
+            edges.some((edge) => lineRectIntersect(edge, screen));
+
+          // Check collision with stand
+          const standCollision =
+            pointInRectangle(p1, stand) ||
+            pointInRectangle(p2, stand) ||
+            pointInRectangle(p3, stand) ||
+            edges.some((edge) => lineRectIntersect(edge, stand));
+
+          return screenCollision || standCollision;
         }
 
         default: {

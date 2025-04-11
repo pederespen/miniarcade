@@ -769,10 +769,10 @@ export default function GameBoard({
         switch (obstacle.type) {
           case "fan":
             // Draw circular hitbox for fan
-            const radius = obstacle.width * 0.37; // Matching collision detection
+            const radius = obstacle.width * 0.37;
             const center = {
               x: obstacle.x + obstacle.width / 2,
-              y: obstacle.y + obstacle.height / 2,
+              y: obstacle.y + obstacle.height / 3,
             };
 
             ctx.beginPath();
@@ -783,23 +783,84 @@ export default function GameBoard({
           case "plant":
             // Draw pot hitbox (rectangle)
             const pot = {
-              x: obstacle.x + obstacle.width * 0.25,
-              y: obstacle.y + obstacle.height * 0.5,
-              width: obstacle.width * 0.5,
-              height: obstacle.height * 0.5,
+              x: obstacle.x + obstacle.width / 4,
+              y: obstacle.y + obstacle.height / 2 + 5,
+              width: obstacle.width / 2,
+              height: obstacle.height / 2 - 5,
             };
 
             ctx.strokeRect(pot.x, pot.y, pot.width, pot.height);
 
-            // Draw foliage hitbox (circle)
+            // Draw foliage hitbox (circle) - covers all the overlapping foliage circles
             const foliage = {
-              x: obstacle.x + obstacle.width * 0.5,
-              y: obstacle.y + obstacle.height * 0.3,
-              radius: obstacle.width * 0.35, // Matching collision detection
+              x: obstacle.x + obstacle.width / 2,
+              y: obstacle.y + obstacle.height / 3,
+              radius: obstacle.width * 0.4,
             };
 
             ctx.beginPath();
             ctx.arc(foliage.x, foliage.y, foliage.radius, 0, Math.PI * 2);
+            ctx.stroke();
+            break;
+
+          case "coffee":
+            // Draw coffee mug hitbox to match new design
+            // Mug body
+            ctx.beginPath();
+            ctx.rect(
+              obstacle.x + obstacle.width / 4 - 2,
+              obstacle.y + obstacle.height / 5,
+              obstacle.width / 2 + 4,
+              obstacle.height * 0.7
+            );
+            ctx.stroke();
+
+            // Mug handle
+            ctx.beginPath();
+            ctx.arc(
+              obstacle.x + (obstacle.width * 3) / 4 + 2,
+              obstacle.y + obstacle.height / 2,
+              obstacle.width / 6,
+              -Math.PI / 2,
+              Math.PI / 2
+            );
+            ctx.stroke();
+            break;
+
+          case "monitor":
+            // Draw monitor hitbox to match new design
+            // Monitor screen (main part)
+            ctx.beginPath();
+            ctx.roundRect(
+              obstacle.x + obstacle.width / 8,
+              obstacle.y + obstacle.height / 8,
+              obstacle.width - obstacle.width / 4,
+              obstacle.height - obstacle.height / 3,
+              3
+            );
+            ctx.stroke();
+
+            // Monitor stand
+            ctx.beginPath();
+            ctx.rect(
+              obstacle.x + obstacle.width / 2 - obstacle.width / 16,
+              obstacle.y + obstacle.height - obstacle.height / 5,
+              obstacle.width / 8,
+              obstacle.height / 6
+            );
+            ctx.stroke();
+            break;
+
+          case "drawer":
+            // Draw drawer hitbox to match new design
+            ctx.beginPath();
+            ctx.roundRect(
+              obstacle.x + obstacle.width * 0.05,
+              obstacle.y + obstacle.height * 0.15,
+              obstacle.width * 0.9,
+              obstacle.height * 0.6,
+              3
+            );
             ctx.stroke();
             break;
 
