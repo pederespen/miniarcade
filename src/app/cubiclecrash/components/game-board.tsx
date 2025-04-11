@@ -64,22 +64,39 @@ export default function GameBoard({
     // Clear canvas
     ctx.clearRect(0, 0, boardSize.width, boardSize.height);
 
-    // Draw background (office wall)
-    ctx.fillStyle = "#f0f0f0";
+    // Draw enhanced office background
+    // Base wall color
+    const wallGradient = ctx.createLinearGradient(0, 0, 0, boardSize.height);
+    wallGradient.addColorStop(0, "#f5f5f5");
+    wallGradient.addColorStop(1, "#e0e0e0");
+    ctx.fillStyle = wallGradient;
     ctx.fillRect(0, 0, boardSize.width, boardSize.height);
 
-    // Draw grid lines
-    ctx.strokeStyle = "#e0e0e0";
+    // Cubicle wall texture - horizontal panels
+    ctx.fillStyle = "#e8e8e8";
+    for (let y = 50; y < boardSize.height; y += 100) {
+      ctx.fillRect(0, y - 5, boardSize.width, 10);
+    }
+
+    // Cubicle posts - vertical supports
+    ctx.fillStyle = "#d0d0d0";
+    for (let x = 0; x < boardSize.width; x += 300) {
+      ctx.fillRect(x - 5, 0, 10, boardSize.height);
+    }
+
+    // Add some subtle pattern
+    ctx.strokeStyle = "#dedede";
     ctx.lineWidth = 1;
 
-    // Grid lines
-    for (let y = 0; y < boardSize.height; y += 50) {
+    // Horizontal lines - cubicle fabric texture
+    for (let y = 0; y < boardSize.height; y += 20) {
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(boardSize.width, y);
       ctx.stroke();
     }
 
+    // Vertical lines - more subtle
     for (let x = 0; x < boardSize.width; x += 50) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
@@ -87,8 +104,19 @@ export default function GameBoard({
       ctx.stroke();
     }
 
+    // Add some shading around the edges to create depth
+    const edgeGradient = ctx.createLinearGradient(
+      0,
+      0,
+      boardSize.width * 0.3,
+      boardSize.height * 0.3
+    );
+    edgeGradient.addColorStop(0, "rgba(0, 0, 0, 0.1)");
+    edgeGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+    ctx.fillStyle = edgeGradient;
+    ctx.fillRect(0, 0, boardSize.width, boardSize.height);
+
     // Draw airplane
-    ctx.fillStyle = "#3b82f6";
     ctx.save();
     ctx.translate(
       airplane.x + airplane.width / 2,
@@ -96,17 +124,89 @@ export default function GameBoard({
     );
     ctx.rotate((airplane.rotation * Math.PI) / 180);
 
-    // Paper airplane shape
+    // Enhanced 3D paper airplane
+    const planeWidth = airplane.width;
+    const planeHeight = airplane.height;
+
+    // Main body
     ctx.beginPath();
-    ctx.moveTo(airplane.width / 2, 0);
-    ctx.lineTo(-airplane.width / 2, -airplane.height / 2);
-    ctx.lineTo(-airplane.width / 4, 0);
-    ctx.lineTo(-airplane.width / 2, airplane.height / 2);
+    ctx.moveTo(planeWidth / 2, 0); // Nose tip
+    ctx.lineTo(-planeWidth / 2, -planeHeight / 2); // Top left
+    ctx.lineTo(-planeWidth / 4, 0); // Middle fold
+    ctx.lineTo(-planeWidth / 2, planeHeight / 2); // Bottom left
     ctx.closePath();
-    ctx.fillStyle = "#f0f0f0";
+
+    // Base color - light paper color
+    ctx.fillStyle = "#f5f5f5";
     ctx.fill();
+
+    // Add shadow for 3D effect - right wing
+    const rightWingGradient = ctx.createLinearGradient(
+      0,
+      0,
+      planeWidth / 2,
+      planeHeight / 4
+    );
+    rightWingGradient.addColorStop(0, "rgba(180, 180, 180, 0.5)");
+    rightWingGradient.addColorStop(1, "rgba(230, 230, 230, 0.2)");
+
+    ctx.beginPath();
+    ctx.moveTo(planeWidth / 2, 0); // Nose tip
+    ctx.lineTo(-planeWidth / 4, 0); // Middle fold
+    ctx.lineTo(-planeWidth / 2, planeHeight / 2); // Bottom left
+    ctx.closePath();
+    ctx.fillStyle = rightWingGradient;
+    ctx.fill();
+
+    // Add highlight for 3D effect - left wing
+    const leftWingGradient = ctx.createLinearGradient(
+      0,
+      0,
+      -planeWidth / 3,
+      -planeHeight / 3
+    );
+    leftWingGradient.addColorStop(0, "rgba(255, 255, 255, 0.8)");
+    leftWingGradient.addColorStop(1, "rgba(240, 240, 240, 0.3)");
+
+    ctx.beginPath();
+    ctx.moveTo(planeWidth / 2, 0); // Nose tip
+    ctx.lineTo(-planeWidth / 2, -planeHeight / 2); // Top left
+    ctx.lineTo(-planeWidth / 4, 0); // Middle fold
+    ctx.closePath();
+    ctx.fillStyle = leftWingGradient;
+    ctx.fill();
+
+    // Draw folding lines
+    ctx.beginPath();
+    ctx.moveTo(planeWidth / 2, 0); // From nose
+    ctx.lineTo(-planeWidth / 4, 0); // To middle fold
+    ctx.strokeStyle = "#aaaaaa";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Bottom middle fold line
+    ctx.beginPath();
+    ctx.moveTo(-planeWidth / 4, 0);
+    ctx.lineTo(-planeWidth / 3, planeHeight / 4);
+    ctx.strokeStyle = "#aaaaaa";
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+
+    // Top middle fold line
+    ctx.beginPath();
+    ctx.moveTo(-planeWidth / 4, 0);
+    ctx.lineTo(-planeWidth / 3, -planeHeight / 4);
+    ctx.stroke();
+
+    // Outline the entire plane
+    ctx.beginPath();
+    ctx.moveTo(planeWidth / 2, 0); // Nose tip
+    ctx.lineTo(-planeWidth / 2, -planeHeight / 2); // Top left
+    ctx.lineTo(-planeWidth / 4, 0); // Middle fold
+    ctx.lineTo(-planeWidth / 2, planeHeight / 2); // Bottom left
+    ctx.closePath();
     ctx.strokeStyle = "#6b7280";
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
     ctx.restore();
@@ -115,39 +215,404 @@ export default function GameBoard({
     obstacles.forEach((obstacle) => {
       switch (obstacle.type) {
         case "drawer":
-          // Brown drawer
-          ctx.fillStyle = "#8B4513";
-          ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-          ctx.fillStyle = "#A0522D";
-          ctx.fillRect(
+          // Enhanced 3D drawer
+          // Drawer body with gradient for depth
+          const drawerGradient = ctx.createLinearGradient(
+            obstacle.x,
+            obstacle.y,
+            obstacle.x + obstacle.width,
+            obstacle.y + obstacle.height
+          );
+          drawerGradient.addColorStop(0, "#8B4513");
+          drawerGradient.addColorStop(1, "#5D2906");
+
+          ctx.fillStyle = drawerGradient;
+          ctx.beginPath();
+          ctx.roundRect(
+            obstacle.x,
+            obstacle.y,
+            obstacle.width,
+            obstacle.height,
+            5
+          );
+          ctx.fill();
+
+          // Drawer front panel with lighter wood color
+          const frontGradient = ctx.createLinearGradient(
+            obstacle.x + 5,
+            obstacle.y + 5,
+            obstacle.x + obstacle.width - 5,
+            obstacle.y + obstacle.height / 2
+          );
+          frontGradient.addColorStop(0, "#A0522D");
+          frontGradient.addColorStop(1, "#8B4513");
+
+          ctx.fillStyle = frontGradient;
+          ctx.beginPath();
+          ctx.roundRect(
             obstacle.x + 5,
             obstacle.y + 5,
             obstacle.width - 10,
-            obstacle.height / 2 - 5
+            obstacle.height / 2 - 5,
+            3
           );
+          ctx.fill();
+
+          // Drawer handle
+          ctx.fillStyle = "#D4AF37";
+          ctx.beginPath();
+          ctx.roundRect(
+            obstacle.x + obstacle.width / 2 - obstacle.width / 8,
+            obstacle.y + obstacle.height / 4 - 5,
+            obstacle.width / 4,
+            10,
+            5
+          );
+          ctx.fill();
+
+          // Add wood grain texture (simple lines)
+          ctx.strokeStyle = "rgba(60, 30, 15, 0.2)";
+          ctx.lineWidth = 1;
+
+          for (
+            let y = obstacle.y + 15;
+            y < obstacle.y + obstacle.height - 10;
+            y += 8
+          ) {
+            ctx.beginPath();
+            ctx.moveTo(obstacle.x + 10, y);
+            ctx.bezierCurveTo(
+              obstacle.x + obstacle.width / 3,
+              y + 3,
+              obstacle.x + (obstacle.width * 2) / 3,
+              y - 2,
+              obstacle.x + obstacle.width - 10,
+              y + 1
+            );
+            ctx.stroke();
+          }
+
+          // Add shadow at the bottom
+          ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
+          ctx.beginPath();
+          ctx.rect(
+            obstacle.x,
+            obstacle.y + obstacle.height - 8,
+            obstacle.width,
+            8
+          );
+          ctx.fill();
           break;
         case "coffee":
-          // Coffee mug
+          // Enhanced coffee mug with 3D effect
+          // Mug body
           ctx.fillStyle = "#ffffff";
-          ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-          ctx.fillStyle = "#6b4226";
-          ctx.fillRect(
-            obstacle.x + 10,
-            obstacle.y + 10,
-            obstacle.width - 20,
-            obstacle.height - 20
+          ctx.beginPath();
+          ctx.ellipse(
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + obstacle.height - obstacle.height / 6,
+            obstacle.width / 2 - 2,
+            obstacle.height / 6,
+            0,
+            0,
+            Math.PI * 2
           );
+          ctx.fill();
+
+          // Create gradient for mug body
+          const mugGradient = ctx.createLinearGradient(
+            obstacle.x,
+            obstacle.y,
+            obstacle.x + obstacle.width,
+            obstacle.y + obstacle.height
+          );
+          mugGradient.addColorStop(0, "#ffffff");
+          mugGradient.addColorStop(1, "#e0e0e0");
+
+          // Cylindrical body
+          ctx.fillStyle = mugGradient;
+          ctx.beginPath();
+          ctx.rect(
+            obstacle.x + obstacle.width / 4,
+            obstacle.y + obstacle.height / 5,
+            obstacle.width / 2,
+            obstacle.height * 0.7
+          );
+          ctx.fill();
+
+          // Coffee liquid
+          const coffeeGradient = ctx.createLinearGradient(
+            obstacle.x + obstacle.width / 4,
+            obstacle.y + obstacle.height / 5,
+            obstacle.x + (obstacle.width * 3) / 4,
+            obstacle.y + obstacle.height / 3
+          );
+          coffeeGradient.addColorStop(0, "#6b4226");
+          coffeeGradient.addColorStop(1, "#8B5A2B");
+
+          ctx.fillStyle = coffeeGradient;
+          ctx.beginPath();
+          ctx.ellipse(
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + obstacle.height / 5,
+            obstacle.width / 4,
+            obstacle.height / 12,
+            0,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+
+          // Mug handle
+          ctx.strokeStyle = "#e0e0e0";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(
+            obstacle.x + (obstacle.width * 3) / 4 + 2,
+            obstacle.y + obstacle.height / 2,
+            obstacle.width / 6,
+            -Math.PI / 2,
+            Math.PI / 2
+          );
+          ctx.stroke();
           break;
         case "plant":
-          // Plant
-          ctx.fillStyle = "#8B4513";
-          ctx.fillRect(
+          // Enhanced 3D plant
+          // Plant pot with gradient
+          const potGradient = ctx.createLinearGradient(
             obstacle.x + obstacle.width / 4,
             obstacle.y + obstacle.height / 2,
-            obstacle.width / 2,
-            obstacle.height / 2
+            obstacle.x + (obstacle.width * 3) / 4,
+            obstacle.y + obstacle.height
           );
-          ctx.fillStyle = "#2e7d32";
+          potGradient.addColorStop(0, "#A0522D");
+          potGradient.addColorStop(1, "#8B4513");
+
+          ctx.fillStyle = potGradient;
+
+          // Draw pot with rounded bottom
+          ctx.beginPath();
+          ctx.moveTo(
+            obstacle.x + obstacle.width / 4,
+            obstacle.y + obstacle.height / 2 + 5
+          );
+          ctx.lineTo(
+            obstacle.x + obstacle.width / 4,
+            obstacle.y + obstacle.height - 5
+          );
+          ctx.quadraticCurveTo(
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + obstacle.height + 5,
+            obstacle.x + (obstacle.width * 3) / 4,
+            obstacle.y + obstacle.height - 5
+          );
+          ctx.lineTo(
+            obstacle.x + (obstacle.width * 3) / 4,
+            obstacle.y + obstacle.height / 2 + 5
+          );
+          ctx.closePath();
+          ctx.fill();
+
+          // Pot rim
+          ctx.fillStyle = "#D2691E";
+          ctx.beginPath();
+          ctx.rect(
+            obstacle.x + obstacle.width / 4 - 3,
+            obstacle.y + obstacle.height / 2,
+            obstacle.width / 2 + 6,
+            8
+          );
+          ctx.fill();
+
+          // Plant foliage with gradient
+          const foliageGradient = ctx.createRadialGradient(
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + obstacle.height / 3,
+            obstacle.width / 10,
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + obstacle.height / 3,
+            obstacle.width / 2.5
+          );
+          foliageGradient.addColorStop(0, "#4CAF50");
+          foliageGradient.addColorStop(0.7, "#2e7d32");
+          foliageGradient.addColorStop(1, "#1b5e20");
+
+          ctx.fillStyle = foliageGradient;
+
+          // Draw multiple overlapping circles for fuller foliage
+          for (let i = 0; i < 5; i++) {
+            const offsetX =
+              (Math.cos((i * Math.PI) / 2.5) * obstacle.width) / 12;
+            const offsetY =
+              (Math.sin((i * Math.PI) / 2.5) * obstacle.width) / 12;
+
+            ctx.beginPath();
+            ctx.arc(
+              obstacle.x + obstacle.width / 2 + offsetX,
+              obstacle.y + obstacle.height / 3 + offsetY,
+              obstacle.width / 5,
+              0,
+              Math.PI * 2
+            );
+            ctx.fill();
+          }
+
+          // Add plant stem
+          ctx.strokeStyle = "#43A047";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + obstacle.height / 2
+          );
+          ctx.lineTo(
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + obstacle.height / 3
+          );
+          ctx.stroke();
+          break;
+        case "monitor":
+          // Enhanced 3D monitor
+          // Monitor base
+          const baseGradient = ctx.createLinearGradient(
+            obstacle.x + obstacle.width / 3,
+            obstacle.y + obstacle.height - obstacle.height / 6,
+            obstacle.x + (obstacle.width * 2) / 3,
+            obstacle.y + obstacle.height
+          );
+          baseGradient.addColorStop(0, "#555555");
+          baseGradient.addColorStop(1, "#333333");
+
+          ctx.fillStyle = baseGradient;
+          ctx.beginPath();
+          ctx.ellipse(
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + obstacle.height - obstacle.height / 12,
+            obstacle.width / 4,
+            obstacle.height / 12,
+            0,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+
+          // Monitor stand
+          ctx.fillStyle = "#444444";
+          ctx.beginPath();
+          ctx.rect(
+            obstacle.x + obstacle.width / 2 - obstacle.width / 16,
+            obstacle.y + obstacle.height - obstacle.height / 5,
+            obstacle.width / 8,
+            obstacle.height / 6
+          );
+          ctx.fill();
+
+          // Monitor body with 3D effect
+          const monitorBodyGradient = ctx.createLinearGradient(
+            obstacle.x,
+            obstacle.y,
+            obstacle.x + obstacle.width,
+            obstacle.y + obstacle.height / 2
+          );
+          monitorBodyGradient.addColorStop(0, "#444444");
+          monitorBodyGradient.addColorStop(1, "#222222");
+
+          // Monitor frame
+          ctx.fillStyle = monitorBodyGradient;
+          ctx.beginPath();
+          ctx.roundRect(
+            obstacle.x,
+            obstacle.y,
+            obstacle.width,
+            obstacle.height - obstacle.height / 5,
+            5
+          );
+          ctx.fill();
+
+          // Monitor screen
+          const screenGradient = ctx.createLinearGradient(
+            obstacle.x + obstacle.width / 8,
+            obstacle.y + obstacle.height / 8,
+            obstacle.x + obstacle.width - obstacle.width / 8,
+            obstacle.y + obstacle.height - obstacle.height / 3
+          );
+          screenGradient.addColorStop(0, "#1e3a8a");
+          screenGradient.addColorStop(1, "#0c1e4a");
+
+          ctx.fillStyle = screenGradient;
+          ctx.beginPath();
+          ctx.roundRect(
+            obstacle.x + obstacle.width / 8,
+            obstacle.y + obstacle.height / 8,
+            obstacle.width - obstacle.width / 4,
+            obstacle.height - obstacle.height / 3,
+            3
+          );
+          ctx.fill();
+
+          // Add screen glare
+          ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+          ctx.beginPath();
+          ctx.ellipse(
+            obstacle.x + obstacle.width / 3,
+            obstacle.y + obstacle.height / 5,
+            obstacle.width / 8,
+            obstacle.height / 8,
+            -Math.PI / 4,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+          break;
+        case "fan":
+          // Enhanced 3D fan
+          // Fan base
+          const fanBaseGradient = ctx.createLinearGradient(
+            obstacle.x + obstacle.width / 4,
+            obstacle.y + (obstacle.height * 3) / 4,
+            obstacle.x + (obstacle.width * 3) / 4,
+            obstacle.y + obstacle.height
+          );
+          fanBaseGradient.addColorStop(0, "#777777");
+          fanBaseGradient.addColorStop(1, "#555555");
+
+          ctx.fillStyle = fanBaseGradient;
+          ctx.beginPath();
+          ctx.ellipse(
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + (obstacle.height * 7) / 8,
+            obstacle.width / 4,
+            obstacle.height / 8,
+            0,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+
+          // Fan pole
+          ctx.fillStyle = "#888888";
+          ctx.beginPath();
+          ctx.rect(
+            obstacle.x + obstacle.width / 2 - 4,
+            obstacle.y + obstacle.height / 2,
+            8,
+            (obstacle.height * 3) / 8
+          );
+          ctx.fill();
+
+          // Fan housing
+          const fanHousingGradient = ctx.createRadialGradient(
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + obstacle.height / 3,
+            obstacle.width / 8,
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + obstacle.height / 3,
+            obstacle.width / 2
+          );
+          fanHousingGradient.addColorStop(0, "#cccccc");
+          fanHousingGradient.addColorStop(1, "#999999");
+
+          ctx.fillStyle = fanHousingGradient;
           ctx.beginPath();
           ctx.arc(
             obstacle.x + obstacle.width / 2,
@@ -157,36 +622,78 @@ export default function GameBoard({
             Math.PI * 2
           );
           ctx.fill();
-          break;
-        case "monitor":
-          // Monitor
-          ctx.fillStyle = "#333333";
-          ctx.fillRect(
-            obstacle.x,
-            obstacle.y,
-            obstacle.width,
-            obstacle.height - 10
-          );
-          ctx.fillStyle = "#111111";
-          ctx.fillRect(
-            obstacle.x + 5,
-            obstacle.y + 5,
-            obstacle.width - 10,
-            obstacle.height - 20
-          );
-          break;
-        case "fan":
-          // Fan
-          ctx.fillStyle = "#aaaaaa";
+
+          // Fan blades
+          ctx.fillStyle = "#777777";
+          for (let i = 0; i < 4; i++) {
+            const angle =
+              (i * Math.PI) / 2 + ((Date.now() * 0.003) % (Math.PI * 2));
+            const bladeLength = obstacle.width / 3.5;
+
+            ctx.save();
+            ctx.translate(
+              obstacle.x + obstacle.width / 2,
+              obstacle.y + obstacle.height / 3
+            );
+            ctx.rotate(angle);
+
+            // Draw a blade
+            ctx.beginPath();
+            ctx.ellipse(
+              bladeLength / 2,
+              0,
+              bladeLength / 2,
+              bladeLength / 5,
+              0,
+              0,
+              Math.PI * 2
+            );
+            ctx.fill();
+            ctx.restore();
+          }
+
+          // Fan center
+          ctx.fillStyle = "#555555";
           ctx.beginPath();
           ctx.arc(
             obstacle.x + obstacle.width / 2,
-            obstacle.y + obstacle.height / 2,
-            obstacle.width / 2 - 5,
+            obstacle.y + obstacle.height / 3,
+            obstacle.width / 12,
             0,
             Math.PI * 2
           );
           ctx.fill();
+
+          // Fan grill
+          ctx.strokeStyle = "#666666";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(
+            obstacle.x + obstacle.width / 2,
+            obstacle.y + obstacle.height / 3,
+            obstacle.width / 3 - 2,
+            0,
+            Math.PI * 2
+          );
+          ctx.stroke();
+
+          // Fan grill spokes
+          for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI) / 4;
+            const innerRadius = obstacle.width / 6;
+            const outerRadius = obstacle.width / 3 - 2;
+
+            ctx.beginPath();
+            ctx.moveTo(
+              obstacle.x + obstacle.width / 2 + Math.cos(angle) * innerRadius,
+              obstacle.y + obstacle.height / 3 + Math.sin(angle) * innerRadius
+            );
+            ctx.lineTo(
+              obstacle.x + obstacle.width / 2 + Math.cos(angle) * outerRadius,
+              obstacle.y + obstacle.height / 3 + Math.sin(angle) * outerRadius
+            );
+            ctx.stroke();
+          }
           break;
         default:
           ctx.fillStyle = "#ef4444";
@@ -244,6 +751,14 @@ export default function GameBoard({
       ctx.lineTo(p2.x, p2.y);
       ctx.lineTo(p3.x, p3.y);
       ctx.closePath();
+      ctx.stroke();
+
+      // Draw interior fold line for hitbox visualization
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(planeCenter.x, planeCenter.y);
+      ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
+      ctx.lineWidth = 1;
       ctx.stroke();
 
       // Draw obstacle hitboxes
