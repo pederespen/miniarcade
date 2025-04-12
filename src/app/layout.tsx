@@ -20,7 +20,7 @@ export default function RootLayout({
           <div className="container mx-auto flex justify-center items-center">
             <Link href="/">
               <Image
-                src="./images/miniarcade-logo-with-text.png"
+                src="./miniarcade-logo-with-text.png"
                 alt="MiniArcade"
                 width={300}
                 height={100}

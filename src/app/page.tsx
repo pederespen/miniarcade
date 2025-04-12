@@ -31,7 +31,6 @@ export default function Home() {
           <Link key={game.id} href={`/${game.id}`} className="block h-full">
             <div className="bg-indigo-800 rounded-lg overflow-hidden shadow-lg hover:shadow-cyan-500/30 transition-all hover:scale-105 cursor-pointer flex flex-col h-full">
               <div className="h-60 bg-indigo-700 flex items-center justify-center">
-                {/* Placeholder for game images */}
                 <div className="text-7xl text-cyan-400">{game.title[0]}</div>
               </div>
               <div className="p-6 flex-grow flex flex-col justify-between">

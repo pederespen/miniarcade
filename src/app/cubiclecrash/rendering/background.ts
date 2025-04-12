@@ -16,7 +16,7 @@ export function drawBackground(
   // Load the background image if not already loaded
   if (!backgroundImage) {
     backgroundImage = new Image();
-    backgroundImage.src = "/images/cubiclecrash-background.svg";
+    backgroundImage.src = "/cubiclecrash/background.svg";
   }
 
   // Draw the background image if it's loaded
