@@ -514,17 +514,18 @@ export default function useGameLogic({
   const handleGameOver = useCallback(() => {
     if (gameStateRef.current.gameOver) return; // Prevent multiple calls
 
+    // Force cancellation of any existing animation frame first
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
     setGameState((prev) => ({ ...prev, isActive: false, gameOver: true }));
 
     // Clear all timers
     if (obstacleTimerRef.current) {
       clearInterval(obstacleTimerRef.current);
       obstacleTimerRef.current = null;
-    }
-
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
     }
 
     // Update high score
@@ -772,7 +773,11 @@ export default function useGameLogic({
 
   // Handle player jump - now startGame is defined before this function
   const handleJump = useCallback(() => {
-    if (gameStateRef.current.gameOver) return;
+    // If game is over, clicking/tapping anywhere should restart the game immediately
+    if (gameStateRef.current.gameOver) {
+      setTimeout(() => startGame(), 0);
+      return;
+    }
 
     // If game not active, start it
     if (!gameStateRef.current.isActive) {

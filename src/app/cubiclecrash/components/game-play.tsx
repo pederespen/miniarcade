@@ -101,7 +101,12 @@ export default function GamePlay({
             }}
             onTouchStart={() => {
               // Only handle touch on mobile devices
-              handleJump();
+              // If the game is over, handle it like a reset
+              if (gameOver) {
+                handleReset();
+              } else {
+                handleJump();
+              }
             }}
             style={{
               cursor: "pointer",
@@ -146,7 +151,10 @@ export default function GamePlay({
                   <p className="text-lg">High Score: {highScore}</p>
                 </div>
                 <button
-                  onClick={handleReset}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent event bubbling
+                    handleReset();
+                  }}
                   className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full cursor-pointer"
                 >
                   Try Again
