@@ -67,14 +67,21 @@ export default function GamePlay({
       setTimeout(() => {
         // Cancel any running animation frames globally
         if (window.requestAnimationFrame) {
-          const id = window.requestAnimationFrame(() => {});
-          for (let i = 0; i < id; i++) {
+          // More thorough cancelAnimationFrame approach
+          const highestId = window.requestAnimationFrame(() => {});
+          for (let i = highestId; i >= 0; i--) {
             window.cancelAnimationFrame(i);
           }
         }
 
-        resetGame();
-      }, 50);
+        // Force browser repaint
+        void document.body.offsetHeight;
+
+        // Small delay before resetGame to allow cleanup to complete
+        setTimeout(() => {
+          resetGame();
+        }, 50);
+      }, 20);
     }
   }, [gameOver, resetGame]);
 
@@ -163,6 +170,7 @@ export default function GamePlay({
               cursor: "pointer",
               touchAction: "none", // This tells the browser we'll handle all touch actions
               outline: "none", // Remove focus outline
+              WebkitTapHighlightColor: "transparent", // Prevent tap highlight on iOS
             }}
           >
             <GameBoard

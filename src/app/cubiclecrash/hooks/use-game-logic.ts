@@ -719,7 +719,7 @@ export default function useGameLogic({
   const startGame = useCallback(() => {
     // Ensure all existing animation frames are canceled before starting a new game
     // This helps prevent issues on mobile when restarting
-    if (animationFrameRef.current) {
+    if (animationFrameRef.current !== null) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
     }
@@ -772,7 +772,21 @@ export default function useGameLogic({
     // Get initial settings
     const initialSettings = settings();
 
-    // Start the warm-up timer
+    // Force a new game loop first - needed for mobile
+    if (typeof window !== "undefined") {
+      // Force layout recalculation in the browser
+      void window.document.body.offsetHeight;
+
+      // Start game loop immediately - no delay
+      // Use setTimeout to ensure it runs in a clean execution context
+      setTimeout(() => {
+        if (animationFrameRef.current === null) {
+          animationFrameRef.current = requestAnimationFrame(gameLoop);
+        }
+      }, 0);
+    }
+
+    // Start the warm-up timer after animation has started
     warmupTimerRef.current = setTimeout(() => {
       // End warm-up and start spawning obstacles
       setGameState((prev) => ({ ...prev, warmupActive: false }));
@@ -791,17 +805,6 @@ export default function useGameLogic({
         initialSettings.spawnRate
       );
     }, WARMUP_DURATION);
-
-    // Force a new game loop - potentially needed for mobile
-    if (typeof window !== "undefined") {
-      // Force layout recalculation in the browser
-      void window.document.body.offsetHeight;
-
-      // Start game loop immediately - no delay
-      animationFrameRef.current = requestAnimationFrame(() => {
-        gameLoop();
-      });
-    }
   }, [
     boardSize.height,
     settings,
@@ -815,7 +818,15 @@ export default function useGameLogic({
   const handleJump = useCallback(() => {
     // If game is over, clicking/tapping anywhere should restart the game immediately
     if (gameStateRef.current.gameOver) {
-      setTimeout(() => startGame(), 0);
+      // Use setTimeout with 0 delay to ensure clean execution context
+      setTimeout(() => {
+        // Force cancel any potentially running animation frames before starting
+        if (animationFrameRef.current !== null) {
+          cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
+        startGame();
+      }, 0);
       return;
     }
 

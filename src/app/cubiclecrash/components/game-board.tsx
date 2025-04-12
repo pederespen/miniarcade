@@ -39,8 +39,11 @@ export default function GameBoard({
     canvas.height = boardSize.height;
 
     // Apply pixel density adjustments for high DPI screens
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false });
     if (ctx) {
+      // Clear any previous content completely
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       const pixelRatio = window.devicePixelRatio || 1;
       if (pixelRatio > 1) {
         const displayWidth = canvas.width;
@@ -65,8 +68,11 @@ export default function GameBoard({
     // Don't attempt to draw if the board size is invalid
     if (boardSize.width <= 0 || boardSize.height <= 0) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
+
+    // Clear the canvas completely before drawing
+    ctx.clearRect(0, 0, boardSize.width, boardSize.height);
 
     // Draw background
     drawBackground(ctx, boardSize);
