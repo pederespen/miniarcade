@@ -88,9 +88,14 @@ export default function GamePlay({
           <div
             ref={gameContainerRef}
             className="absolute inset-0 flex justify-center items-center"
-            onClick={handleJump}
+            onClick={() => {
+              // Only handle clicks on desktop devices
+              if (window.matchMedia("(hover: hover)").matches) {
+                handleJump();
+              }
+            }}
             onTouchStart={() => {
-              // Don't call preventDefault() as modern browsers handle touch events as passive by default
+              // Only handle touch on mobile devices
               handleJump();
             }}
             style={{
