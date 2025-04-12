@@ -194,3 +194,42 @@ export function drawDebugHitboxes(
     }
   });
 }
+
+/**
+ * Draw debug statistics in the bottom left corner
+ */
+export function drawDebugStats(
+  ctx: CanvasRenderingContext2D,
+  boardSize: { width: number; height: number },
+  stats: {
+    obstacleSpeed: number;
+    spawnRate: number;
+    fps?: number;
+  }
+): void {
+  const { obstacleSpeed, spawnRate, fps } = stats;
+
+  // Draw semi-transparent background
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  ctx.fillRect(10, boardSize.height - 110, 180, 100);
+
+  // Set text style
+  ctx.fillStyle = "rgba(0, 255, 0, 0.9)";
+  ctx.font = "bold 14px monospace";
+  ctx.textAlign = "left";
+
+  // Display stats
+  const y = boardSize.height - 90;
+  const lineHeight = 18;
+
+  ctx.fillText(`Speed: ${obstacleSpeed.toFixed(2)}`, 20, y + lineHeight);
+  ctx.fillText(
+    `Spawn Rate: ${spawnRate.toFixed(0)} ms`,
+    20,
+    y + lineHeight * 2
+  );
+
+  if (fps !== undefined) {
+    ctx.fillText(`FPS: ${Math.round(fps)}`, 20, y + lineHeight * 3);
+  }
+}

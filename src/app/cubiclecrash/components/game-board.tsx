@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Airplane, GameBoardSize, Obstacle } from "../types";
 import {
   drawBackground,
@@ -8,6 +8,7 @@ import {
   drawObstacle,
   drawDebugHitboxes,
   drawScore,
+  drawDebugStats,
 } from "../rendering";
 
 interface GameBoardProps {
@@ -17,6 +18,10 @@ interface GameBoardProps {
   score: number;
   gameOver: boolean;
   debug?: boolean;
+  debugStats?: {
+    obstacleSpeed: number;
+    spawnRate: number;
+  };
 }
 
 export default function GameBoard({
@@ -26,8 +31,13 @@ export default function GameBoard({
   score,
   gameOver,
   debug = false,
+  debugStats,
 }: GameBoardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [fps, setFps] = useState<number | undefined>(undefined);
+  const lastFrameTimeRef = useRef<number | null>(null);
+  const frameCountRef = useRef(0);
+  const lastFpsUpdateRef = useRef(0);
 
   // Set up canvas with correct dimensions
   useEffect(() => {
@@ -71,6 +81,27 @@ export default function GameBoard({
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
+    // Track FPS for debug mode
+    if (debug) {
+      const now = performance.now();
+      frameCountRef.current++;
+
+      if (lastFrameTimeRef.current) {
+        // Only update FPS calculation once per second to avoid fluctuations
+        if (now - lastFpsUpdateRef.current > 1000) {
+          const elapsed = now - lastFpsUpdateRef.current;
+          setFps((frameCountRef.current * 1000) / elapsed);
+          frameCountRef.current = 0;
+          lastFpsUpdateRef.current = now;
+        }
+      } else {
+        // First frame
+        lastFpsUpdateRef.current = now;
+      }
+
+      lastFrameTimeRef.current = now;
+    }
+
     // Clear the canvas completely before drawing
     ctx.clearRect(0, 0, boardSize.width, boardSize.height);
 
@@ -85,14 +116,22 @@ export default function GameBoard({
       drawObstacle(ctx, obstacle);
     });
 
+    // Draw the score
+    drawScore(ctx, score);
+
     // Draw hitboxes for debugging if enabled
     if (debug) {
       drawDebugHitboxes(ctx, airplane, obstacles);
-    }
 
-    // Draw the score
-    drawScore(ctx, score);
-  }, [boardSize, airplane, obstacles, debug, score, gameOver]);
+      // Draw debug stats if provided
+      if (debugStats) {
+        drawDebugStats(ctx, boardSize, {
+          ...debugStats,
+          fps,
+        });
+      }
+    }
+  }, [boardSize, airplane, obstacles, debug, debugStats, score, gameOver, fps]);
 
   return (
     <canvas

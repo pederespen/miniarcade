@@ -6,7 +6,6 @@ import GameBoard from "./game-board";
 import useBoardSize from "../hooks/use-board-size";
 import useGameLogic from "../hooks/use-game-logic";
 
-// Set to true only during development, false for production
 const DEV_MODE = false;
 
 export default function GamePlay({
@@ -14,7 +13,6 @@ export default function GamePlay({
   highScore,
   setHighScore,
 }: GamePlayProps) {
-  // Use DEV_MODE constant instead of UI toggle
   const [debugMode] = useState(DEV_MODE);
   // Add countdown state
   const [countdown, setCountdown] = useState(3);
@@ -37,6 +35,7 @@ export default function GamePlay({
     isWarmupActive,
     handleJump,
     resetGame,
+    currentSettings,
   } = useGameLogic({
     boardSize,
     highScore,
@@ -173,6 +172,14 @@ export default function GamePlay({
               score={score}
               gameOver={gameOver}
               debug={debugMode}
+              debugStats={
+                debugMode && currentSettings
+                  ? {
+                      obstacleSpeed: currentSettings.obstacleSpeed,
+                      spawnRate: currentSettings.spawnRate,
+                    }
+                  : undefined
+              }
             />
 
             {/* Replace warm-up indicator with countdown */}

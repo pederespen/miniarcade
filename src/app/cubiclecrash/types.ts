@@ -40,6 +40,19 @@ export interface GameBoardProps {
   score: number;
   gameOver: boolean;
   debug?: boolean;
+  debugStats?: {
+    difficultyTier: number;
+    obstacleSpeed: number;
+    spawnRate: number;
+    fps?: number;
+  };
+}
+
+export interface GameSettings {
+  gravity: number;
+  jumpPower: number;
+  obstacleSpeed: number;
+  spawnRate: number;
 }
 
 export interface GameLogicReturn {
@@ -51,4 +64,5 @@ export interface GameLogicReturn {
   isWarmupActive: boolean;
   handleJump: () => void;
   resetGame: () => void;
+  currentSettings: GameSettings;
 }
