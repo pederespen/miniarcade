@@ -105,8 +105,8 @@ export default function GameBoard({
     // Clear the canvas completely before drawing
     ctx.clearRect(0, 0, boardSize.width, boardSize.height);
 
-    // Draw background
-    drawBackground(ctx, boardSize);
+    // Draw background with score
+    drawBackground(ctx, boardSize, score);
 
     // Draw airplane
     drawAirplane(ctx, airplane);

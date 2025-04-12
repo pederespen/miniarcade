@@ -1,34 +1,73 @@
 import { GameBoardSize } from "../types";
 
-// Background image cache
-let backgroundImage: HTMLImageElement | null = null;
+// Background image cache for different backgrounds
+const backgroundImages: Record<string, HTMLImageElement | null> = {
+  default: null,
+  level2: null,
+  level3: null,
+};
 
 /**
  * Draws the office background for the game using an SVG image
+ * Changes background at score thresholds:
+ * - default: 0-39 points
+ * - level2: 40-79 points
+ * - level3: 80+ points
  */
 export function drawBackground(
   ctx: CanvasRenderingContext2D,
-  boardSize: GameBoardSize
+  boardSize: GameBoardSize,
+  score: number = 0
 ): void {
   // Clear canvas
   ctx.clearRect(0, 0, boardSize.width, boardSize.height);
 
+  // Determine which background to use based on score
+  let backgroundKey = "default";
+  if (score <= 80) {
+    backgroundKey = "level3";
+  } else if (score >= 40) {
+    backgroundKey = "level2";
+  }
+
   // Load the background image if not already loaded
-  if (!backgroundImage) {
-    backgroundImage = new Image();
-    backgroundImage.src = "/cubiclecrash/background.svg";
+  if (!backgroundImages[backgroundKey]) {
+    backgroundImages[backgroundKey] = new Image();
+
+    // Set the appropriate source based on level
+    if (backgroundKey === "level3") {
+      backgroundImages[backgroundKey]!.src =
+        "/cubiclecrash/background-level3.svg";
+    } else if (backgroundKey === "level2") {
+      backgroundImages[backgroundKey]!.src =
+        "/cubiclecrash/background-level2.svg";
+    } else {
+      backgroundImages[backgroundKey]!.src = "/cubiclecrash/background.svg";
+    }
   }
 
   // Draw the background image if it's loaded
-  if (backgroundImage.complete) {
-    ctx.drawImage(backgroundImage, 0, 0, boardSize.width, boardSize.height);
+  if (backgroundImages[backgroundKey]?.complete) {
+    ctx.drawImage(
+      backgroundImages[backgroundKey]!,
+      0,
+      0,
+      boardSize.width,
+      boardSize.height
+    );
   } else {
     // If image is not loaded yet, draw a simple background and listen for load event
     drawFallbackBackground(ctx, boardSize);
-    backgroundImage.onload = () => {
+    backgroundImages[backgroundKey]!.onload = () => {
       // Redraw with the loaded image
       ctx.clearRect(0, 0, boardSize.width, boardSize.height);
-      ctx.drawImage(backgroundImage!, 0, 0, boardSize.width, boardSize.height);
+      ctx.drawImage(
+        backgroundImages[backgroundKey]!,
+        0,
+        0,
+        boardSize.width,
+        boardSize.height
+      );
     };
   }
 }
@@ -49,3 +88,78 @@ function drawFallbackBackground(
   const floorHeight = boardSize.height * 0.15;
   ctx.fillRect(0, boardSize.height - floorHeight, boardSize.width, floorHeight);
 }
+
+// The following functions are kept for reference but are no longer used
+// since the background is now drawn from an SVG image
+
+/* 
+function drawFilingCabinet(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): void {
+  // Content removed as it's now part of the SVG
+}
+
+function drawBookshelf(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): void {
+  // Content removed as it's now part of the SVG
+}
+
+function drawBooksFixed(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  shelfIndex: number
+): void {
+  // Content removed as it's now part of the SVG
+}
+
+function drawDesk(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): void {
+  // Content removed as it's now part of the SVG
+}
+
+function drawClock(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number
+): void {
+  // Content removed as it's now part of the SVG
+}
+
+function drawPictureFrame(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): void {
+  // Content removed as it's now part of the SVG
+}
+
+function drawWindow(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): void {
+  // Content removed as it's now part of the SVG
+}
+*/

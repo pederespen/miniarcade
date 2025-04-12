@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Base wall color - gradient from top to bottom (executive office) -->
+  <defs>
+    <linearGradient id="wallGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f0ece0" />
+      <stop offset="100%" stop-color="#e0d8c8" />
+    </linearGradient>
+    
+    <!-- Floor carpet gradient (luxury carpet) -->
+    <linearGradient id="carpetGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(120, 90, 60, 0.3)" />
+      <stop offset="100%" stop-color="rgba(100, 70, 40, 0.4)" />
+    </linearGradient>
+    
+    <!-- Edge gradient for depth -->
+    <linearGradient id="edgeGradient" x1="0%" y1="0%" x2="30%" y2="30%">
+      <stop offset="0%" stop-color="rgba(0, 0, 0, 0.1)" />
+      <stop offset="100%" stop-color="rgba(0, 0, 0, 0)" />
+    </linearGradient>
+    
+    <!-- Wooden desk gradient -->
+    <linearGradient id="woodDeskGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a08060" />
+      <stop offset="100%" stop-color="#907050" />
+    </linearGradient>
+    
+    <!-- Leather chair gradient -->
+    <linearGradient id="leatherGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#604030" />
+      <stop offset="100%" stop-color="#503020" />
+    </linearGradient>
+    
+    <!-- Panoramic window view gradient (sunset) -->
+    <linearGradient id="sunsetGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e0a070" />
+      <stop offset="30%" stop-color="#d08060" />
+      <stop offset="60%" stop-color="#a06080" />
+      <stop offset="100%" stop-color="#7060a0" />
+    </linearGradient>
+    
+    <!-- Bookcase wood gradient -->
+    <linearGradient id="bookcaseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#906040" />
+      <stop offset="100%" stop-color="#805030" />
+    </linearGradient>
+    
+    <!-- Oil painting gradient -->
+    <linearGradient id="paintingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#705030" />
+      <stop offset="50%" stop-color="#806040" />
+      <stop offset="100%" stop-color="#907050" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Wall background -->
+  <rect x="0" y="0" width="800" height="600" fill="url(#wallGradient)" />
+  
+  <!-- Floor carpet -->
+  <rect x="0" y="510" width="800" height="90" fill="url(#carpetGradient)" />
+  
+  <!-- Carpet texture (subtle pattern) -->
+  <g opacity="0.05" stroke="#e0d0c0" stroke-width="0.5">
+    <!-- Ornate pattern -->
+    <path d="M 0,520 Q 25,510 50,520 Q 75,530 100,520 Q 125,510 150,520 Q 175,530 200,520 Q 225,510 250,520 Q 275,530 300,520 Q 325,510 350,520 Q 375,530 400,520 Q 425,510 450,520 Q 475,530 500,520 Q 525,510 550,520 Q 575,530 600,520 Q 625,510 650,520 Q 675,530 700,520 Q 725,510 750,520 Q 775,530 800,520" fill="none" />
+    <path d="M 0,540 Q 25,530 50,540 Q 75,550 100,540 Q 125,530 150,540 Q 175,550 200,540 Q 225,530 250,540 Q 275,550 300,540 Q 325,530 350,540 Q 375,550 400,540 Q 425,530 450,540 Q 475,550 500,540 Q 525,530 550,540 Q 575,550 600,540 Q 625,530 650,540 Q 675,550 700,540 Q 725,530 750,540 Q 775,550 800,540" fill="none" />
+    <path d="M 0,560 Q 25,550 50,560 Q 75,570 100,560 Q 125,550 150,560 Q 175,570 200,560 Q 225,550 250,560 Q 275,570 300,560 Q 325,550 350,560 Q 375,570 400,560 Q 425,550 450,560 Q 475,570 500,560 Q 525,550 550,560 Q 575,570 600,560 Q 625,550 650,560 Q 675,570 700,560 Q 725,550 750,560 Q 775,570 800,560" fill="none" />
+    <path d="M 0,580 Q 25,570 50,580 Q 75,590 100,580 Q 125,570 150,580 Q 175,590 200,580 Q 225,570 250,580 Q 275,590 300,580 Q 325,570 350,580 Q 375,590 400,580 Q 425,570 450,580 Q 475,590 500,580 Q 525,570 550,580 Q 575,590 600,580 Q 625,570 650,580 Q 675,590 700,580 Q 725,570 750,580 Q 775,590 800,580" fill="none" />
+  </g>
+  
+  <!-- Wall/floor divider (crown molding) -->
+  <rect x="0" y="502" width="800" height="8" fill="rgba(160, 140, 120, 0.5)" />
+  <rect x="0" y="500" width="800" height="2" fill="rgba(180, 160, 140, 0.5)" />
+  
+  <!-- Executive office elements with opacity -->
+  <g opacity="0.6">
+    <!-- Panoramic window with sunset view -->
+    <g transform="translate(50, 100)">
+      <rect x="0" y="0" width="300" height="180" fill="#d0d0d0" stroke="#c0c0c0" stroke-width="2" />
+      <rect x="5" y="5" width="290" height="170" fill="url(#sunsetGradient)" />
+      
+      <!-- Window frame -->
+      <rect x="99" y="0" width="2" height="180" fill="#c0c0c0" />
+      <rect x="199" y="0" width="2" height="180" fill="#c0c0c0" />
+      <rect x="0" y="89" width="300" height="2" fill="#c0c0c0" />
+      
+      <!-- City skyline silhouette -->
+      <path d="M 5,130 L 20,130 L 20,110 L 30,110 L 30,120 L 40,120 L 40,100 L 45,100 L 45,90 L 50,90 L 50,100 L 60,100 L 60,120 L 70,120 L 70,110 L 80,110 L 80,130 L 90,130 L 90,90 L 100,90 L 100,115 L 110,115 L 110,85 L 120,85 L 120,105 L 130,105 L 130,95 L 140,95 L 140,110 L 150,110 L 150,80 L 160,80 L 160,100 L 170,100 L 170,115 L 180,115 L 180,105 L 190,105 L 190,120 L 200,120 L 200,110 L 210,110 L 210,90 L 220,90 L 220,100 L 230,100 L 230,120 L 240,120 L 240,110 L 250,110 L 250,130 L 260,130 L 260,115 L 270,115 L 270,125 L 280,125 L 280,120 L 290,120 L 290,175 L 5,175 Z" fill="#202020" opacity="0.8" />
+      
+      <!-- Sun -->
+      <circle cx="70" cy="50" r="20" fill="#f0a060" opacity="0.9" />
+      <circle cx="70" cy="50" r="25" fill="#f0a060" opacity="0.3" />
+      <circle cx="70" cy="50" r="30" fill="#f0a060" opacity="0.2" />
+    </g>
+    
+    <!-- Executive desk -->
+    <g transform="translate(400, 470)">
+      <!-- Main desk surface -->
+      <path d="M 0,0 L 300,0 L 280,-10 L 20,-10 Z" fill="url(#woodDeskGradient)" stroke="#604020" stroke-width="1" />
+      
+      <!-- Desk front panel -->
+      <rect x="20" y="0" width="260" height="40" fill="url(#woodDeskGradient)" stroke="#604020" stroke-width="1" />
+      
+      <!-- Desk legs -->
+      <rect x="40" y="40" width="40" height="10" fill="#805030" stroke="#604020" stroke-width="1" />
+      <rect x="220" y="40" width="40" height="10" fill="#805030" stroke="#604020" stroke-width="1" />
+      
+      <!-- Desk items -->
+      <!-- Laptop -->
+      <g transform="translate(150, -25)">
+        <!-- Base -->
+        <rect x="-20" y="0" width="40" height="25" rx="2" ry="2" fill="#404040" />
+        <!-- Screen -->
+        <rect x="-25" y="-30" width="50" height="30" rx="2" ry="2" fill="#505050" />
+        <rect x="-23" y="-28" width="46" height="26" rx="1" ry="1" fill="#303840" />
+        <!-- Hinge -->
+        <rect x="-15" y="-3" width="30" height="3" fill="#404040" />
+      </g>
+      
+      <!-- Document/paper -->
+      <rect x="70" y="-15" width="50" height="35" transform="rotate(10,70,-15)" fill="#f8f8f8" />
+      
+      <!-- Pen holder -->
+      <rect x="220" y="-20" width="15" height="15" rx="2" ry="2" fill="#704030" />
+    </g>
+    
+    <!-- Executive chair -->
+    <g transform="translate(150, 450)">
+      <!-- Chair back -->
+      <rect x="-25" y="-60" width="50" height="60" rx="5" ry="5" fill="url(#leatherGradient)" stroke="#402010" stroke-width="1" />
+      
+      <!-- Seat -->
+      <rect x="-30" y="0" width="60" height="15" rx="3" ry="3" fill="url(#leatherGradient)" stroke="#402010" stroke-width="1" />
+      
+      <!-- Armrests -->
+      <path d="M -25,0 L -25,-15 L -40,-15 L -40,-5 Z" fill="#503020" />
+      <path d="M 25,0 L 25,-15 L 40,-15 L 40,-5 Z" fill="#503020" />
+      
+      <!-- Base and wheels -->
+      <rect x="-5" y="15" width="10" height="20" fill="#404040" />
+      <path d="M -5,35 L -15,45 M 5,35 L 15,45 M -5,35 L -10,45 M 5,35 L 10,45" stroke="#303030" stroke-width="2" />
+    </g>
+    
+    <!-- Luxury bookcase with books -->
+    <g transform="translate(650, 350)">
+      <!-- Bookcase frame -->
+      <rect x="0" y="0" width="120" height="160" fill="url(#bookcaseGradient)" stroke="#604020" stroke-width="2" />
+      
+      <!-- Shelves -->
+      <rect x="0" y="40" width="120" height="4" fill="#704030" />
+      <rect x="0" y="80" width="120" height="4" fill="#704030" />
+      <rect x="0" y="120" width="120" height="4" fill="#704030" />
+      
+      <!-- Books on shelves -->
+      <!-- Top shelf -->
+      <g transform="translate(10, 10)">
+        <rect x="0" y="0" width="15" height="30" fill="#903030" />
+        <rect x="16" y="0" width="12" height="30" fill="#304090" />
+        <rect x="29" y="0" width="18" height="30" fill="#306030" />
+        <rect x="48" y="0" width="14" height="30" fill="#806020" />
+        <rect x="63" y="0" width="10" height="30" fill="#304090" />
+        <rect x="74" y="0" width="16" height="30" fill="#903030" />
+        <rect x="91" y="0" width="12" height="30" fill="#306030" />
+      </g>
+      
+      <!-- Second shelf -->
+      <g transform="translate(10, 45)">
+        <rect x="0" y="0" width="12" height="30" fill="#306030" />
+        <rect x="13" y="0" width="15" height="30" fill="#806020" />
+        <rect x="29" y="0" width="11" height="30" fill="#903030" />
+        <rect x="41" y="0" width="14" height="30" fill="#304090" />
+        <rect x="56" y="0" width="17" height="30" fill="#806020" />
+        <rect x="74" y="0" width="10" height="30" fill="#306030" />
+        <rect x="85" y="0" width="16" height="30" fill="#903030" />
+      </g>
+      
+      <!-- Third shelf -->
+      <g transform="translate(10, 85)">
+        <rect x="0" y="0" width="14" height="30" fill="#806020" />
+        <rect x="15" y="0" width="11" height="30" fill="#304090" />
+        <rect x="27" y="0" width="16" height="30" fill="#903030" />
+        <rect x="44" y="0" width="12" height="30" fill="#306030" />
+        <rect x="57" y="0" width="15" height="30" fill="#806020" />
+        <rect x="73" y="0" width="13" height="30" fill="#304090" />
+        <rect x="87" y="0" width="14" height="30" fill="#306030" />
+      </g>
+      
+      <!-- Bottom shelf - decorative items -->
+      <g transform="translate(10, 125)">
+        <!-- Trophy/award -->
+        <path d="M 10,0 L 30,0 L 28,5 L 25,7 L 25,20 L 15,20 L 15,7 L 12,5 Z" fill="#d0c080" />
+        
+        <!-- Globe -->
+        <circle cx="60" cy="15" r="12" fill="#6090b0" stroke="#d0c080" stroke-width="1" />
+        <ellipse cx="60" cy="15" rx="12" ry="3" fill="none" stroke="#d0c080" stroke-width="0.5" />
+        <path d="M 60,3 L 60,27" stroke="#d0c080" stroke-width="0.5" />
+        
+        <!-- Decorative box -->
+        <rect x="85" y="5" width="20" height="15" fill="#904030" stroke="#d0c080" stroke-width="1" />
+      </g>
+    </g>
+    
+    <!-- Oil painting in gilded frame -->
+    <g transform="translate(400, 150)">
+      <!-- Ornate frame -->
+      <path d="M -10,-10 L 120,-10 L 120,90 L -10,90 Z M 0,0 L 110,0 L 110,80 L 0,80 Z" fill="#d0c080" />
+      
+      <!-- Painting (landscape) -->
+      <rect x="0" y="0" width="110" height="80" fill="url(#paintingGradient)" />
+      
+      <!-- Landscape elements -->
+      <path d="M 0,50 Q 20,30 40,45 Q 60,55 80,40 Q 100,30 110,45 L 110,80 L 0,80 Z" fill="#607040" />
+      <path d="M 0,30 L 30,10 L 60,25 L 90,5 L 110,15 L 110,45 Q 100,30 80,40 Q 60,55 40,45 Q 20,30 0,50 Z" fill="#a0c0e0" />
+    </g>
+    
+    <!-- Decorative plant -->
+    <g transform="translate(570, 440)">
+      <!-- Ornate pot -->
+      <path d="M 10,0 L 30,0 L 40,60 L 0,60 Z" fill="#906050" />
+      <path d="M 5,10 L 35,10" stroke="#805040" stroke-width="1" />
+      <path d="M 3,20 L 37,20" stroke="#805040" stroke-width="1" />
+      
+      <!-- Plant -->
+      <g fill="#406030">
+        <!-- Stems -->
+        <path d="M 20,0 L 15,-50 C 15,-55 25,-55 25,-50 L 20,0 Z" />
+        <path d="M 20,0 L 0,-40 C -3,-44 5,-50 8,-46 L 20,0 Z" />
+        <path d="M 20,0 L 40,-40 C 43,-44 35,-50 32,-46 L 20,0 Z" />
+        
+        <!-- Leaves -->
+        <ellipse cx="15" cy="-50" rx="12" ry="7" />
+        <ellipse cx="5" cy="-40" rx="10" ry="6" />
+        <ellipse cx="35" cy="-40" rx="10" ry="6" />
+        <ellipse cx="20" cy="-25" rx="8" ry="5" />
+      </g>
+    </g>
+    
+    <!-- Wall sconce light -->
+    <g transform="translate(280, 140)">
+      <path d="M 0,0 L 0,10 L 5,15 L 15,15 L 20,10 L 20,0 Z" fill="#d0c080" />
+      <rect x="5" y="15" width="10" height="5" fill="#d0c080" />
+      <ellipse cx="10" cy="20" rx="15" ry="5" fill="#f0e8a0" opacity="0.3" />
+    </g>
+  </g>
+  
+  <!-- Edge shading for depth (full opacity) -->
+  <rect x="0" y="0" width="800" height="600" fill="url(#edgeGradient)" />
+</svg> 
