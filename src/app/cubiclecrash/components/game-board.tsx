@@ -79,7 +79,7 @@ export default function GameBoard({
         }
       }
     };
-  }, [boardSize.width, boardSize.height, canvasKey.current]);
+  }, [boardSize.width, boardSize.height]);
 
   // Draw the game
   useEffect(() => {
