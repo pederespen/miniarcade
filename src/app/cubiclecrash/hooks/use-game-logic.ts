@@ -5,6 +5,8 @@ import {
   GameBoardSize,
   GameLogicReturn,
   GameSettings,
+  Powerup,
+  PowerupType,
 } from "../types";
 
 interface UseGameLogicProps {
@@ -18,6 +20,14 @@ const SPEED_INCREASE_THRESHOLD = 3; // Every 3 points
 const SPEED_INCREASE_FACTOR = 1.05; // 5% increase per threshold
 const SPAWN_RATE_DECREASE_FACTOR = 0.92; // 8% decrease per threshold
 const MAX_DIFFICULTY_SCORE = 75; // Cap difficulty increases at score of 75 (equivalent to tier 25)
+
+// Powerup constants
+const POWERUP_SPAWN_CHANCE = 0.2; // 20% chance to spawn a powerup when obstacle spawns
+const POWERUP_DURATION = 8000; // 8 seconds powerup duration
+const MIN_SCORE_FOR_POWERUPS = 5; // Don't spawn powerups until player has at least 5 points
+
+// Define warm-up duration in milliseconds
+const WARMUP_DURATION = 3000; // Exactly 3 seconds to match the countdown
 
 export default function useGameLogic({
   boardSize,
@@ -44,6 +54,8 @@ export default function useGameLogic({
   });
 
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
+  const [powerups, setPowerups] = useState<Powerup[]>([]);
+  const [activePowerup, setActivePowerup] = useState<PowerupType | null>(null);
 
   // Track current settings in state to ensure UI updates properly
   const [currentSettings, setCurrentSettings] = useState<GameSettings>();
@@ -52,6 +64,12 @@ export default function useGameLogic({
   // This ensures we don't double-count obstacles regardless of state updates
   const lastScoringObstacleRef = useRef<number | null>(null);
   const scoreRef = useRef(0);
+
+  // Ref for active powerup timer
+  const powerupTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Warm-up timer reference
+  const warmupTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fixed game settings - base values
   const baseHeight = 480; // Reference height for scaling
@@ -68,6 +86,7 @@ export default function useGameLogic({
     [scaleFactor]
   );
 
+  // Calculate the current settings based on score and active powerups
   const calculateSettings = useCallback(
     (score: number): GameSettings => {
       // Cap the score for difficulty calculation
@@ -534,38 +553,168 @@ export default function useGameLogic({
 
   // Handle game over
   const handleGameOver = useCallback(() => {
-    if (gameStateRef.current.gameOver) return; // Prevent multiple calls
+    // Check if powerup is active and if it's invincibility
+    if (activePowerup === PowerupType.INVINCIBILITY) {
+      // Player is invincible, don't end the game
+      return;
+    }
 
-    // Force cancellation of any existing animation frame first
+    // Cancel any animation frames
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
     }
 
-    setGameState((prev) => ({ ...prev, isActive: false, gameOver: true }));
-
-    // Clear all timers
+    // Clear any timers
     if (obstacleTimerRef.current) {
       clearInterval(obstacleTimerRef.current);
       obstacleTimerRef.current = null;
     }
 
-    if (warmupTimerRef.current) {
-      clearTimeout(warmupTimerRef.current);
-      warmupTimerRef.current = null;
+    if (powerupTimerRef.current) {
+      clearTimeout(powerupTimerRef.current);
+      powerupTimerRef.current = null;
     }
 
-    // Update high score
-    if (gameStateRef.current.score > highScore) {
-      setHighScore(gameStateRef.current.score);
+    // Update high score if needed
+    if (scoreRef.current > highScore) {
+      setHighScore(scoreRef.current);
     }
-  }, [highScore, setHighScore]);
 
-  // Define warm-up duration in milliseconds
-  const WARMUP_DURATION = 3000; // Exactly 3 seconds to match the countdown
+    // Set game over state
+    setGameState((prev) => ({
+      ...prev,
+      gameOver: true,
+    }));
+  }, [highScore, setHighScore, activePowerup]);
 
-  // Warm-up timer reference
-  const warmupTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Helper function to check for powerup collisions and handle collection
+  const checkPowerupCollision = useCallback(
+    (plane: Airplane, powerup: Powerup): boolean => {
+      if (powerup.collected) return false;
+
+      // Use a simplified circular hitbox for powerups
+      const powerupCenter = {
+        x: powerup.x + powerup.width / 2,
+        y: powerup.y + powerup.height / 2,
+      };
+      const powerupRadius = powerup.width / 2;
+
+      // Use the same airplane triangle hitbox as in checkCollision
+      const planeCenter = {
+        x: plane.x + plane.width / 2,
+        y: plane.y + plane.height / 2,
+      };
+
+      // Calculate the rotated triangle points of the paper airplane
+      const angleRad = (plane.rotation * Math.PI) / 180;
+      const cosAngle = Math.cos(angleRad);
+      const sinAngle = Math.sin(angleRad);
+
+      // Define the triangle points relative to center
+      const rightTip = {
+        x: plane.width * 0.45,
+        y: 0,
+      };
+
+      const topLeft = {
+        x: -plane.width * 0.45,
+        y: -plane.height * 0.45,
+      };
+
+      const bottomLeft = {
+        x: -plane.width * 0.45,
+        y: plane.height * 0.45,
+      };
+
+      // Rotate the points based on plane rotation
+      const rotatePoint = (point: { x: number; y: number }) => {
+        return {
+          x: planeCenter.x + (point.x * cosAngle - point.y * sinAngle),
+          y: planeCenter.y + (point.x * sinAngle + point.y * cosAngle),
+        };
+      };
+
+      // Get actual points after rotation
+      const p1 = rotatePoint(rightTip);
+      const p2 = rotatePoint(topLeft);
+      const p3 = rotatePoint(bottomLeft);
+
+      // Check if any point of the airplane is close enough to the powerup center
+      const distanceToP1 = Math.sqrt(
+        Math.pow(p1.x - powerupCenter.x, 2) +
+          Math.pow(p1.y - powerupCenter.y, 2)
+      );
+      const distanceToP2 = Math.sqrt(
+        Math.pow(p2.x - powerupCenter.x, 2) +
+          Math.pow(p2.y - powerupCenter.y, 2)
+      );
+      const distanceToP3 = Math.sqrt(
+        Math.pow(p3.x - powerupCenter.x, 2) +
+          Math.pow(p3.y - powerupCenter.y, 2)
+      );
+
+      return (
+        distanceToP1 < powerupRadius ||
+        distanceToP2 < powerupRadius ||
+        distanceToP3 < powerupRadius
+      );
+    },
+    []
+  );
+
+  // Function to apply powerup effect
+  const applyPowerup = useCallback((powerupType: PowerupType) => {
+    // End any existing powerup
+    if (powerupTimerRef.current) {
+      clearTimeout(powerupTimerRef.current);
+    }
+
+    // Apply the new powerup
+    setActivePowerup(powerupType);
+
+    // Set a timer to end the powerup effect
+    powerupTimerRef.current = setTimeout(() => {
+      setActivePowerup(null);
+      powerupTimerRef.current = null;
+    }, POWERUP_DURATION);
+  }, []);
+
+  // Spawn powerup - will be called with a chance from spawnObstacle
+  const spawnPowerup = useCallback(() => {
+    // Don't spawn powerups during warm-up period or if game is over
+    if (
+      gameStateRef.current.warmupActive ||
+      gameStateRef.current.gameOver ||
+      scoreRef.current < MIN_SCORE_FOR_POWERUPS
+    )
+      return;
+
+    // Random powerup type
+    const powerupTypes = [PowerupType.DOUBLE_POINTS, PowerupType.INVINCIBILITY];
+    const type = powerupTypes[Math.floor(Math.random() * powerupTypes.length)];
+
+    // Base sizes for powerups
+    const baseSize = 40;
+    const size = Math.floor(baseSize * scaleFactor);
+
+    // Randomize y position - ensure better vertical spacing
+    const minY = size * 1.2; // Add some margin from top
+    const maxY = boardSize.height - size * 1.2; // Add some margin from bottom
+    const y = Math.floor(Math.random() * (maxY - minY) + minY);
+
+    const newPowerup: Powerup = {
+      id: Date.now(),
+      x: boardSize.width + size,
+      y,
+      width: size,
+      height: size,
+      type,
+      collected: false,
+    };
+
+    setPowerups((prev) => [...prev, newPowerup]);
+  }, [boardSize.width, boardSize.height, scaleFactor]);
 
   // Game loop function - declare early for use in startGame
   const gameLoop = useCallback(() => {
@@ -619,58 +768,94 @@ export default function useGameLogic({
       return updatedAirplane;
     });
 
-    // Only update obstacles if warm-up is complete and game version hasn't changed
-    if (
-      !gameStateRef.current.warmupActive &&
-      currentVersion === gameStateRef.current.version
-    ) {
-      // Update obstacles with simplified state access
-      setObstacles((prev) => {
-        // Prevent updates if the game version has changed
-        if (currentVersion !== gameStateRef.current.version) return prev;
+    // Move obstacles based on current speed and calculate score
+    setObstacles((prev) => {
+      // Prevent updates if the game version has changed
+      if (currentVersion !== gameStateRef.current.version) return prev;
 
-        let scoredThisFrame = false;
-
-        const updatedObstacles = prev.map((obstacle) => {
-          // Move obstacle - ALWAYS use the latest settings to ensure proper speed
+      // Process obstacles - move them left and check if they've been passed
+      return prev
+        .map((obstacle) => {
+          // Move obstacle to the left
           const newX = obstacle.x - latestSettings.obstacleSpeed;
-          let { passed } = obstacle;
 
-          // Check if obstacle just passed the airplane and we haven't scored from it before
+          // Check if obstacle is now passed
+          const isPassed =
+            obstacle.passed || newX + obstacle.width < airplane.x;
+
+          // IMPORTANT: Update score if this is a newly passed obstacle
+          // We only update the score for an obstacle once
           if (
-            !passed &&
-            newX + obstacle.width < airplane.x &&
-            lastScoringObstacleRef.current !== obstacle.id &&
-            !scoredThisFrame
+            isPassed &&
+            !obstacle.passed &&
+            obstacle.id !== lastScoringObstacleRef.current
           ) {
-            // Mark this obstacle as passed
-            passed = true;
-            scoredThisFrame = true;
+            // Increment score, handling double points
+            const pointsToAdd =
+              activePowerup === PowerupType.DOUBLE_POINTS ? 2 : 1;
 
-            // Store the ID of this obstacle so we never count it again
+            scoreRef.current += pointsToAdd;
             lastScoringObstacleRef.current = obstacle.id;
 
-            // Increment our score counter (separate from React state)
-            scoreRef.current += 1;
-
-            // Sync the React state with our score counter
-            // The settings will be updated via useEffect when score changes
-            setGameState((prevState) => ({
-              ...prevState,
-              score: scoreRef.current,
-            }));
-          } else if (!passed && newX + obstacle.width < airplane.x) {
-            // If we already scored this frame, just mark as passed without counting
-            passed = true;
+            // Update React state (for display purposes)
+            setTimeout(() => {
+              setGameState((prevState) => ({
+                ...prevState,
+                score: scoreRef.current,
+              }));
+            }, 0);
           }
 
-          // Create updated obstacle state
-          return { ...obstacle, x: newX, passed };
-        });
+          return {
+            ...obstacle,
+            x: newX,
+            passed: isPassed,
+          };
+        })
+        .filter((obstacle) => obstacle.x + obstacle.width > 0); // Remove obstacles that are off-screen
+    });
 
-        return updatedObstacles.filter((o) => o.x + o.width > 0);
-      });
-    }
+    // Move powerups based on current speed and check for collection
+    setPowerups((prev) => {
+      // Prevent updates if the game version has changed
+      if (currentVersion !== gameStateRef.current.version) return prev;
+
+      // Check if airplane has collected any powerups
+      let hasCollectedPowerup = false;
+      let collectedType: PowerupType | null = null;
+
+      // Process powerups - move them left and check for collection
+      const updatedPowerups = prev
+        .map((powerup) => {
+          // Move powerup to the left
+          const newX = powerup.x - latestSettings.obstacleSpeed;
+
+          // Check if powerup should be collected
+          let isCollected = powerup.collected;
+
+          if (!isCollected && checkPowerupCollision(airplane, powerup)) {
+            isCollected = true;
+            hasCollectedPowerup = true;
+            collectedType = powerup.type;
+          }
+
+          return {
+            ...powerup,
+            x: newX,
+            collected: isCollected,
+          };
+        })
+        .filter((powerup) => powerup.x + powerup.width > 0); // Remove powerups that are off-screen
+
+      // Apply collected powerup effect (in a setTimeout to avoid state update during render)
+      if (hasCollectedPowerup && collectedType) {
+        setTimeout(() => {
+          applyPowerup(collectedType!);
+        }, 0);
+      }
+
+      return updatedPowerups;
+    });
 
     // Continue the loop only if the game version is still the same
     if (
@@ -679,7 +864,15 @@ export default function useGameLogic({
     ) {
       animationFrameRef.current = requestAnimationFrame(gameLoop);
     }
-  }, [boardSize.height, airplane, handleGameOver, calculateSettings]);
+  }, [
+    calculateSettings,
+    boardSize.height,
+    handleGameOver,
+    airplane,
+    activePowerup,
+    checkPowerupCollision,
+    applyPowerup,
+  ]);
 
   // Spawn obstacles - declare early for use in startGame
   const spawnObstacle = useCallback(() => {
@@ -727,51 +920,15 @@ export default function useGameLogic({
     };
 
     setObstacles((prev) => [...prev, newObstacle]);
-  }, [boardSize.width, boardSize.height, scaleFactor]);
 
-  // Detect changes in spawn rate and update the timer
-  useEffect(() => {
-    // Don't update if the game is over or not active or in warmup
+    // Chance to spawn a powerup
     if (
-      gameStateRef.current.gameOver ||
-      !gameStateRef.current.isActive ||
-      gameStateRef.current.warmupActive
+      Math.random() < POWERUP_SPAWN_CHANCE &&
+      scoreRef.current >= MIN_SCORE_FOR_POWERUPS
     ) {
-      return;
+      spawnPowerup();
     }
-
-    // Calculate settings based on current score
-    const latestSettings = calculateSettings(scoreRef.current);
-
-    // Debug check - print settings to help diagnose issues
-    if (process.env.NODE_ENV === "development") {
-      console.log(
-        `[DEBUG] Score: ${
-          scoreRef.current
-        }, Speed: ${latestSettings.obstacleSpeed.toFixed(
-          2
-        )}, Spawn: ${latestSettings.spawnRate.toFixed(0)}ms`
-      );
-    }
-
-    // Clear and restart timer if:
-    // 1. We have a timer active AND
-    // 2. Either the spawn rate has changed OR we detect a reset occurred
-    const spawnRateChanged =
-      latestSettings.spawnRate !== currentSpawnRateRef.current;
-
-    if (obstacleTimerRef.current && spawnRateChanged) {
-      // Update our reference
-      currentSpawnRateRef.current = latestSettings.spawnRate;
-
-      // Clear and restart the timer with the new spawn rate
-      clearInterval(obstacleTimerRef.current);
-      obstacleTimerRef.current = setInterval(
-        spawnObstacle,
-        latestSettings.spawnRate
-      );
-    }
-  }, [gameState.score, calculateSettings, spawnObstacle]);
+  }, [boardSize.width, boardSize.height, scaleFactor, spawnPowerup]);
 
   // Start the game - need to define this before handleJump can reference it
   const startGame = useCallback(() => {
@@ -814,10 +971,18 @@ export default function useGameLogic({
     // 4. Reset spawn rate reference
     currentSpawnRateRef.current = baseSettings.spawnRate;
 
-    // 5. Clear all existing obstacles
+    // 5. Clear all existing obstacles and powerups
     setObstacles([]);
+    setPowerups([]);
 
-    // 6. Update game state with score: 0
+    // 6. Clear any active powerup
+    setActivePowerup(null);
+    if (powerupTimerRef.current) {
+      clearTimeout(powerupTimerRef.current);
+      powerupTimerRef.current = null;
+    }
+
+    // 7. Update game state with score: 0
     setGameState({
       isActive: true,
       gameOver: false,
@@ -826,7 +991,7 @@ export default function useGameLogic({
       version: newVersion,
     });
 
-    // 7. Clear any existing timers
+    // 8. Clear any existing timers
     if (obstacleTimerRef.current) {
       clearInterval(obstacleTimerRef.current);
       obstacleTimerRef.current = null;
@@ -837,7 +1002,7 @@ export default function useGameLogic({
       warmupTimerRef.current = null;
     }
 
-    // 8. Reset airplane position and physics
+    // 9. Reset airplane position and physics
     const baseAirplaneWidth = 60;
     const baseAirplaneHeight = 30;
     const airplaneWidth = Math.floor(baseAirplaneWidth * scaleFactor);
@@ -857,10 +1022,10 @@ export default function useGameLogic({
       void window.document.body.offsetHeight;
     }
 
-    // 9. Start a new animation frame with the reset state
+    // 10. Start a new animation frame with the reset state
     animationFrameRef.current = window.requestAnimationFrame(gameLoop);
 
-    // 10. Set up warm-up timer with the GUARANTEED BASE SETTINGS
+    // 11. Set up warm-up timer with the GUARANTEED BASE SETTINGS
     warmupTimerRef.current = setTimeout(() => {
       if (gameStateRef.current.version === newVersion) {
         // End warm-up
@@ -883,7 +1048,7 @@ export default function useGameLogic({
     }, WARMUP_DURATION);
   }, [boardSize.height, spawnObstacle, gameLoop, scaleFactor, baseSettings]);
 
-  // Handle player jump - now startGame is defined before this function
+  // Handle player jump
   const handleJump = useCallback(() => {
     // If game is over, clicking/tapping anywhere should restart the game immediately
     if (gameStateRef.current.gameOver) {
@@ -924,7 +1089,28 @@ export default function useGameLogic({
     if (hasCollision) {
       handleGameOver();
     }
-  }, [airplane, obstacles, handleGameOver, checkCollision]);
+
+    // Check for powerup collections
+    powerups.forEach((powerup) => {
+      if (!powerup.collected && checkPowerupCollision(airplane, powerup)) {
+        // Mark powerup as collected
+        setPowerups((prev) =>
+          prev.map((p) => (p.id === powerup.id ? { ...p, collected: true } : p))
+        );
+
+        // Apply powerup effect
+        applyPowerup(powerup.type);
+      }
+    });
+  }, [
+    airplane,
+    obstacles,
+    powerups,
+    handleGameOver,
+    checkCollision,
+    checkPowerupCollision,
+    applyPowerup,
+  ]);
 
   // Clean up on unmount
   useEffect(() => {
@@ -937,6 +1123,9 @@ export default function useGameLogic({
       }
       if (warmupTimerRef.current) {
         clearTimeout(warmupTimerRef.current);
+      }
+      if (powerupTimerRef.current) {
+        clearTimeout(powerupTimerRef.current);
       }
     };
   }, []);
@@ -956,10 +1145,12 @@ export default function useGameLogic({
   return {
     airplane,
     obstacles,
+    powerups,
     score: gameState.score,
     isPlaying: gameState.isActive,
     gameOver: gameState.gameOver,
     isWarmupActive: gameState.warmupActive,
+    activePowerup,
     handleJump,
     resetGame: startGame,
     currentSettings: currentSettings || calculateSettings(gameState.score),

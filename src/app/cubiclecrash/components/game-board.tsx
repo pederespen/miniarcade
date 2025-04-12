@@ -1,22 +1,32 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { Airplane, GameBoardSize, Obstacle } from "../types";
+import {
+  Airplane,
+  GameBoardSize,
+  Obstacle,
+  Powerup,
+  PowerupType,
+} from "../types";
 import {
   drawBackground,
   drawAirplane,
   drawObstacle,
+  drawPowerup,
   drawDebugHitboxes,
   drawScore,
   drawDebugStats,
+  drawPowerupIndicator,
 } from "../rendering";
 
 interface GameBoardProps {
   airplane: Airplane;
   obstacles: Obstacle[];
+  powerups: Powerup[];
   boardSize: GameBoardSize;
   score: number;
   gameOver: boolean;
+  activePowerup: PowerupType | null;
   debug?: boolean;
   debugStats?: {
     obstacleSpeed: number;
@@ -27,9 +37,11 @@ interface GameBoardProps {
 export default function GameBoard({
   airplane,
   obstacles,
+  powerups,
   boardSize,
   score,
   gameOver,
+  activePowerup,
   debug = false,
   debugStats,
 }: GameBoardProps) {
@@ -108,20 +120,30 @@ export default function GameBoard({
     // Draw background with score
     drawBackground(ctx, boardSize, score);
 
-    // Draw airplane
-    drawAirplane(ctx, airplane);
+    // Draw powerups
+    powerups.forEach((powerup) => {
+      if (!powerup.collected) {
+        drawPowerup(ctx, powerup);
+      }
+    });
 
     // Draw obstacles
     obstacles.forEach((obstacle) => {
       drawObstacle(ctx, obstacle);
     });
 
+    // Draw airplane with powerup effect if active
+    drawAirplane(ctx, airplane, activePowerup);
+
     // Draw the score
     drawScore(ctx, score);
 
+    // Draw powerup indicator if active
+    drawPowerupIndicator(ctx, activePowerup);
+
     // Draw hitboxes for debugging if enabled
     if (debug) {
-      drawDebugHitboxes(ctx, airplane, obstacles);
+      drawDebugHitboxes(ctx, airplane, obstacles, powerups);
 
       // Draw debug stats if provided
       if (debugStats) {
@@ -131,7 +153,18 @@ export default function GameBoard({
         });
       }
     }
-  }, [boardSize, airplane, obstacles, debug, debugStats, score, gameOver, fps]);
+  }, [
+    boardSize,
+    airplane,
+    obstacles,
+    powerups,
+    activePowerup,
+    debug,
+    debugStats,
+    score,
+    gameOver,
+    fps,
+  ]);
 
   return (
     <canvas

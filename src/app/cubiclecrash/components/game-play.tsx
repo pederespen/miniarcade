@@ -6,7 +6,7 @@ import GameBoard from "./game-board";
 import useBoardSize from "../hooks/use-board-size";
 import useGameLogic from "../hooks/use-game-logic";
 
-const DEV_MODE = false;
+const DEV_MODE = true;
 
 export default function GamePlay({
   onBoardSizeChange,
@@ -29,10 +29,12 @@ export default function GamePlay({
   const {
     airplane,
     obstacles,
+    powerups,
     score,
     isPlaying,
     gameOver,
     isWarmupActive,
+    activePowerup,
     handleJump,
     resetGame,
     currentSettings,
@@ -168,9 +170,11 @@ export default function GamePlay({
             <GameBoard
               airplane={airplane}
               obstacles={obstacles}
+              powerups={powerups}
               boardSize={boardSize}
               score={score}
               gameOver={gameOver}
+              activePowerup={activePowerup}
               debug={debugMode}
               debugStats={
                 debugMode && currentSettings

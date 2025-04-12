@@ -24,7 +24,7 @@ export function drawBackground(
 
   // Determine which background to use based on score
   let backgroundKey = "default";
-  if (score <= 80) {
+  if (score >= 80) {
     backgroundKey = "level3";
   } else if (score >= 40) {
     backgroundKey = "level2";

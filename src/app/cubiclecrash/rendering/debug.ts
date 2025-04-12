@@ -1,4 +1,4 @@
-import { Airplane, Obstacle } from "../types";
+import { Airplane, Obstacle, Powerup } from "../types";
 
 interface Point {
   x: number;
@@ -11,7 +11,8 @@ interface Point {
 export function drawDebugHitboxes(
   ctx: CanvasRenderingContext2D,
   airplane: Airplane,
-  obstacles: Obstacle[]
+  obstacles: Obstacle[],
+  powerups: Powerup[] = []
 ): void {
   // Define the actual shape of the paper airplane as a triangle with 3 points
   const planeCenter = {
@@ -140,7 +141,7 @@ export function drawDebugHitboxes(
       }
 
       case "monitor": {
-        // Draw screen hitbox
+        // Draw screen hitbox (main part)
         const screen = {
           x: obstacle.x + obstacle.width * 0.125,
           y: obstacle.y + obstacle.height * 0.125,
@@ -150,7 +151,7 @@ export function drawDebugHitboxes(
 
         ctx.strokeRect(screen.x, screen.y, screen.width, screen.height);
 
-        // Draw stand hitbox
+        // Draw monitor stand
         const stand = {
           x: obstacle.x + obstacle.width * 0.5 - obstacle.width * 0.0625,
           y: obstacle.y + obstacle.height * 0.8,
@@ -162,36 +163,44 @@ export function drawDebugHitboxes(
         break;
       }
 
-      case "drawer": {
-        // Draw drawer hitbox
-        const drawer = {
-          x: obstacle.x + obstacle.width * 0.05,
-          y: obstacle.y + obstacle.height * 0.15,
-          width: obstacle.width * 0.9,
-          height: obstacle.height * 0.6,
-        };
-
-        ctx.strokeRect(drawer.x, drawer.y, drawer.width, drawer.height);
+      default: {
+        // Default rectangular hitbox
+        ctx.strokeRect(
+          obstacle.x + obstacle.width * 0.1,
+          obstacle.y + obstacle.height * 0.1,
+          obstacle.width * 0.8,
+          obstacle.height * 0.8
+        );
         break;
       }
-
-      default: {
-        // Default hitbox
-        const defaultHitbox = {
-          x: obstacle.x + obstacle.width * 0.1,
-          y: obstacle.y + obstacle.height * 0.1,
-          width: obstacle.width * 0.8,
-          height: obstacle.height * 0.8,
-        };
-
-        ctx.strokeRect(
-          defaultHitbox.x,
-          defaultHitbox.y,
-          defaultHitbox.width,
-          defaultHitbox.height
-        );
-      }
     }
+  });
+
+  // Draw powerup hitboxes
+  powerups.forEach((powerup) => {
+    if (powerup.collected) return;
+
+    // Draw circular hitbox for powerups (purple color to distinguish from obstacles)
+    ctx.strokeStyle = "rgba(255, 0, 255, 0.8)"; // Purple color
+    ctx.lineWidth = 2;
+
+    const centerX = powerup.x + powerup.width / 2;
+    const centerY = powerup.y + powerup.height / 2;
+    const radius = powerup.width / 2;
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Add a label for the powerup type
+    ctx.fillStyle = "rgba(255, 0, 255, 0.8)";
+    ctx.font = "10px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(
+      powerup.type === "DOUBLE_POINTS" ? "2X" : "INV",
+      centerX,
+      centerY - radius - 5
+    );
   });
 }
 
