@@ -744,13 +744,12 @@ export default function useGameLogic({
     const newVersion = (gameStateRef.current.version || 0) + 1;
 
     // Ensure all existing animation frames are canceled before starting a new game
-    // This helps prevent issues on mobile when restarting
     if (animationFrameRef.current !== null) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
     }
 
-    // Try to cancel any potential lingering animation frames (mobile fix)
+    // Try to cancel any potential lingering animation frames (for both mobile and desktop)
     try {
       const id = window.requestAnimationFrame(() => {});
       for (let i = id; i > id - 10; i--) {
@@ -810,19 +809,18 @@ export default function useGameLogic({
     // Get initial settings
     const initialSettings = settings();
 
-    // Force a new game loop first - needed for mobile
+    // Force a new game loop - consistent approach for both mobile and desktop
     if (typeof window !== "undefined") {
-      // Force layout recalculation in the browser
+      // Force browser to handle any pending operations
       void window.document.body.offsetHeight;
 
-      // Start game loop immediately - no delay
-      // Use a direct approach for mobile rather than nested setTimeout
+      // Start the animation frame directly
       animationFrameRef.current = window.requestAnimationFrame(gameLoop);
     }
 
     // Start the warm-up timer after animation has started
     warmupTimerRef.current = setTimeout(() => {
-      // Only proceed if the version is still the same
+      // Only proceed if the version is still the same (prevents issues with rapid restarts)
       if (gameStateRef.current.version === newVersion) {
         // End warm-up and start spawning obstacles
         setGameState((prev) => ({ ...prev, warmupActive: false }));
@@ -855,7 +853,7 @@ export default function useGameLogic({
   const handleJump = useCallback(() => {
     // If game is over, clicking/tapping anywhere should restart the game immediately
     if (gameStateRef.current.gameOver) {
-      // Direct restart approach for mobile compatibility
+      // Restart the game with a direct call for both desktop and mobile
       startGame();
       return;
     }

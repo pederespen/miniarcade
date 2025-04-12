@@ -29,16 +29,6 @@ export default function GameBoard({
 }: GameBoardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Add a key for canvas re-creation on game over -> restart
-  const canvasKey = useRef(0);
-
-  // Force canvas refresh when game state changes from over to playing
-  useEffect(() => {
-    if (!gameOver) {
-      canvasKey.current++;
-    }
-  }, [gameOver]);
-
   // Set up canvas with correct dimensions
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -68,17 +58,6 @@ export default function GameBoard({
         ctx.scale(pixelRatio, pixelRatio);
       }
     }
-
-    // Hard reset the canvas on mobile for restarts
-    return () => {
-      if (canvas && !window.matchMedia("(hover: hover)").matches) {
-        const ctx = canvas.getContext("2d", { alpha: false });
-        if (ctx) {
-          // Full clear on teardown
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-      }
-    };
   }, [boardSize.width, boardSize.height]);
 
   // Draw the game
@@ -121,7 +100,6 @@ export default function GameBoard({
       width={boardSize.width}
       height={boardSize.height}
       className="rounded-lg shadow-lg"
-      key={canvasKey.current} // Force re-creation of canvas element on key change
       style={{
         touchAction: "none",
         maxWidth: "100%",

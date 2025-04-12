@@ -45,12 +45,12 @@ export default function GamePlay({
 
   // Wrap resetGame to avoid React state updates during rendering
   const handleReset = useCallback(() => {
-    // For mobile compatibility, focus on the container after reset
+    // Focus on the container
     if (gameContainerRef.current) {
       gameContainerRef.current.focus();
     }
-    // Schedule the reset to happen in the next tick
-    setTimeout(() => resetGame(), 0);
+    // Call resetGame directly for consistency with mobile
+    resetGame();
   }, [resetGame]);
 
   // Handle mobile-specific restart issues
@@ -60,9 +60,7 @@ export default function GamePlay({
       // 1. Focus and scroll if needed
       if (gameContainerRef.current) {
         gameContainerRef.current.focus();
-
-        // 2. Force a complete reset
-        // Direct call to resetGame is more reliable than nested timeouts
+        // 2. Direct call to resetGame
         resetGame();
       }
     }
@@ -218,13 +216,8 @@ export default function GamePlay({
                 <button
                   onClick={(e) => {
                     e.stopPropagation(); // Prevent event bubbling
-                    if (window.matchMedia("(hover: hover)").matches) {
-                      // Desktop
-                      handleReset();
-                    } else {
-                      // Mobile - simplified approach
-                      forceMobileRestart();
-                    }
+                    // Use the same approach for both desktop and mobile
+                    handleReset();
                   }}
                   onTouchStart={(e) => {
                     // Handle mobile touch directly to prevent issues
