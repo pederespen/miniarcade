@@ -8,6 +8,8 @@ import useGameLogic from "../hooks/use-game-logic";
 
 // Set to true only during development, false for production
 const DEV_MODE = false;
+// Set to true to show the mobile debugging overlay
+const MOBILE_DEBUG = true;
 
 export default function GamePlay({
   onBoardSizeChange,
@@ -16,6 +18,22 @@ export default function GamePlay({
 }: GamePlayProps) {
   // Use DEV_MODE constant instead of UI toggle
   const [debugMode] = useState(DEV_MODE);
+  const [debugInfo, setDebugInfo] = useState({
+    status: "Initializing",
+    lastAction: "None",
+    jumpCount: 0,
+  });
+
+  // Capture debug info
+  const updateDebugInfo = useCallback((status: string, action: string) => {
+    if (MOBILE_DEBUG) {
+      setDebugInfo((prev) => ({
+        status,
+        lastAction: action,
+        jumpCount: action === "jump" ? prev.jumpCount + 1 : prev.jumpCount,
+      }));
+    }
+  }, []);
 
   // Use refs to avoid re-renders that cause update depth issues
   const gameContainerRef = useRef<HTMLDivElement>(null);
@@ -46,9 +64,39 @@ export default function GamePlay({
     if (gameContainerRef.current) {
       gameContainerRef.current.focus();
     }
+    console.log("【RESET】 Reset initiated, calling resetGame");
     // Schedule the reset to happen in the next tick
     setTimeout(() => resetGame(), 0);
   }, [resetGame]);
+
+  // Handle mobile-specific restart issues
+  const forceMobileRestart = useCallback(() => {
+    console.log("【MOBILE】 Force mobile restart initiated");
+
+    // For severe mobile issues, try the nuclear approach:
+    if (gameOver) {
+      console.log("【MOBILE】 Applying nuclear restart approach");
+      // 1. Focus and scroll if needed
+      if (gameContainerRef.current) {
+        gameContainerRef.current.focus();
+        window.scrollTo(0, 0);
+      }
+
+      // 2. Force a complete reset with multiple approaches
+      setTimeout(() => {
+        // Cancel any running animation frames globally
+        if (window.requestAnimationFrame) {
+          const id = window.requestAnimationFrame(() => {});
+          for (let i = 0; i < id; i++) {
+            window.cancelAnimationFrame(i);
+          }
+        }
+
+        console.log("【MOBILE】 Running resetGame");
+        resetGame();
+      }, 50);
+    }
+  }, [gameOver, resetGame]);
 
   // Add keyboard controls
   useEffect(() => {
@@ -97,14 +145,17 @@ export default function GamePlay({
               // Only handle clicks on desktop devices
               if (window.matchMedia("(hover: hover)").matches) {
                 handleJump();
+                updateDebugInfo(gameOver ? "Game Over" : "Playing", "jump");
               }
             }}
             onTouchStart={() => {
               // Only handle touch on mobile devices
               // If the game is over, handle it like a reset
               if (gameOver) {
-                handleReset();
+                updateDebugInfo("Restarting", "restart_touch");
+                forceMobileRestart();
               } else {
+                updateDebugInfo(isPlaying ? "Playing" : "Starting", "jump");
                 handleJump();
               }
             }}
@@ -122,6 +173,22 @@ export default function GamePlay({
               gameOver={gameOver}
               debug={debugMode}
             />
+
+            {/* Mobile debug overlay */}
+            {MOBILE_DEBUG && (
+              <div
+                className="absolute top-0 left-0 p-2 bg-black/70 text-white text-xs z-50 w-full"
+                style={{ pointerEvents: "none" }}
+              >
+                <p>Status: {debugInfo.status}</p>
+                <p>Last Action: {debugInfo.lastAction}</p>
+                <p>Game Over: {gameOver ? "Yes" : "No"}</p>
+                <p>Is Playing: {isPlaying ? "Yes" : "No"}</p>
+                <p>Jump Count: {debugInfo.jumpCount}</p>
+                <p>Airplane Y: {airplane.y.toFixed(1)}</p>
+                <p>Velocity: {airplane.velocity.toFixed(2)}</p>
+              </div>
+            )}
           </div>
 
           {!isPlaying && !gameOver && (
@@ -153,7 +220,15 @@ export default function GamePlay({
                 <button
                   onClick={(e) => {
                     e.stopPropagation(); // Prevent event bubbling
-                    handleReset();
+                    console.log("【BUTTON】 Try Again button clicked");
+                    updateDebugInfo("Try Again Clicked", "restart_button");
+                    if (window.matchMedia("(hover: hover)").matches) {
+                      // Desktop
+                      handleReset();
+                    } else {
+                      // Mobile - use the nuclear approach
+                      forceMobileRestart();
+                    }
                   }}
                   className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full cursor-pointer"
                 >

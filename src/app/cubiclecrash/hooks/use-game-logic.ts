@@ -536,7 +536,10 @@ export default function useGameLogic({
 
   // Game loop function - declare early for use in startGame
   const gameLoop = useCallback(() => {
-    if (gameStateRef.current.gameOver) return;
+    if (gameStateRef.current.gameOver) {
+      console.log("【LOOP】 Game over, not running loop");
+      return;
+    }
 
     // Get latest settings
     const latestSettings = settings();
@@ -552,6 +555,7 @@ export default function useGameLogic({
       // Check boundaries
       if (newY < 0 || newY > boardSize.height - prev.height) {
         // Schedule game over instead of calling it directly to avoid state updates during render
+        console.log("【LOOP】 Airplane hit boundary, triggering game over");
         setTimeout(() => handleGameOver(), 0);
         return prev;
       }
@@ -705,14 +709,22 @@ export default function useGameLogic({
 
   // Start the game - need to define this before handleJump can reference it
   const startGame = useCallback(() => {
+    // Add debugging for mobile restart issue
+    console.log("【RESTART】 startGame called");
+
     // Ensure all existing animation frames are canceled before starting a new game
     // This helps prevent issues on mobile when restarting
     if (animationFrameRef.current) {
+      console.log(
+        "【RESTART】 Canceling existing animation frame:",
+        animationFrameRef.current
+      );
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
     }
 
     // Reset game state and difficulty
+    console.log("【RESTART】 Resetting game state");
     scoreRef.current = 0;
     lastScoringObstacleRef.current = null;
 
@@ -727,6 +739,7 @@ export default function useGameLogic({
 
     // Clear any existing timers
     if (obstacleTimerRef.current) {
+      console.log("【RESTART】 Clearing obstacle timer");
       clearInterval(obstacleTimerRef.current);
       obstacleTimerRef.current = null;
     }
@@ -738,6 +751,7 @@ export default function useGameLogic({
     const airplaneHeight = Math.floor(baseAirplaneHeight * scaleFactor);
 
     // Reset airplane with size scaled to the canvas
+    console.log("【RESTART】 Setting airplane position");
     setAirplane({
       x: Math.floor(80 * scaleFactor), // Position scaled relative to board size
       y: boardSize.height / 2,
@@ -748,20 +762,32 @@ export default function useGameLogic({
     });
 
     // Clear obstacles
+    console.log("【RESTART】 Clearing obstacles");
     setObstacles([]);
 
     // Get initial settings
     const initialSettings = settings();
 
     // Start obstacle spawning
+    console.log("【RESTART】 Starting obstacle spawning");
     spawnObstacle(); // Spawn one immediately
     obstacleTimerRef.current = setInterval(
       spawnObstacle,
       initialSettings.spawnRate
     );
 
-    // Start game loop immediately - no delay
-    animationFrameRef.current = requestAnimationFrame(gameLoop);
+    console.log("【RESTART】 Starting game loop");
+    // Force a new game loop - potentially needed for mobile
+    if (typeof window !== "undefined") {
+      // Force layout recalculation in the browser
+      void window.document.body.offsetHeight;
+
+      // Start game loop immediately - no delay
+      animationFrameRef.current = requestAnimationFrame(() => {
+        console.log("【RESTART】 First animation frame running");
+        gameLoop();
+      });
+    }
   }, [
     boardSize.height,
     settings,
@@ -773,19 +799,31 @@ export default function useGameLogic({
 
   // Handle player jump - now startGame is defined before this function
   const handleJump = useCallback(() => {
+    // Log for mobile debugging
+    console.log(
+      "【JUMP】 handleJump called, gameOver:",
+      gameStateRef.current.gameOver
+    );
+
     // If game is over, clicking/tapping anywhere should restart the game immediately
     if (gameStateRef.current.gameOver) {
+      console.log("【JUMP】 Game over, restarting game");
       setTimeout(() => startGame(), 0);
       return;
     }
 
     // If game not active, start it
     if (!gameStateRef.current.isActive) {
+      console.log("【JUMP】 Game not active, starting game");
       setTimeout(() => startGame(), 0);
       return;
     }
 
     const latestSettings = settings();
+    console.log(
+      "【JUMP】 Normal jump, applying velocity:",
+      latestSettings.jumpPower
+    );
 
     setAirplane((prev) => ({
       ...prev,
