@@ -16,6 +16,8 @@ export default function GamePlay({
 }: GamePlayProps) {
   // Use DEV_MODE constant instead of UI toggle
   const [debugMode] = useState(DEV_MODE);
+  // Add countdown state
+  const [countdown, setCountdown] = useState(3);
 
   // Use refs to avoid re-renders that cause update depth issues
   const gameContainerRef = useRef<HTMLDivElement>(null);
@@ -32,6 +34,7 @@ export default function GamePlay({
     score,
     isPlaying,
     gameOver,
+    isWarmupActive,
     handleJump,
     resetGame,
   } = useGameLogic({
@@ -78,6 +81,12 @@ export default function GamePlay({
   // Add keyboard controls
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      // Ignore input during warm-up period
+      if (isWarmupActive) {
+        e.preventDefault();
+        return;
+      }
+
       if (e.code === "Space" || e.key === " ") {
         handleJump();
         e.preventDefault();
@@ -92,7 +101,21 @@ export default function GamePlay({
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [handleJump]);
+  }, [handleJump, isWarmupActive]);
+
+  // Add countdown effect
+  useEffect(() => {
+    if (isPlaying && isWarmupActive) {
+      setCountdown(3);
+      const timer1 = setTimeout(() => setCountdown(2), 1000);
+      const timer2 = setTimeout(() => setCountdown(1), 2000);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
+    }
+  }, [isPlaying, isWarmupActive]);
 
   // Simple loading state - should resolve quickly with our improved useBoardSize
   if (!sizeCalculated) {
@@ -119,17 +142,20 @@ export default function GamePlay({
             className="absolute inset-0 flex justify-center items-center"
             tabIndex={0}
             onClick={() => {
-              // Only handle clicks on desktop devices
-              if (window.matchMedia("(hover: hover)").matches) {
+              // Only handle clicks on desktop devices when not in warm-up mode
+              if (
+                window.matchMedia("(hover: hover)").matches &&
+                !isWarmupActive
+              ) {
                 handleJump();
               }
             }}
             onTouchStart={() => {
-              // Only handle touch on mobile devices
+              // Only handle touch on mobile devices when not in warm-up mode
               // If the game is over, handle it like a reset
               if (gameOver) {
                 forceMobileRestart();
-              } else {
+              } else if (!isWarmupActive) {
                 handleJump();
               }
             }}
@@ -147,6 +173,15 @@ export default function GamePlay({
               gameOver={gameOver}
               debug={debugMode}
             />
+
+            {/* Replace warm-up indicator with countdown */}
+            {isPlaying && isWarmupActive && (
+              <div className="absolute top-1/3 left-0 right-0 flex justify-center">
+                <div className="bg-black/70 text-white px-8 py-6 rounded-lg text-5xl font-bold animate-pulse">
+                  {countdown}
+                </div>
+              </div>
+            )}
 
             {/* Removed mobile debug overlay */}
           </div>

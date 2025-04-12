@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { Airplane, Obstacle, GameBoardSize } from "../types";
+import { Airplane, Obstacle, GameBoardSize, GameLogicReturn } from "../types";
 
 interface UseGameLogicProps {
   boardSize: GameBoardSize;
@@ -23,6 +23,7 @@ export default function useGameLogic({
     isActive: false,
     gameOver: false,
     score: 0,
+    warmupActive: false, // New state to track warm-up period
   });
 
   // Game elements
@@ -534,6 +535,12 @@ export default function useGameLogic({
     }
   }, [highScore, setHighScore]);
 
+  // Define warm-up duration in milliseconds
+  const WARMUP_DURATION = 3000; // Exactly 3 seconds to match the countdown
+
+  // Warm-up timer reference
+  const warmupTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Game loop function - declare early for use in startGame
   const gameLoop = useCallback(() => {
     if (gameStateRef.current.gameOver) {
@@ -545,6 +552,15 @@ export default function useGameLogic({
 
     // Update airplane with physics
     setAirplane((prev) => {
+      // During warm-up, keep the plane flying straight with no gravity
+      if (gameStateRef.current.warmupActive) {
+        return {
+          ...prev,
+          rotation: 0, // Keep rotation level during warm-up
+        };
+      }
+
+      // Normal physics after warm-up
       const newVelocity = prev.velocity + latestSettings.gravity;
       const newY = prev.y + newVelocity;
       let newRotation = prev.rotation + 1;
@@ -570,56 +586,59 @@ export default function useGameLogic({
       return updatedAirplane;
     });
 
-    // Update obstacles with simplified state access
-    setObstacles((prev) => {
-      let scoredThisFrame = false;
+    // Only update obstacles if warm-up is complete
+    if (!gameStateRef.current.warmupActive) {
+      // Update obstacles with simplified state access
+      setObstacles((prev) => {
+        let scoredThisFrame = false;
 
-      const updatedObstacles = prev.map((obstacle) => {
-        // Move obstacle
-        const newX = obstacle.x - latestSettings.obstacleSpeed;
-        let { passed } = obstacle;
+        const updatedObstacles = prev.map((obstacle) => {
+          // Move obstacle
+          const newX = obstacle.x - latestSettings.obstacleSpeed;
+          let { passed } = obstacle;
 
-        // Check if obstacle just passed the airplane and we haven't scored from it before
-        if (
-          !passed &&
-          newX + obstacle.width < airplane.x &&
-          lastScoringObstacleRef.current !== obstacle.id &&
-          !scoredThisFrame
-        ) {
-          // Mark this obstacle as passed
-          passed = true;
-          scoredThisFrame = true;
+          // Check if obstacle just passed the airplane and we haven't scored from it before
+          if (
+            !passed &&
+            newX + obstacle.width < airplane.x &&
+            lastScoringObstacleRef.current !== obstacle.id &&
+            !scoredThisFrame
+          ) {
+            // Mark this obstacle as passed
+            passed = true;
+            scoredThisFrame = true;
 
-          // Store the ID of this obstacle so we never count it again
-          lastScoringObstacleRef.current = obstacle.id;
+            // Store the ID of this obstacle so we never count it again
+            lastScoringObstacleRef.current = obstacle.id;
 
-          // Increment our score counter (separate from React state)
-          scoreRef.current += 1;
+            // Increment our score counter (separate from React state)
+            scoreRef.current += 1;
 
-          // Update difficulty tier based on current score
-          const newDifficultyTier = Math.floor(
-            scoreRef.current / SPEED_INCREASE_THRESHOLD
-          );
-          if (newDifficultyTier > difficultyTier) {
-            setDifficultyTier(newDifficultyTier);
+            // Update difficulty tier based on current score
+            const newDifficultyTier = Math.floor(
+              scoreRef.current / SPEED_INCREASE_THRESHOLD
+            );
+            if (newDifficultyTier > difficultyTier) {
+              setDifficultyTier(newDifficultyTier);
+            }
+
+            // Sync the React state with our score counter
+            setGameState((prevState) => ({
+              ...prevState,
+              score: scoreRef.current,
+            }));
+          } else if (!passed && newX + obstacle.width < airplane.x) {
+            // If we already scored this frame, just mark as passed without counting
+            passed = true;
           }
 
-          // Sync the React state with our score counter
-          setGameState((prevState) => ({
-            ...prevState,
-            score: scoreRef.current,
-          }));
-        } else if (!passed && newX + obstacle.width < airplane.x) {
-          // If we already scored this frame, just mark as passed without counting
-          passed = true;
-        }
+          // Create updated obstacle state
+          return { ...obstacle, x: newX, passed };
+        });
 
-        // Create updated obstacle state
-        return { ...obstacle, x: newX, passed };
+        return updatedObstacles.filter((o) => o.x + o.width > 0);
       });
-
-      return updatedObstacles.filter((o) => o.x + o.width > 0);
-    });
+    }
 
     // Continue the loop
     animationFrameRef.current = requestAnimationFrame(gameLoop);
@@ -627,7 +646,9 @@ export default function useGameLogic({
 
   // Spawn obstacles - declare early for use in startGame
   const spawnObstacle = useCallback(() => {
-    if (gameStateRef.current.gameOver) return;
+    // Don't spawn obstacles during warm-up period or if game is over
+    if (gameStateRef.current.warmupActive || gameStateRef.current.gameOver)
+      return;
 
     const obstacleTypes = ["drawer", "coffee", "plant", "monitor", "fan"];
     const type = obstacleTypes[
@@ -711,6 +732,7 @@ export default function useGameLogic({
       isActive: true,
       gameOver: false,
       score: 0,
+      warmupActive: true, // Start with warm-up active
     });
 
     setDifficultyTier(0);
@@ -720,6 +742,12 @@ export default function useGameLogic({
     if (obstacleTimerRef.current) {
       clearInterval(obstacleTimerRef.current);
       obstacleTimerRef.current = null;
+    }
+
+    // Clear any existing warm-up timer
+    if (warmupTimerRef.current) {
+      clearTimeout(warmupTimerRef.current);
+      warmupTimerRef.current = null;
     }
 
     // Scale airplane size based on board size
@@ -735,7 +763,7 @@ export default function useGameLogic({
       width: airplaneWidth,
       height: airplaneHeight,
       rotation: 0,
-      velocity: 0.1 * scaleFactor, // Scale initial velocity
+      velocity: 0, // Start with zero velocity in warm-up
     });
 
     // Clear obstacles
@@ -744,12 +772,25 @@ export default function useGameLogic({
     // Get initial settings
     const initialSettings = settings();
 
-    // Start obstacle spawning
-    spawnObstacle(); // Spawn one immediately
-    obstacleTimerRef.current = setInterval(
-      spawnObstacle,
-      initialSettings.spawnRate
-    );
+    // Start the warm-up timer
+    warmupTimerRef.current = setTimeout(() => {
+      // End warm-up and start spawning obstacles
+      setGameState((prev) => ({ ...prev, warmupActive: false }));
+
+      // Add a slight upward "launch" motion when warm-up ends to signal start
+      setAirplane((prev) => ({
+        ...prev,
+        velocity: -3 * scaleFactor, // Gentle upward motion
+        rotation: -10, // Slight upward tilt
+      }));
+
+      // Start obstacle spawning after warm-up
+      spawnObstacle(); // Spawn one immediately
+      obstacleTimerRef.current = setInterval(
+        spawnObstacle,
+        initialSettings.spawnRate
+      );
+    }, WARMUP_DURATION);
 
     // Force a new game loop - potentially needed for mobile
     if (typeof window !== "undefined") {
@@ -781,6 +822,11 @@ export default function useGameLogic({
     // If game not active, start it
     if (!gameStateRef.current.isActive) {
       setTimeout(() => startGame(), 0);
+      return;
+    }
+
+    // Ignore jumps during warm-up period
+    if (gameStateRef.current.warmupActive) {
       return;
     }
 
@@ -816,6 +862,9 @@ export default function useGameLogic({
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      if (warmupTimerRef.current) {
+        clearTimeout(warmupTimerRef.current);
+      }
     };
   }, []);
 
@@ -837,7 +886,8 @@ export default function useGameLogic({
     score: gameState.score,
     isPlaying: gameState.isActive,
     gameOver: gameState.gameOver,
+    isWarmupActive: gameState.warmupActive,
     handleJump,
     resetGame: startGame,
-  };
+  } as GameLogicReturn;
 }

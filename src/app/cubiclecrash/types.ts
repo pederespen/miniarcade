@@ -41,3 +41,14 @@ export interface GameBoardProps {
   gameOver: boolean;
   debug?: boolean;
 }
+
+export interface GameLogicReturn {
+  airplane: Airplane;
+  obstacles: Obstacle[];
+  score: number;
+  isPlaying: boolean;
+  gameOver: boolean;
+  isWarmupActive: boolean;
+  handleJump: () => void;
+  resetGame: () => void;
+}
