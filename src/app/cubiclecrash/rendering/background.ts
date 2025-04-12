@@ -37,12 +37,12 @@ export function drawBackground(
     // Set the appropriate source based on level
     if (backgroundKey === "level3") {
       backgroundImages[backgroundKey]!.src =
-        "/cubiclecrash/background-level3.svg";
+        "./cubiclecrash/background-level3.svg";
     } else if (backgroundKey === "level2") {
       backgroundImages[backgroundKey]!.src =
-        "/cubiclecrash/background-level2.svg";
+        "./cubiclecrash/background-level2.svg";
     } else {
-      backgroundImages[backgroundKey]!.src = "/cubiclecrash/background.svg";
+      backgroundImages[backgroundKey]!.src = "./cubiclecrash/background.svg";
     }
   }
 
