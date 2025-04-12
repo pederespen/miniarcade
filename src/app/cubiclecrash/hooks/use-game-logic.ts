@@ -24,6 +24,7 @@ export default function useGameLogic({
     gameOver: false,
     score: 0,
     warmupActive: false, // New state to track warm-up period
+    version: 0, // Version flag to help with stale closures
   });
 
   // Game elements
@@ -529,6 +530,11 @@ export default function useGameLogic({
       obstacleTimerRef.current = null;
     }
 
+    if (warmupTimerRef.current) {
+      clearTimeout(warmupTimerRef.current);
+      warmupTimerRef.current = null;
+    }
+
     // Update high score
     if (gameStateRef.current.score > highScore) {
       setHighScore(gameStateRef.current.score);
@@ -543,6 +549,9 @@ export default function useGameLogic({
 
   // Game loop function - declare early for use in startGame
   const gameLoop = useCallback(() => {
+    // Get the current version to prevent stale closures
+    const currentVersion = gameStateRef.current.version;
+
     if (gameStateRef.current.gameOver) {
       return;
     }
@@ -552,6 +561,9 @@ export default function useGameLogic({
 
     // Update airplane with physics
     setAirplane((prev) => {
+      // Prevent updates if the game version has changed
+      if (currentVersion !== gameStateRef.current.version) return prev;
+
       // During warm-up, keep the plane flying straight with no gravity
       if (gameStateRef.current.warmupActive) {
         return {
@@ -586,10 +598,16 @@ export default function useGameLogic({
       return updatedAirplane;
     });
 
-    // Only update obstacles if warm-up is complete
-    if (!gameStateRef.current.warmupActive) {
+    // Only update obstacles if warm-up is complete and game version hasn't changed
+    if (
+      !gameStateRef.current.warmupActive &&
+      currentVersion === gameStateRef.current.version
+    ) {
       // Update obstacles with simplified state access
       setObstacles((prev) => {
+        // Prevent updates if the game version has changed
+        if (currentVersion !== gameStateRef.current.version) return prev;
+
         let scoredThisFrame = false;
 
         const updatedObstacles = prev.map((obstacle) => {
@@ -640,8 +658,13 @@ export default function useGameLogic({
       });
     }
 
-    // Continue the loop
-    animationFrameRef.current = requestAnimationFrame(gameLoop);
+    // Continue the loop only if the game version is still the same
+    if (
+      currentVersion === gameStateRef.current.version &&
+      !gameStateRef.current.gameOver
+    ) {
+      animationFrameRef.current = requestAnimationFrame(gameLoop);
+    }
   }, [boardSize.height, airplane, handleGameOver, settings, difficultyTier]);
 
   // Spawn obstacles - declare early for use in startGame
@@ -717,6 +740,9 @@ export default function useGameLogic({
 
   // Start the game - need to define this before handleJump can reference it
   const startGame = useCallback(() => {
+    // Increment the version to invalidate any stale closures
+    const newVersion = (gameStateRef.current.version || 0) + 1;
+
     // Ensure all existing animation frames are canceled before starting a new game
     // This helps prevent issues on mobile when restarting
     if (animationFrameRef.current !== null) {
@@ -724,15 +750,27 @@ export default function useGameLogic({
       animationFrameRef.current = null;
     }
 
+    // Try to cancel any potential lingering animation frames (mobile fix)
+    try {
+      const id = window.requestAnimationFrame(() => {});
+      for (let i = id; i > id - 10; i--) {
+        window.cancelAnimationFrame(i);
+      }
+    } catch {
+      // Ignore errors, just a precaution
+    }
+
     // Reset game state and difficulty
     scoreRef.current = 0;
     lastScoringObstacleRef.current = null;
 
+    // Set new game state with incremented version
     setGameState({
       isActive: true,
       gameOver: false,
       score: 0,
       warmupActive: true, // Start with warm-up active
+      version: newVersion,
     });
 
     setDifficultyTier(0);
@@ -778,32 +816,31 @@ export default function useGameLogic({
       void window.document.body.offsetHeight;
 
       // Start game loop immediately - no delay
-      // Use setTimeout to ensure it runs in a clean execution context
-      setTimeout(() => {
-        if (animationFrameRef.current === null) {
-          animationFrameRef.current = requestAnimationFrame(gameLoop);
-        }
-      }, 0);
+      // Use a direct approach for mobile rather than nested setTimeout
+      animationFrameRef.current = window.requestAnimationFrame(gameLoop);
     }
 
     // Start the warm-up timer after animation has started
     warmupTimerRef.current = setTimeout(() => {
-      // End warm-up and start spawning obstacles
-      setGameState((prev) => ({ ...prev, warmupActive: false }));
+      // Only proceed if the version is still the same
+      if (gameStateRef.current.version === newVersion) {
+        // End warm-up and start spawning obstacles
+        setGameState((prev) => ({ ...prev, warmupActive: false }));
 
-      // Add a slight upward "launch" motion when warm-up ends to signal start
-      setAirplane((prev) => ({
-        ...prev,
-        velocity: -3 * scaleFactor, // Gentle upward motion
-        rotation: -10, // Slight upward tilt
-      }));
+        // Add a slight upward "launch" motion when warm-up ends to signal start
+        setAirplane((prev) => ({
+          ...prev,
+          velocity: -3 * scaleFactor, // Gentle upward motion
+          rotation: -10, // Slight upward tilt
+        }));
 
-      // Start obstacle spawning after warm-up
-      spawnObstacle(); // Spawn one immediately
-      obstacleTimerRef.current = setInterval(
-        spawnObstacle,
-        initialSettings.spawnRate
-      );
+        // Start obstacle spawning after warm-up
+        spawnObstacle(); // Spawn one immediately
+        obstacleTimerRef.current = setInterval(
+          spawnObstacle,
+          initialSettings.spawnRate
+        );
+      }
     }, WARMUP_DURATION);
   }, [
     boardSize.height,
@@ -818,21 +855,14 @@ export default function useGameLogic({
   const handleJump = useCallback(() => {
     // If game is over, clicking/tapping anywhere should restart the game immediately
     if (gameStateRef.current.gameOver) {
-      // Use setTimeout with 0 delay to ensure clean execution context
-      setTimeout(() => {
-        // Force cancel any potentially running animation frames before starting
-        if (animationFrameRef.current !== null) {
-          cancelAnimationFrame(animationFrameRef.current);
-          animationFrameRef.current = null;
-        }
-        startGame();
-      }, 0);
+      // Direct restart approach for mobile compatibility
+      startGame();
       return;
     }
 
     // If game not active, start it
     if (!gameStateRef.current.isActive) {
-      setTimeout(() => startGame(), 0);
+      startGame();
       return;
     }
 

@@ -60,28 +60,11 @@ export default function GamePlay({
       // 1. Focus and scroll if needed
       if (gameContainerRef.current) {
         gameContainerRef.current.focus();
-        window.scrollTo(0, 0);
+
+        // 2. Force a complete reset
+        // Direct call to resetGame is more reliable than nested timeouts
+        resetGame();
       }
-
-      // 2. Force a complete reset with multiple approaches
-      setTimeout(() => {
-        // Cancel any running animation frames globally
-        if (window.requestAnimationFrame) {
-          // More thorough cancelAnimationFrame approach
-          const highestId = window.requestAnimationFrame(() => {});
-          for (let i = highestId; i >= 0; i--) {
-            window.cancelAnimationFrame(i);
-          }
-        }
-
-        // Force browser repaint
-        void document.body.offsetHeight;
-
-        // Small delay before resetGame to allow cleanup to complete
-        setTimeout(() => {
-          resetGame();
-        }, 50);
-      }, 20);
     }
   }, [gameOver, resetGame]);
 
@@ -157,7 +140,10 @@ export default function GamePlay({
                 handleJump();
               }
             }}
-            onTouchStart={() => {
+            onTouchStart={(e) => {
+              // Prevent default touch behavior to avoid any browser interference
+              e.preventDefault();
+
               // Only handle touch on mobile devices when not in warm-up mode
               // If the game is over, handle it like a reset
               if (gameOver) {
@@ -166,11 +152,20 @@ export default function GamePlay({
                 handleJump();
               }
             }}
+            onTouchEnd={(e) => {
+              // Prevent default to avoid ghost clicks and scrolling on mobile
+              e.preventDefault();
+            }}
+            onTouchCancel={(e) => {
+              // Ensure we clean up any touch events properly
+              e.preventDefault();
+            }}
             style={{
               cursor: "pointer",
               touchAction: "none", // This tells the browser we'll handle all touch actions
               outline: "none", // Remove focus outline
               WebkitTapHighlightColor: "transparent", // Prevent tap highlight on iOS
+              userSelect: "none", // Prevent text selection
             }}
           >
             <GameBoard
@@ -227,9 +222,15 @@ export default function GamePlay({
                       // Desktop
                       handleReset();
                     } else {
-                      // Mobile - use the nuclear approach
+                      // Mobile - simplified approach
                       forceMobileRestart();
                     }
+                  }}
+                  onTouchStart={(e) => {
+                    // Handle mobile touch directly to prevent issues
+                    e.stopPropagation();
+                    e.preventDefault();
+                    forceMobileRestart();
                   }}
                   className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full cursor-pointer"
                 >
