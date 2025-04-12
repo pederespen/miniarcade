@@ -71,6 +71,9 @@ export default function useGameLogic({
   // Warm-up timer reference
   const warmupTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Ref to track active powerup for consistent state access
+  const activePowerupRef = useRef<PowerupType | null>(null);
+
   // Fixed game settings - base values
   const baseHeight = 480; // Reference height for scaling
   const scaleFactor = boardSize.height / baseHeight;
@@ -554,7 +557,7 @@ export default function useGameLogic({
   // Handle game over
   const handleGameOver = useCallback(() => {
     // Check if powerup is active and if it's invincibility
-    if (activePowerup === PowerupType.INVINCIBILITY) {
+    if (activePowerupRef.current === PowerupType.INVINCIBILITY) {
       // Player is invincible, don't end the game
       return;
     }
@@ -586,7 +589,7 @@ export default function useGameLogic({
       ...prev,
       gameOver: true,
     }));
-  }, [highScore, setHighScore, activePowerup]);
+  }, [highScore, setHighScore, activePowerupRef]);
 
   // Helper function to check for powerup collisions and handle collection
   const checkPowerupCollision = useCallback(
@@ -663,19 +666,33 @@ export default function useGameLogic({
     []
   );
 
-  // Function to apply powerup effect
+  // Update activePowerupRef whenever activePowerup changes
+  useEffect(() => {
+    activePowerupRef.current = activePowerup;
+  }, [activePowerup]);
+
+  // In the applyPowerup function, update both state and ref
   const applyPowerup = useCallback((powerupType: PowerupType) => {
     // End any existing powerup
     if (powerupTimerRef.current) {
       clearTimeout(powerupTimerRef.current);
     }
 
-    // Apply the new powerup
+    // Debug log
+    console.log("Applying powerup", {
+      powerupType,
+      isDoublePoints: powerupType === PowerupType.DOUBLE_POINTS,
+    });
+
+    // Apply the new powerup to both state and ref
     setActivePowerup(powerupType);
+    activePowerupRef.current = powerupType;
 
     // Set a timer to end the powerup effect
     powerupTimerRef.current = setTimeout(() => {
+      console.log("Powerup expired", { powerupType });
       setActivePowerup(null);
+      activePowerupRef.current = null;
       powerupTimerRef.current = null;
     }, POWERUP_DURATION);
   }, []);
@@ -791,8 +808,26 @@ export default function useGameLogic({
             obstacle.id !== lastScoringObstacleRef.current
           ) {
             // Increment score, handling double points
-            const pointsToAdd =
-              activePowerup === PowerupType.DOUBLE_POINTS ? 2 : 1;
+            let pointsToAdd = 1;
+
+            if (activePowerupRef.current === PowerupType.DOUBLE_POINTS) {
+              pointsToAdd = 2;
+              console.log("DOUBLE POINTS ACTIVE - Adding 2 points");
+            } else {
+              console.log("Regular scoring - Adding 1 point");
+            }
+
+            // Debug logs
+            console.log("Scoring obstacle", {
+              activePowerup,
+              activePowerupFromRef: activePowerupRef.current,
+              activePowerupType: activePowerup
+                ? activePowerup.toString()
+                : "none",
+              doublePointsEnum: PowerupType.DOUBLE_POINTS.toString(),
+              isEqual: activePowerupRef.current === PowerupType.DOUBLE_POINTS,
+              pointsToAdd,
+            });
 
             scoreRef.current += pointsToAdd;
             lastScoringObstacleRef.current = obstacle.id;
@@ -850,6 +885,12 @@ export default function useGameLogic({
       // Apply collected powerup effect (in a setTimeout to avoid state update during render)
       if (hasCollectedPowerup && collectedType) {
         setTimeout(() => {
+          console.log(
+            "Collected powerup:",
+            collectedType,
+            "Is double points:",
+            collectedType === PowerupType.DOUBLE_POINTS
+          );
           applyPowerup(collectedType!);
         }, 0);
       }
@@ -977,6 +1018,7 @@ export default function useGameLogic({
 
     // 6. Clear any active powerup
     setActivePowerup(null);
+    activePowerupRef.current = null;
     if (powerupTimerRef.current) {
       clearTimeout(powerupTimerRef.current);
       powerupTimerRef.current = null;
@@ -1103,10 +1145,12 @@ export default function useGameLogic({
       }
     });
   }, [
+    calculateSettings,
+    boardSize.height,
+    handleGameOver,
     airplane,
     obstacles,
     powerups,
-    handleGameOver,
     checkCollision,
     checkPowerupCollision,
     applyPowerup,
