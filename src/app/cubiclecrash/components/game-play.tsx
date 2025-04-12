@@ -42,6 +42,10 @@ export default function GamePlay({
 
   // Wrap resetGame to avoid React state updates during rendering
   const handleReset = useCallback(() => {
+    // For mobile compatibility, focus on the container after reset
+    if (gameContainerRef.current) {
+      gameContainerRef.current.focus();
+    }
     // Schedule the reset to happen in the next tick
     setTimeout(() => resetGame(), 0);
   }, [resetGame]);
@@ -88,6 +92,7 @@ export default function GamePlay({
           <div
             ref={gameContainerRef}
             className="absolute inset-0 flex justify-center items-center"
+            tabIndex={0}
             onClick={() => {
               // Only handle clicks on desktop devices
               if (window.matchMedia("(hover: hover)").matches) {
@@ -101,6 +106,7 @@ export default function GamePlay({
             style={{
               cursor: "pointer",
               touchAction: "none", // This tells the browser we'll handle all touch actions
+              outline: "none", // Remove focus outline
             }}
           >
             <GameBoard

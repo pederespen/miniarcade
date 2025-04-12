@@ -704,6 +704,13 @@ export default function useGameLogic({
 
   // Start the game - need to define this before handleJump can reference it
   const startGame = useCallback(() => {
+    // Ensure all existing animation frames are canceled before starting a new game
+    // This helps prevent issues on mobile when restarting
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
     // Reset game state and difficulty
     scoreRef.current = 0;
     lastScoringObstacleRef.current = null;
@@ -720,10 +727,7 @@ export default function useGameLogic({
     // Clear any existing timers
     if (obstacleTimerRef.current) {
       clearInterval(obstacleTimerRef.current);
-    }
-
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
+      obstacleTimerRef.current = null;
     }
 
     // Scale airplane size based on board size
@@ -755,7 +759,7 @@ export default function useGameLogic({
       initialSettings.spawnRate
     );
 
-    // Start game loop
+    // Start game loop immediately - no delay
     animationFrameRef.current = requestAnimationFrame(gameLoop);
   }, [
     boardSize.height,
