@@ -432,7 +432,7 @@ export default function useGameLogic({
             foliage: {
               x: obstacle.x + obstacle.width * 0.5,
               y: obstacle.y + obstacle.height * 0.3,
-              radius: obstacle.width * 0.4,
+              radius: obstacle.width * 0.25,
             },
           };
 

@@ -107,7 +107,7 @@ export function drawDebugHitboxes(
         const foliage = {
           x: obstacle.x + obstacle.width / 2,
           y: obstacle.y + obstacle.height / 3,
-          radius: obstacle.width * 0.4,
+          radius: obstacle.width * 0.25,
         };
 
         ctx.beginPath();
