@@ -1156,6 +1156,37 @@ export default function useGameLogic({
     applyPowerup,
   ]);
 
+  // Effect to update obstacle spawn rate when score changes
+  useEffect(() => {
+    // Skip if game is not active or is in warm-up
+    if (
+      !gameStateRef.current.isActive ||
+      gameStateRef.current.warmupActive ||
+      gameStateRef.current.gameOver
+    ) {
+      return;
+    }
+
+    // Get the updated spawn rate based on current score
+    const updatedSettings = calculateSettings(gameStateRef.current.score);
+
+    // Only update if spawn rate has changed significantly
+    if (
+      Math.abs(updatedSettings.spawnRate - currentSpawnRateRef.current) > 10
+    ) {
+      currentSpawnRateRef.current = updatedSettings.spawnRate;
+
+      // Clear existing timer and create a new one with updated spawn rate
+      if (obstacleTimerRef.current) {
+        clearInterval(obstacleTimerRef.current);
+        obstacleTimerRef.current = setInterval(
+          spawnObstacle,
+          updatedSettings.spawnRate
+        );
+      }
+    }
+  }, [gameState.score, calculateSettings, spawnObstacle]);
+
   // Clean up on unmount
   useEffect(() => {
     return () => {
