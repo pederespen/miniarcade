@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { GameBoardSize } from "./types";
 import GameSetup from "./components/game-setup";
 import GamePlay from "./components/game-play";
+import DebugPanel from "../components/debug-panel";
 
 export default function CubiclecrashGame() {
   const [gameStarted, setGameStarted] = useState(false);
@@ -52,6 +53,9 @@ export default function CubiclecrashGame() {
           setHighScore={setHighScore}
         />
       )}
+
+      {/* Debug Panel */}
+      <DebugPanel gameName="Cubicle Crash" />
     </div>
   );
 }

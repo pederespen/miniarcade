@@ -214,13 +214,20 @@ export function drawDebugStats(
     obstacleSpeed: number;
     spawnRate: number;
     fps?: number;
+    activeDebugFeatures?: string[];
   }
 ): void {
   const { obstacleSpeed, spawnRate, fps } = stats;
 
+  // Reduce height with smaller line spacing and less padding
+  const lineHeight = 16;
+  const padding = 8;
+  // Calculate box height - remove feature height calculation
+  const boxHeight = lineHeight * 3 + padding * 2;
+
   // Draw semi-transparent background
   ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-  ctx.fillRect(10, boardSize.height - 110, 180, 100);
+  ctx.fillRect(10, boardSize.height - boxHeight - 5, 180, boxHeight);
 
   // Set text style
   ctx.fillStyle = "rgba(0, 255, 0, 0.9)";
@@ -228,17 +235,15 @@ export function drawDebugStats(
   ctx.textAlign = "left";
 
   // Display stats
-  const y = boardSize.height - 90;
-  const lineHeight = 18;
+  const y = boardSize.height - boxHeight + padding;
 
-  ctx.fillText(`Speed: ${obstacleSpeed.toFixed(2)}`, 20, y + lineHeight);
-  ctx.fillText(
-    `Spawn Rate: ${spawnRate.toFixed(0)} ms`,
-    20,
-    y + lineHeight * 2
-  );
+  // Original three-line format with smaller spacing
+  ctx.fillText(`Speed: ${obstacleSpeed.toFixed(2)}`, 20, y);
+  ctx.fillText(`Spawn Rate: ${spawnRate.toFixed(0)} ms`, 20, y + lineHeight);
 
   if (fps !== undefined) {
-    ctx.fillText(`FPS: ${Math.round(fps)}`, 20, y + lineHeight * 3);
+    ctx.fillText(`FPS: ${Math.round(fps)}`, 20, y + lineHeight * 2);
   }
+
+  // Remove the active debug features display section
 }

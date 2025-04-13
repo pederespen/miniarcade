@@ -5,15 +5,17 @@ import { GamePlayProps } from "../types";
 import GameBoard from "./game-board";
 import useBoardSize from "../hooks/use-board-size";
 import useGameLogic from "../hooks/use-game-logic";
+import { debugConfig, isDevelopment } from "../../utils/env-config";
 
-const DEV_MODE = true;
+// Replace the hardcoded DEV_MODE constant
+// const DEV_MODE = true;
 
 export default function GamePlay({
   onBoardSizeChange,
   highScore,
   setHighScore,
 }: GamePlayProps) {
-  const [debugMode] = useState(DEV_MODE);
+  const [debugMode, setDebugMode] = useState(debugConfig.showCollisionBoxes);
   // Add countdown state
   const [countdown, setCountdown] = useState(3);
 
@@ -81,9 +83,9 @@ export default function GamePlay({
         e.preventDefault();
       }
 
-      // Keep debug mode toggle for development but only if DEV_MODE is true
-      if (DEV_MODE && (e.code === "KeyD" || e.key === "d")) {
-        // No longer needed as we're not toggling debug mode
+      // Keep debug mode toggle for development but only if in development mode
+      if (isDevelopment && (e.code === "KeyD" || e.key === "d")) {
+        setDebugMode((prev) => !prev);
         e.preventDefault();
       }
     };
@@ -117,8 +119,6 @@ export default function GamePlay({
 
   return (
     <div className="flex flex-col items-center w-full space-y-4">
-      {/* Removed buttons section entirely */}
-
       {/* Aspect ratio container - 4:3 ratio maintained */}
       <div
         className="relative w-full max-w-xl mt-10"
