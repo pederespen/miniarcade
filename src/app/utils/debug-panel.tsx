@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { isDevelopment, debugConfig } from "../utils/env-config";
+import { isDevelopment, debugConfig } from "./env-config";
 
 interface DebugPanelProps {
   gameName: string;

@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { GameBoardSize } from "./types";
 import GameSetup from "./components/game-setup";
 import GamePlay from "./components/game-play";
-import DebugPanel from "../components/debug-panel";
+import DebugPanel from "../utils/debug-panel";
 
 export default function CubiclecrashGame() {
   const [gameStarted, setGameStarted] = useState(false);
