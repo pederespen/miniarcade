@@ -25,6 +25,7 @@ const MAX_DIFFICULTY_SCORE = 75; // Cap difficulty increases at score of 75 (equ
 const POWERUP_SPAWN_CHANCE = 0.2; // 20% chance to spawn a powerup when obstacle spawns
 const POWERUP_DURATION = 8000; // 8 seconds powerup duration
 const MIN_SCORE_FOR_POWERUPS = 5; // Don't spawn powerups until player has at least 5 points
+const MIN_OBSTACLES_BETWEEN_POWERUPS = 5; // Minimum obstacles before another powerup can spawn
 
 // Define warm-up duration in milliseconds
 const WARMUP_DURATION = 3000; // Exactly 3 seconds to match the countdown
@@ -64,6 +65,9 @@ export default function useGameLogic({
   // This ensures we don't double-count obstacles regardless of state updates
   const lastScoringObstacleRef = useRef<number | null>(null);
   const scoreRef = useRef(0);
+
+  // Ref to track obstacles since last powerup
+  const obstaclesSinceLastPowerupRef = useRef<number>(0);
 
   // Ref for active powerup timer
   const powerupTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -933,12 +937,18 @@ export default function useGameLogic({
 
     setObstacles((prev) => [...prev, newObstacle]);
 
-    // Chance to spawn a powerup
+    // Increment the obstacles since last powerup counter
+    obstaclesSinceLastPowerupRef.current += 1;
+
+    // Chance to spawn a powerup, but only if minimum obstacle count has been reached
     if (
+      obstaclesSinceLastPowerupRef.current >= MIN_OBSTACLES_BETWEEN_POWERUPS &&
       Math.random() < POWERUP_SPAWN_CHANCE &&
       scoreRef.current >= MIN_SCORE_FOR_POWERUPS
     ) {
       spawnPowerup();
+      // Reset the counter when a powerup is spawned
+      obstaclesSinceLastPowerupRef.current = 0;
     }
   }, [boardSize.width, boardSize.height, scaleFactor, spawnPowerup]);
 
@@ -968,6 +978,7 @@ export default function useGameLogic({
     // 1. Reset score and tracking refs
     scoreRef.current = 0;
     lastScoringObstacleRef.current = null;
+    obstaclesSinceLastPowerupRef.current = 0; // Reset the obstacles since last powerup counter
 
     // 2. Generate fresh settings object based on base values
     const initialGameSettings = {
