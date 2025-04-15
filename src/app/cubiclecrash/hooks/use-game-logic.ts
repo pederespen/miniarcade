@@ -13,13 +13,13 @@ import {
   SPEED_INCREASE_FACTOR,
   SPAWN_RATE_DECREASE_FACTOR,
   MAX_DIFFICULTY_SCORE,
-  POWERUP_SPAWN_CHANCE,
-  POWERUP_DURATION,
-  MIN_SCORE_FOR_POWERUPS,
   MIN_OBSTACLES_BETWEEN_POWERUPS,
+  POWERUP_SPAWN_CHANCE,
+  MIN_SCORE_FOR_POWERUPS,
   WARMUP_DURATION,
 } from "../constants";
 import { checkCollision, checkPowerupCollision } from "../utils/collision";
+import { createPowerupManager } from "../utils/powerups";
 
 export default function useGameLogic({
   boardSize,
@@ -72,6 +72,27 @@ export default function useGameLogic({
   // Fixed game settings - base values
   const baseHeight = 480; // Reference height for scaling
   const scaleFactor = boardSize.height / baseHeight;
+
+  // Initialize the game state - using a ref to prevent dependency issues
+  const gameStateRef = useRef(gameState);
+  gameStateRef.current = gameState;
+
+  // Create powerup manager
+  const powerupManager = useMemo(
+    () =>
+      createPowerupManager(
+        setActivePowerup,
+        activePowerupRef,
+        powerupTimerRef,
+        setPowerups,
+        scoreRef,
+        obstaclesSinceLastPowerupRef,
+        gameStateRef,
+        boardSize,
+        scaleFactor
+      ),
+    [boardSize, scaleFactor]
+  );
 
   // Base settings - wrapped in useMemo to prevent recreation on every render
   const baseSettings = useMemo(
@@ -127,10 +148,6 @@ export default function useGameLogic({
     currentSettings?.spawnRate || baseSettings.spawnRate
   );
 
-  // Initialize the game state - using a ref to prevent dependency issues
-  const gameStateRef = useRef(gameState);
-  gameStateRef.current = gameState;
-
   // Handle game over
   const handleGameOver = useCallback(() => {
     // Check if powerup is active and if it's invincibility
@@ -151,10 +168,8 @@ export default function useGameLogic({
       obstacleTimerRef.current = null;
     }
 
-    if (powerupTimerRef.current) {
-      clearTimeout(powerupTimerRef.current);
-      powerupTimerRef.current = null;
-    }
+    // Clear powerup timer
+    powerupManager.clearPowerupTimer();
 
     // Update high score if needed
     if (scoreRef.current > highScore) {
@@ -166,67 +181,12 @@ export default function useGameLogic({
       ...prev,
       gameOver: true,
     }));
-  }, [highScore, setHighScore, activePowerupRef]);
+  }, [highScore, setHighScore, activePowerupRef, powerupManager]);
 
   // Update activePowerupRef whenever activePowerup changes
   useEffect(() => {
     activePowerupRef.current = activePowerup;
   }, [activePowerup]);
-
-  // In the applyPowerup function, update both state and ref
-  const applyPowerup = useCallback((powerupType: PowerupType) => {
-    // End any existing powerup
-    if (powerupTimerRef.current) {
-      clearTimeout(powerupTimerRef.current);
-    }
-
-    // Apply the new powerup to both state and ref
-    setActivePowerup(powerupType);
-    activePowerupRef.current = powerupType;
-
-    // Set a timer to end the powerup effect
-    powerupTimerRef.current = setTimeout(() => {
-      setActivePowerup(null);
-      activePowerupRef.current = null;
-      powerupTimerRef.current = null;
-    }, POWERUP_DURATION);
-  }, []);
-
-  // Spawn powerup - will be called with a chance from spawnObstacle
-  const spawnPowerup = useCallback(() => {
-    // Don't spawn powerups during warm-up period or if game is over
-    if (
-      gameStateRef.current.warmupActive ||
-      gameStateRef.current.gameOver ||
-      scoreRef.current < MIN_SCORE_FOR_POWERUPS
-    )
-      return;
-
-    // Random powerup type
-    const powerupTypes = [PowerupType.DOUBLE_POINTS, PowerupType.INVINCIBILITY];
-    const type = powerupTypes[Math.floor(Math.random() * powerupTypes.length)];
-
-    // Base sizes for powerups
-    const baseSize = 40;
-    const size = Math.floor(baseSize * scaleFactor);
-
-    // Randomize y position - ensure better vertical spacing
-    const minY = size * 1.2; // Add some margin from top
-    const maxY = boardSize.height - size * 1.2; // Add some margin from bottom
-    const y = Math.floor(Math.random() * (maxY - minY) + minY);
-
-    const newPowerup: Powerup = {
-      id: Date.now(),
-      x: boardSize.width + size,
-      y,
-      width: size,
-      height: size,
-      type,
-      collected: false,
-    };
-
-    setPowerups((prev) => [...prev, newPowerup]);
-  }, [boardSize.width, boardSize.height, scaleFactor]);
 
   // Game loop function - declare early for use in startGame
   const gameLoop = useCallback(() => {
@@ -365,7 +325,7 @@ export default function useGameLogic({
       // Apply collected powerup effect (in a setTimeout to avoid state update during render)
       if (hasCollectedPowerup && collectedType) {
         setTimeout(() => {
-          applyPowerup(collectedType!);
+          powerupManager.applyPowerup(collectedType!);
         }, 0);
       }
 
@@ -384,7 +344,7 @@ export default function useGameLogic({
     boardSize.height,
     handleGameOver,
     airplane,
-    applyPowerup,
+    powerupManager,
   ]);
 
   // Spawn obstacles - declare early for use in startGame
@@ -443,11 +403,11 @@ export default function useGameLogic({
       Math.random() < POWERUP_SPAWN_CHANCE &&
       scoreRef.current >= MIN_SCORE_FOR_POWERUPS
     ) {
-      spawnPowerup();
+      powerupManager.spawnPowerup();
       // Reset the counter when a powerup is spawned
       obstaclesSinceLastPowerupRef.current = 0;
     }
-  }, [boardSize.width, boardSize.height, scaleFactor, spawnPowerup]);
+  }, [boardSize.width, boardSize.height, scaleFactor, powerupManager]);
 
   // Start the game - need to define this before handleJump can reference it
   const startGame = useCallback(() => {
@@ -620,7 +580,7 @@ export default function useGameLogic({
         );
 
         // Apply powerup effect
-        applyPowerup(powerup.type);
+        powerupManager.applyPowerup(powerup.type);
       }
     });
   }, [
@@ -630,7 +590,7 @@ export default function useGameLogic({
     airplane,
     obstacles,
     powerups,
-    applyPowerup,
+    powerupManager,
   ]);
 
   // Effect to update obstacle spawn rate when score changes
