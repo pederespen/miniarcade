@@ -12,6 +12,13 @@ export interface GamePlayProps {
   setHighScore: (score: number) => void;
 }
 
+// Add UseGameLogicProps
+export interface UseGameLogicProps {
+  boardSize: GameBoardSize;
+  setHighScore: (score: number) => void;
+  highScore: number;
+}
+
 // Add GameContextType
 export interface GameContextType {
   gameStarted: boolean;
@@ -99,4 +106,33 @@ export interface GameLogicReturn {
   handleJump: () => void;
   resetGame: () => void;
   currentSettings: GameSettings;
+}
+
+// Collision detection types
+export interface CircleHitbox {
+  x: number;
+  y: number;
+  radius: number;
+}
+
+export interface RectHitbox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface PlantHitbox {
+  pot: RectHitbox;
+  foliage: CircleHitbox;
+}
+
+export interface Point {
+  x: number;
+  y: number;
+}
+
+export interface LineSegment {
+  p1: Point;
+  p2: Point;
 }

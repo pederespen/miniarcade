@@ -2,18 +2,17 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   Airplane,
   Obstacle,
-  GameBoardSize,
   GameLogicReturn,
   GameSettings,
   Powerup,
   PowerupType,
+  UseGameLogicProps,
+  CircleHitbox,
+  RectHitbox,
+  PlantHitbox,
+  Point,
+  LineSegment,
 } from "../types";
-
-interface UseGameLogicProps {
-  boardSize: GameBoardSize;
-  setHighScore: (score: number) => void;
-  highScore: number;
-}
 
 // Constants for progressive difficulty
 const SPEED_INCREASE_THRESHOLD = 3; // Every 3 points
@@ -139,36 +138,6 @@ export default function useGameLogic({
   // Initialize the game state - using a ref to prevent dependency issues
   const gameStateRef = useRef(gameState);
   gameStateRef.current = gameState;
-
-  // Define types for obstacle hitboxes
-  interface CircleHitbox {
-    x: number;
-    y: number;
-    radius: number;
-  }
-
-  interface RectHitbox {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  }
-
-  interface PlantHitbox {
-    pot: RectHitbox;
-    foliage: CircleHitbox;
-  }
-
-  // Define types for geometric calculations
-  interface Point {
-    x: number;
-    y: number;
-  }
-
-  interface LineSegment {
-    p1: Point;
-    p2: Point;
-  }
 
   // Helper function to check if a point is inside a rectangle
   const pointInRectangle = useCallback(
