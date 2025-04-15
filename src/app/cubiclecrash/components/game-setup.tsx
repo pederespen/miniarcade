@@ -1,8 +1,14 @@
 "use client";
 
-import { GameSetupProps } from "../types";
+import { useGameContext } from "../context/game-context";
 
-export default function GameSetup({ onStartGame, highScore }: GameSetupProps) {
+export default function GameSetup() {
+  const { setGameStarted, highScore } = useGameContext();
+
+  const onStartGame = () => {
+    setGameStarted(true);
+  };
+
   return (
     <div className="flex flex-col items-center space-y-8 mt-10">
       <div className="bg-indigo-800 p-6 rounded-lg shadow-lg w-full max-w-lg">

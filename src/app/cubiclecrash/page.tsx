@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { GameBoardSize } from "./types";
+import { useEffect } from "react";
 import GameSetup from "./components/game-setup";
 import GamePlay from "./components/game-play";
+import { GameProvider, useGameContext } from "./context/game-context";
 
-export default function CubiclecrashGame() {
-  const [gameStarted, setGameStarted] = useState(false);
-  const [highScore, setHighScore] = useState(0);
+function CubiclecrashGameContent() {
+  const { gameStarted, highScore, setHighScore, handleBoardSizeChange } =
+    useGameContext();
 
   // Add a viewport meta tag to ensure proper scaling on mobile
   useEffect(() => {
@@ -30,21 +30,10 @@ export default function CubiclecrashGame() {
     }
   }, []);
 
-  // Handle board size changes (required by interface but we don't need to use the size)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleBoardSizeChange = useCallback((size: GameBoardSize) => {
-    // The size is handled internally by the game components
-    // We don't need to do anything with it at this level
-  }, []);
-
-  const startGame = () => {
-    setGameStarted(true);
-  };
-
   return (
     <div className="container mx-auto px-2 sm:px-6 py-4 max-w-4xl h-full flex flex-col">
       {!gameStarted ? (
-        <GameSetup onStartGame={startGame} highScore={highScore} />
+        <GameSetup />
       ) : (
         <GamePlay
           onBoardSizeChange={handleBoardSizeChange}
@@ -53,5 +42,13 @@ export default function CubiclecrashGame() {
         />
       )}
     </div>
+  );
+}
+
+export default function CubiclecrashGame() {
+  return (
+    <GameProvider>
+      <CubiclecrashGameContent />
+    </GameProvider>
   );
 }
