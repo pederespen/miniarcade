@@ -13,13 +13,15 @@ import {
   SPEED_INCREASE_FACTOR,
   SPAWN_RATE_DECREASE_FACTOR,
   MAX_DIFFICULTY_SCORE,
-  MIN_OBSTACLES_BETWEEN_POWERUPS,
-  POWERUP_SPAWN_CHANCE,
-  MIN_SCORE_FOR_POWERUPS,
   WARMUP_DURATION,
 } from "../constants";
 import { checkCollision, checkPowerupCollision } from "../utils/collision";
 import { createPowerupManager } from "../utils/powerups";
+import {
+  createObstacle,
+  shouldSpawnPowerup,
+  updateObstacles,
+} from "../utils/obstacles";
 
 export default function useGameLogic({
   boardSize,
@@ -240,54 +242,36 @@ export default function useGameLogic({
       return updatedAirplane;
     });
 
-    // Move obstacles based on current speed and calculate score
+    // Use the extracted updateObstacles function
     setObstacles((prev) => {
       // Prevent updates if the game version has changed
       if (currentVersion !== gameStateRef.current.version) return prev;
 
-      // Process obstacles - move them left and check if they've been passed
-      return prev
-        .map((obstacle) => {
-          // Move obstacle to the left
-          const newX = obstacle.x - latestSettings.obstacleSpeed;
+      // Process obstacles using the extracted function
+      const { updatedObstacles, newLastScoringObstacleId, scoreIncrement } =
+        updateObstacles(
+          prev,
+          latestSettings.obstacleSpeed,
+          airplane.x,
+          lastScoringObstacleRef.current,
+          activePowerupRef.current
+        );
 
-          // Check if obstacle is now passed
-          const isPassed =
-            obstacle.passed || newX + obstacle.width < airplane.x;
+      // Update score reference and last scoring obstacle reference if needed
+      if (scoreIncrement > 0) {
+        scoreRef.current += scoreIncrement;
+        lastScoringObstacleRef.current = newLastScoringObstacleId;
 
-          // IMPORTANT: Update score if this is a newly passed obstacle
-          // We only update the score for an obstacle once
-          if (
-            isPassed &&
-            !obstacle.passed &&
-            obstacle.id !== lastScoringObstacleRef.current
-          ) {
-            // Increment score, handling double points
-            let pointsToAdd = 1;
+        // Update React state (for display purposes)
+        setTimeout(() => {
+          setGameState((prevState) => ({
+            ...prevState,
+            score: scoreRef.current,
+          }));
+        }, 0);
+      }
 
-            if (activePowerupRef.current === PowerupType.DOUBLE_POINTS) {
-              pointsToAdd = 2;
-            }
-
-            scoreRef.current += pointsToAdd;
-            lastScoringObstacleRef.current = obstacle.id;
-
-            // Update React state (for display purposes)
-            setTimeout(() => {
-              setGameState((prevState) => ({
-                ...prevState,
-                score: scoreRef.current,
-              }));
-            }, 0);
-          }
-
-          return {
-            ...obstacle,
-            x: newX,
-            passed: isPassed,
-          };
-        })
-        .filter((obstacle) => obstacle.x + obstacle.width > 0); // Remove obstacles that are off-screen
+      return updatedObstacles;
     });
 
     // Move powerups based on current speed and check for collection
@@ -353,55 +337,21 @@ export default function useGameLogic({
     if (gameStateRef.current.warmupActive || gameStateRef.current.gameOver)
       return;
 
-    const obstacleTypes = ["drawer", "coffee", "plant", "monitor", "fan"];
-    const type = obstacleTypes[
-      Math.floor(Math.random() * obstacleTypes.length)
-    ] as Obstacle["type"];
-
-    // Base sizes for reference board size
-    let baseWidth = 70;
-    let baseHeight = 60;
-
-    if (type === "drawer") {
-      baseWidth = 120;
-      baseHeight = 40;
-    } else if (type === "monitor") {
-      baseWidth = 80;
-      baseHeight = 70;
-    } else if (type === "fan") {
-      baseWidth = 60;
-      baseHeight = 60;
-    }
-
-    // Scale obstacle size based on board size
-    const width = Math.floor(baseWidth * scaleFactor);
-    const height = Math.floor(baseHeight * scaleFactor);
-
-    // Randomize y position - ensure better vertical spacing
-    const minY = height * 1.2; // Add some margin from top
-    const maxY = boardSize.height - height * 1.2; // Add some margin from bottom
-    const y = Math.floor(Math.random() * (maxY - minY) + minY);
-
-    const newObstacle: Obstacle = {
-      id: Date.now(),
-      x: boardSize.width + width,
-      y,
-      width,
-      height,
-      type,
-      passed: false,
-    };
+    // Use the extracted createObstacle function
+    const newObstacle = createObstacle(
+      boardSize.width,
+      boardSize.height,
+      scaleFactor
+    );
 
     setObstacles((prev) => [...prev, newObstacle]);
 
     // Increment the obstacles since last powerup counter
     obstaclesSinceLastPowerupRef.current += 1;
 
-    // Chance to spawn a powerup, but only if minimum obstacle count has been reached
+    // Use the extracted shouldSpawnPowerup function
     if (
-      obstaclesSinceLastPowerupRef.current >= MIN_OBSTACLES_BETWEEN_POWERUPS &&
-      Math.random() < POWERUP_SPAWN_CHANCE &&
-      scoreRef.current >= MIN_SCORE_FOR_POWERUPS
+      shouldSpawnPowerup(obstaclesSinceLastPowerupRef.current, scoreRef.current)
     ) {
       powerupManager.spawnPowerup();
       // Reset the counter when a powerup is spawned
