@@ -8,13 +8,7 @@ import {
   PowerupType,
   UseGameLogicProps,
 } from "../types";
-import {
-  SPEED_INCREASE_THRESHOLD,
-  SPEED_INCREASE_FACTOR,
-  SPAWN_RATE_DECREASE_FACTOR,
-  MAX_DIFFICULTY_SCORE,
-  WARMUP_DURATION,
-} from "../constants";
+import { WARMUP_DURATION } from "../constants";
 import { checkCollision, checkPowerupCollision } from "../utils/collision";
 import { createPowerupManager } from "../utils/powerups";
 import {
@@ -28,6 +22,11 @@ import {
   createInitialAirplane,
   applyWarmupEndMotion,
 } from "../utils/airplane";
+import {
+  createBaseSettings,
+  calculateGameSettings,
+  shouldUpdateSpawnRate,
+} from "../utils/game-settings";
 
 export default function useGameLogic({
   boardSize,
@@ -104,41 +103,14 @@ export default function useGameLogic({
 
   // Base settings - wrapped in useMemo to prevent recreation on every render
   const baseSettings = useMemo(
-    () => ({
-      gravity: 0.4 * scaleFactor,
-      jumpPower: -7 * scaleFactor,
-      obstacleSpeed: 4 * scaleFactor,
-      spawnRate: 1500,
-    }),
+    () => createBaseSettings(scaleFactor),
     [scaleFactor]
   );
 
   // Calculate the current settings based on score and active powerups
   const calculateSettings = useCallback(
     (score: number): GameSettings => {
-      // Cap the score for difficulty calculation
-      const cappedScore = Math.min(score, MAX_DIFFICULTY_SCORE);
-
-      // Calculate how many thresholds we've crossed
-      const thresholdsPassed = Math.floor(
-        cappedScore / SPEED_INCREASE_THRESHOLD
-      );
-
-      // Calculate speed multiplier
-      const speedMultiplier = Math.pow(SPEED_INCREASE_FACTOR, thresholdsPassed);
-
-      // Calculate spawn rate multiplier (changes every 2 thresholds)
-      const spawnRateMultiplier = Math.pow(
-        SPAWN_RATE_DECREASE_FACTOR,
-        Math.floor(thresholdsPassed / 2)
-      );
-
-      return {
-        gravity: baseSettings.gravity,
-        jumpPower: baseSettings.jumpPower,
-        obstacleSpeed: baseSettings.obstacleSpeed * speedMultiplier,
-        spawnRate: baseSettings.spawnRate * spawnRateMultiplier,
-      };
+      return calculateGameSettings(baseSettings, score);
     },
     [baseSettings]
   );
@@ -377,12 +349,7 @@ export default function useGameLogic({
     obstaclesSinceLastPowerupRef.current = 0; // Reset the obstacles since last powerup counter
 
     // 2. Generate fresh settings object based on base values
-    const initialGameSettings = {
-      gravity: baseSettings.gravity,
-      jumpPower: baseSettings.jumpPower,
-      obstacleSpeed: baseSettings.obstacleSpeed, // Base speed, not multiplied
-      spawnRate: baseSettings.spawnRate, // Base spawn rate, not multiplied
-    };
+    const initialGameSettings = createBaseSettings(scaleFactor);
 
     // 3. Update the settings state
     setCurrentSettings(initialGameSettings);
@@ -527,9 +494,12 @@ export default function useGameLogic({
     // Get the updated spawn rate based on current score
     const updatedSettings = calculateSettings(gameStateRef.current.score);
 
-    // Only update if spawn rate has changed significantly
+    // Use extracted function to check if spawn rate needs updating
     if (
-      Math.abs(updatedSettings.spawnRate - currentSpawnRateRef.current) > 10
+      shouldUpdateSpawnRate(
+        currentSpawnRateRef.current,
+        updatedSettings.spawnRate
+      )
     ) {
       currentSpawnRateRef.current = updatedSettings.spawnRate;
 
