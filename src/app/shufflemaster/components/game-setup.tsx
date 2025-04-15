@@ -4,29 +4,22 @@ import {
   SelectedImageDisplay,
   GameControls,
 } from "./image-selection";
+import { useGameContext } from "../contexts/game-context";
 
 // GameSetup Component
-export function GameSetup({
-  gridSize,
-  onGridSizeChange,
-  selectedPresetId,
-  onImageSelect,
-  userImage,
-  selectingImage,
-  onStartGame,
-  onSelectDifferentImage,
-  isCustomImage = false,
-}: {
-  gridSize: number;
-  onGridSizeChange: (size: number) => void;
-  selectedPresetId: number | null;
-  onImageSelect: (imageUrl: string, id: number) => void;
-  userImage: string | null;
-  selectingImage: boolean;
-  onStartGame: () => void;
-  onSelectDifferentImage: () => void;
-  isCustomImage?: boolean;
-}) {
+export function GameSetup() {
+  const {
+    gridSize,
+    setGridSize: onGridSizeChange,
+    selectedPresetId,
+    handlePresetSelect: onImageSelect,
+    userImage,
+    selectingImage,
+    startGame: onStartGame,
+    selectDifferentImage: onSelectDifferentImage,
+    isCustomImage,
+  } = useGameContext();
+
   return (
     <div className="bg-black rounded-lg p-6 shadow-lg">
       <GridSizeSelector

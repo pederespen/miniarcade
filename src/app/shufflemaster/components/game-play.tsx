@@ -1,44 +1,30 @@
 import { useRef } from "react";
 import ShuffleMasterGame from "../game";
 import { GameplayControls } from "./tooltips";
+import { useGameContext } from "../contexts/game-context";
 
-// GamePlay Component
-export function GamePlay({
-  userImage,
-  gridSize,
-  onReset,
-  gameBoardSize,
-  onBoardSizeChange,
-  howToPlayTooltipRef,
-  howToPlayButtonRef,
-  toggleHowToPlayTooltip,
-  hideHowToPlayTooltip,
-  helpTooltipRef,
-  helpButtonRef,
-  toggleHelpTooltip,
-  hideHelpTooltip,
-  isCustomImage = false,
-}: {
-  userImage: string;
-  gridSize: number;
-  onReset: () => void;
-  gameBoardSize: number;
-  onBoardSizeChange: (size: number) => void;
-  howToPlayTooltipRef: React.RefObject<HTMLDivElement | null>;
-  howToPlayButtonRef: React.RefObject<HTMLButtonElement | null>;
-  toggleHowToPlayTooltip: (
-    otherTooltipRef?: React.RefObject<HTMLDivElement | null>
-  ) => void;
-  hideHowToPlayTooltip: () => void;
-  helpTooltipRef: React.RefObject<HTMLDivElement | null>;
-  helpButtonRef: React.RefObject<HTMLButtonElement | null>;
-  toggleHelpTooltip: (
-    otherTooltipRef?: React.RefObject<HTMLDivElement | null>
-  ) => void;
-  hideHelpTooltip: () => void;
-  isCustomImage?: boolean;
-}) {
+// GamePlay Component - simplified with context
+export function GamePlay() {
+  const {
+    userImage,
+    gridSize,
+    gameBoardSize,
+    isCustomImage,
+    onBoardSizeChange,
+    resetGame: onReset,
+    howToPlayTooltipRef,
+    howToPlayButtonRef,
+    toggleHowToPlayTooltip,
+    hideHowToPlayTooltip,
+    helpTooltipRef,
+    helpButtonRef,
+    toggleHelpTooltip,
+    hideHelpTooltip,
+  } = useGameContext();
+
   const gameContainerRef = useRef<HTMLDivElement>(null);
+
+  if (!userImage) return null;
 
   return (
     <div className="flex flex-col items-center w-full">
