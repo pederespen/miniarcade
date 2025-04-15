@@ -5,19 +5,28 @@ import { GamePlayProps } from "../types";
 import GameBoard from "./game-board";
 import useBoardSize from "../hooks/use-board-size";
 import useGameLogic from "../hooks/use-game-logic";
-import { debugConfig, isDevelopment } from "../../utils/env-config";
-
-// Replace the hardcoded DEV_MODE constant
-// const DEV_MODE = true;
 
 export default function GamePlay({
   onBoardSizeChange,
   highScore,
   setHighScore,
 }: GamePlayProps) {
-  const [debugMode, setDebugMode] = useState(debugConfig.showCollisionBoxes);
+  const isDevelopment = process.env.NODE_ENV === "development";
+  const [debugMode, setDebugMode] = useState(false);
   // Add countdown state
   const [countdown, setCountdown] = useState(3);
+
+  // Initialize debug mode from URL parameters in development mode
+  useEffect(() => {
+    if (isDevelopment && typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      // Default to true in development mode unless explicitly set to false
+      const debug = params.has("debug") ? params.get("debug") === "true" : true;
+      setDebugMode(debug);
+    } else {
+      setDebugMode(false); // Always false in production
+    }
+  }, [isDevelopment]);
 
   // Use refs to avoid re-renders that cause update depth issues
   const gameContainerRef = useRef<HTMLDivElement>(null);
@@ -92,7 +101,7 @@ export default function GamePlay({
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [handleJump, isWarmupActive]);
+  }, [handleJump, isDevelopment, isWarmupActive]);
 
   // Add countdown effect
   useEffect(() => {

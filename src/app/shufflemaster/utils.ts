@@ -57,7 +57,6 @@ export const formatTime = (totalSeconds: number): string => {
   return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
 };
 
-// Fisher-Yates shuffle algorithm - for regular gameplay
 export const shuffleTiles = (tilesArray: Tile[], gridSize: number): Tile[] => {
   // Start with a solved puzzle (already in order)
   // Then perform a series of random valid moves
@@ -104,7 +103,7 @@ export const devShuffleTiles = (
   // Then just swap the last two tiles
 
   // The array is already ordered initially (tile.id === tile.currentPos)
-  // so we only need to swap the last two positions
+  // so only need to swap the last two positions
 
   // Get the indices of tiles that should go in the last two positions
   const lastTileIndex = tilesArray.findIndex((t) => t.id === totalTiles - 1); // Empty tile

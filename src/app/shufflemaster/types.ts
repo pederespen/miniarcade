@@ -13,6 +13,3 @@ export interface ShuffleGameProps {
   onBoardSizeChange?: (size: number) => void;
   isCustomImage?: boolean;
 }
-
-// For game development/testing
-export const DEV_MODE = false;

@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { Tile } from "../types";
 import { canMoveTile, shuffleTiles, devShuffleTiles } from "../utils";
-import { DEV_MODE } from "../types";
 
 export default function useGameLogic(gridSize: number, imageUrl: string) {
+  const isDevelopment = process.env.NODE_ENV === "development";
   const [tiles, setTiles] = useState<Tile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [moves, setMoves] = useState(0);
@@ -34,14 +34,14 @@ export default function useGameLogic(gridSize: number, imageUrl: string) {
       });
     }
 
-    // Use appropriate shuffle function based on DEV_MODE
-    const shuffledTiles = DEV_MODE
+    // Use appropriate shuffle function based on environment
+    const shuffledTiles = isDevelopment
       ? devShuffleTiles([...initialTiles], totalTiles)
       : shuffleTiles([...initialTiles], gridSize);
 
     setTiles(shuffledTiles);
     setIsLoading(false);
-  }, [gridSize, totalTiles]);
+  }, [gridSize, totalTiles, isDevelopment]);
 
   // Initialize timer when game starts
   useEffect(() => {
