@@ -22,6 +22,12 @@ import {
   shouldSpawnPowerup,
   updateObstacles,
 } from "../utils/obstacles";
+import {
+  updateAirplanePhysics,
+  handleAirplaneJump,
+  createInitialAirplane,
+  applyWarmupEndMotion,
+} from "../utils/airplane";
 
 export default function useGameLogic({
   boardSize,
@@ -203,42 +209,25 @@ export default function useGameLogic({
     // This ensures we're always using the correct values, not stale ones
     const latestSettings = calculateSettings(scoreRef.current);
 
-    // Update airplane with physics
+    // Update airplane with physics using extracted function
     setAirplane((prev) => {
       // Prevent updates if the game version has changed
       if (currentVersion !== gameStateRef.current.version) return prev;
 
-      // During warm-up, keep the plane flying straight with no gravity
-      if (gameStateRef.current.warmupActive) {
-        return {
-          ...prev,
-          rotation: 0, // Keep rotation level during warm-up
-        };
-      }
+      // Use the extracted function to update airplane physics
+      const { updatedAirplane, outOfBounds } = updateAirplanePhysics(
+        prev,
+        latestSettings,
+        boardSize.height,
+        gameStateRef.current.warmupActive
+      );
 
-      // Normal physics after warm-up
-      const newVelocity = prev.velocity + latestSettings.gravity;
-      const newY = prev.y + newVelocity;
-      let newRotation = prev.rotation + 1;
-
-      if (newRotation > 45) newRotation = 45;
-
-      // Check boundaries
-      if (newY < 0 || newY > boardSize.height - prev.height) {
-        // Schedule game over instead of calling it directly to avoid state updates during render
+      // Schedule game over if out of bounds
+      if (outOfBounds) {
         setTimeout(() => handleGameOver(), 0);
         return prev;
       }
 
-      // Create updated airplane state for collision checking
-      const updatedAirplane = {
-        ...prev,
-        y: newY,
-        velocity: newVelocity,
-        rotation: newRotation,
-      };
-
-      // Instead of checking for collisions here, we'll let the effect in the main component handle it
       return updatedAirplane;
     });
 
@@ -433,20 +422,8 @@ export default function useGameLogic({
       warmupTimerRef.current = null;
     }
 
-    // 9. Reset airplane position and physics
-    const baseAirplaneWidth = 60;
-    const baseAirplaneHeight = 30;
-    const airplaneWidth = Math.floor(baseAirplaneWidth * scaleFactor);
-    const airplaneHeight = Math.floor(baseAirplaneHeight * scaleFactor);
-
-    setAirplane({
-      x: Math.floor(80 * scaleFactor),
-      y: boardSize.height / 2,
-      width: airplaneWidth,
-      height: airplaneHeight,
-      rotation: 0,
-      velocity: 0,
-    });
+    // 9. Reset airplane position and physics using the extracted function
+    setAirplane(createInitialAirplane(boardSize.height, scaleFactor));
 
     // Force browser to handle any pending operations before continuing
     if (typeof window !== "undefined") {
@@ -462,12 +439,8 @@ export default function useGameLogic({
         // End warm-up
         setGameState((prev) => ({ ...prev, warmupActive: false }));
 
-        // Add a slight upward motion
-        setAirplane((prev) => ({
-          ...prev,
-          velocity: -3 * scaleFactor,
-          rotation: -10,
-        }));
+        // Add a slight upward motion using the extracted function
+        setAirplane((prev) => applyWarmupEndMotion(prev, scaleFactor));
 
         // Spawn first obstacle and start timer with GUARANTEED BASE SPAWN RATE
         spawnObstacle();
@@ -501,11 +474,8 @@ export default function useGameLogic({
 
     const latestSettings = calculateSettings(gameStateRef.current.score);
 
-    setAirplane((prev) => ({
-      ...prev,
-      velocity: latestSettings.jumpPower,
-      rotation: -20,
-    }));
+    // Use the extracted function to handle airplane jump
+    setAirplane((prev) => handleAirplaneJump(prev, latestSettings.jumpPower));
   }, [calculateSettings, startGame]);
 
   // Collision detection effect - separate from the game loop to avoid state updates during render
