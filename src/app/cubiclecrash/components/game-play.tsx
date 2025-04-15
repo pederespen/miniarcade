@@ -115,6 +115,54 @@ export default function GamePlay({
     }
   }, [isPlaying, isWarmupActive, setCountdown]);
 
+  // Add non-passive touch event listeners
+  useEffect(() => {
+    const gameContainer = gameContainerRef.current;
+    if (gameContainer) {
+      // Add non-passive touch event listeners
+      const touchStartHandler = (e: TouchEvent) => {
+        // Prevent default touch behavior to avoid any browser interference
+        e.preventDefault();
+
+        // Only handle touch on mobile devices when not in warm-up mode
+        // If the game is over, handle it like a reset
+        if (gameOver) {
+          forceMobileRestart();
+        } else if (!isWarmupActive) {
+          handleJump();
+        }
+      };
+
+      const touchEndHandler = (e: TouchEvent) => {
+        // Prevent default to avoid ghost clicks and scrolling on mobile
+        e.preventDefault();
+      };
+
+      const touchCancelHandler = (e: TouchEvent) => {
+        // Ensure we clean up any touch events properly
+        e.preventDefault();
+      };
+
+      // Add event listeners with the non-passive option
+      gameContainer.addEventListener("touchstart", touchStartHandler, {
+        passive: false,
+      });
+      gameContainer.addEventListener("touchend", touchEndHandler, {
+        passive: false,
+      });
+      gameContainer.addEventListener("touchcancel", touchCancelHandler, {
+        passive: false,
+      });
+
+      return () => {
+        // Clean up event listeners
+        gameContainer.removeEventListener("touchstart", touchStartHandler);
+        gameContainer.removeEventListener("touchend", touchEndHandler);
+        gameContainer.removeEventListener("touchcancel", touchCancelHandler);
+      };
+    }
+  }, [gameOver, isWarmupActive, forceMobileRestart, handleJump]);
+
   // Simple loading state - should resolve quickly with our improved useBoardSize
   if (!sizeCalculated) {
     return (
@@ -145,26 +193,6 @@ export default function GamePlay({
               ) {
                 handleJump();
               }
-            }}
-            onTouchStart={(e) => {
-              // Prevent default touch behavior to avoid any browser interference
-              e.preventDefault();
-
-              // Only handle touch on mobile devices when not in warm-up mode
-              // If the game is over, handle it like a reset
-              if (gameOver) {
-                forceMobileRestart();
-              } else if (!isWarmupActive) {
-                handleJump();
-              }
-            }}
-            onTouchEnd={(e) => {
-              // Prevent default to avoid ghost clicks and scrolling on mobile
-              e.preventDefault();
-            }}
-            onTouchCancel={(e) => {
-              // Ensure we clean up any touch events properly
-              e.preventDefault();
             }}
             style={{
               cursor: "pointer",
@@ -237,12 +265,6 @@ export default function GamePlay({
                     e.stopPropagation(); // Prevent event bubbling
                     // Use the same approach for both desktop and mobile
                     handleReset();
-                  }}
-                  onTouchStart={(e) => {
-                    // Handle mobile touch directly to prevent issues
-                    e.stopPropagation();
-                    e.preventDefault();
-                    forceMobileRestart();
                   }}
                   className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full cursor-pointer"
                 >
