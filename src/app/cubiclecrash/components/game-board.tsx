@@ -27,6 +27,7 @@ interface GameBoardProps {
   score: number;
   gameOver: boolean;
   activePowerup: PowerupType | null;
+  gameVersion: number;
   debug?: boolean;
   debugStats?: {
     obstacleSpeed: number;
@@ -42,6 +43,7 @@ export default function GameBoard({
   score,
   gameOver,
   activePowerup,
+  gameVersion,
   debug = false,
   debugStats,
 }: GameBoardProps) {
@@ -117,8 +119,8 @@ export default function GameBoard({
     // Clear the canvas completely before drawing
     ctx.clearRect(0, 0, boardSize.width, boardSize.height);
 
-    // Draw background with score
-    drawBackground(ctx, boardSize, score);
+    // Draw background with score and game version
+    drawBackground(ctx, boardSize, score, gameVersion);
 
     // Draw powerups
     powerups.forEach((powerup) => {
@@ -164,6 +166,7 @@ export default function GameBoard({
     score,
     gameOver,
     fps,
+    gameVersion,
   ]);
 
   return (

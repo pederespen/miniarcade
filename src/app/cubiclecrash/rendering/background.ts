@@ -7,6 +7,9 @@ const backgroundImages: Record<string, HTMLImageElement | null> = {
   level3: null,
 };
 
+// Track the current game version to detect resets
+let currentGameVersion = 0;
+
 /**
  * Draws the office background for the game using an SVG image
  * Changes background at score thresholds:
@@ -17,8 +20,14 @@ const backgroundImages: Record<string, HTMLImageElement | null> = {
 export function drawBackground(
   ctx: CanvasRenderingContext2D,
   boardSize: GameBoardSize,
-  score: number = 0
+  score: number = 0,
+  gameVersion: number = 1
 ): void {
+  // If game version changed, reset to default background
+  if (gameVersion !== currentGameVersion) {
+    currentGameVersion = gameVersion;
+  }
+
   // Clear canvas
   ctx.clearRect(0, 0, boardSize.width, boardSize.height);
 

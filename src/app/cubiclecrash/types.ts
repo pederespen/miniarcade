@@ -3,15 +3,28 @@ export interface GameBoardSize {
   height: number;
 }
 
-export interface GameSetupProps {
-  onStartGame: () => void;
-  highScore: number;
-}
+// Remove the empty interface and use a Record type
+export type GameSetupProps = Record<string, never>;
 
 export interface GamePlayProps {
   onBoardSizeChange: (size: GameBoardSize) => void;
   highScore: number;
   setHighScore: (score: number) => void;
+}
+
+// Add GameContextType
+export interface GameContextType {
+  gameStarted: boolean;
+  setGameStarted: (started: boolean) => void;
+  highScore: number;
+  setHighScore: (score: number) => void;
+  handleBoardSizeChange: (size: GameBoardSize) => void;
+  debugMode: boolean;
+  setDebugMode: (mode: boolean) => void;
+  countdown: number;
+  setCountdown: (count: number) => void;
+  gameVersion: number;
+  incrementGameVersion: () => void;
 }
 
 export interface Obstacle {
@@ -58,9 +71,9 @@ export interface GameBoardProps {
   score: number;
   gameOver: boolean;
   activePowerup: PowerupType | null;
+  gameVersion: number;
   debug?: boolean;
   debugStats?: {
-    difficultyTier: number;
     obstacleSpeed: number;
     spawnRate: number;
     fps?: number;

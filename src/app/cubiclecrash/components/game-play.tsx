@@ -1,32 +1,26 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { GamePlayProps } from "../types";
 import GameBoard from "./game-board";
 import useBoardSize from "../hooks/use-board-size";
 import useGameLogic from "../hooks/use-game-logic";
+import { useGameContext } from "../context/game-context";
 
 export default function GamePlay({
   onBoardSizeChange,
   highScore,
   setHighScore,
 }: GamePlayProps) {
+  const {
+    debugMode,
+    setDebugMode,
+    countdown,
+    setCountdown,
+    gameVersion,
+    incrementGameVersion,
+  } = useGameContext();
   const isDevelopment = process.env.NODE_ENV === "development";
-  const [debugMode, setDebugMode] = useState(false);
-  // Add countdown state
-  const [countdown, setCountdown] = useState(3);
-
-  // Initialize debug mode from URL parameters in development mode
-  useEffect(() => {
-    if (isDevelopment && typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      // Default to true in development mode unless explicitly set to false
-      const debug = params.has("debug") ? params.get("debug") === "true" : true;
-      setDebugMode(debug);
-    } else {
-      setDebugMode(false); // Always false in production
-    }
-  }, [isDevelopment]);
 
   // Use refs to avoid re-renders that cause update depth issues
   const gameContainerRef = useRef<HTMLDivElement>(null);
@@ -61,9 +55,11 @@ export default function GamePlay({
     if (gameContainerRef.current) {
       gameContainerRef.current.focus();
     }
+    // Increment game version to reset background
+    incrementGameVersion();
     // Call resetGame directly for consistency with mobile
     resetGame();
-  }, [resetGame]);
+  }, [resetGame, incrementGameVersion]);
 
   // Handle mobile-specific restart issues
   const forceMobileRestart = useCallback(() => {
@@ -72,11 +68,13 @@ export default function GamePlay({
       // 1. Focus and scroll if needed
       if (gameContainerRef.current) {
         gameContainerRef.current.focus();
+        // Increment game version to reset background
+        incrementGameVersion();
         // 2. Direct call to resetGame
         resetGame();
       }
     }
-  }, [gameOver, resetGame]);
+  }, [gameOver, resetGame, incrementGameVersion]);
 
   // Add keyboard controls
   useEffect(() => {
@@ -94,14 +92,14 @@ export default function GamePlay({
 
       // Keep debug mode toggle for development but only if in development mode
       if (isDevelopment && (e.code === "KeyD" || e.key === "d")) {
-        setDebugMode((prev) => !prev);
+        setDebugMode(!debugMode);
         e.preventDefault();
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [handleJump, isDevelopment, isWarmupActive]);
+  }, [handleJump, isDevelopment, isWarmupActive, debugMode, setDebugMode]);
 
   // Add countdown effect
   useEffect(() => {
@@ -115,7 +113,7 @@ export default function GamePlay({
         clearTimeout(timer2);
       };
     }
-  }, [isPlaying, isWarmupActive]);
+  }, [isPlaying, isWarmupActive, setCountdown]);
 
   // Simple loading state - should resolve quickly with our improved useBoardSize
   if (!sizeCalculated) {
@@ -184,6 +182,7 @@ export default function GamePlay({
               score={score}
               gameOver={gameOver}
               activePowerup={activePowerup}
+              gameVersion={gameVersion}
               debug={debugMode}
               debugStats={
                 debugMode && currentSettings
