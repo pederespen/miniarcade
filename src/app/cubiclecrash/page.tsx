@@ -4,7 +4,7 @@ import GameSetup from "./components/game-setup";
 import GamePlay from "./components/game-play";
 import { GameProvider, useGameContext } from "./context/game-context";
 
-function CubiclecrashGameContent() {
+function CubicleCrashGameContent() {
   const { gameStarted, highScore, setHighScore, handleBoardSizeChange } =
     useGameContext();
 
@@ -26,7 +26,7 @@ function CubiclecrashGameContent() {
 export default function CubiclecrashGame() {
   return (
     <GameProvider>
-      <CubiclecrashGameContent />
+      <CubicleCrashGameContent />
     </GameProvider>
   );
 }
