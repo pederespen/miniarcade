@@ -65,7 +65,6 @@ export function ImageSelector({
       {/* Content */}
       {activeTab === "presets" ? (
         <div>
-          <h3 className="text-indigo-100 mb-4">Select a Preset Image</h3>
           <div className="flex overflow-x-auto pb-4 sm:grid sm:grid-cols-3 gap-4">
             {presetImages.map((image) => (
               <div
@@ -136,11 +135,11 @@ export function GridSizeSelector({
   return (
     <div className="mb-6">
       <label className="block text-indigo-100 mb-2">Grid Size</label>
-      <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
+      <div className="flex flex-row flex-wrap justify-center gap-1 sm:gap-2 justify-start">
         {[3, 4, 5, 6, 7].map((size) => (
           <button
             key={size}
-            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded cursor-pointer transition-colors ${
+            className={`px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-base rounded cursor-pointer transition-colors ${
               gridSize === size
                 ? "bg-cyan-500 text-white"
                 : "bg-indigo-700 text-indigo-100 hover:bg-indigo-600"
