@@ -6,20 +6,10 @@ import { GamePlayProps } from "../types";
 import { useGameLogic } from "../hooks/use-game-logic";
 import GameBoard from "./game-board";
 import Keyboard from "./keyboard";
-import { DEFAULT_BOARD_SIZE } from "../constants";
 
-export default function GamePlay({
-  onBoardSizeChange,
-  highScore,
-  setHighScore,
-}: GamePlayProps) {
-  const {
-    countdown,
-    setCountdown,
-    debugMode,
-    gameVersion,
-    incrementGameVersion,
-  } = useGameContext();
+export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
+  const { countdown, setCountdown, gameVersion, incrementGameVersion } =
+    useGameContext();
   const [showCountdown, setShowCountdown] = useState(countdown > 0);
 
   // Set up the game logic
@@ -31,9 +21,8 @@ export default function GamePlay({
     stats,
     handleKeyPress,
     resetGame,
-    currentSettings,
   } = useGameLogic({
-    boardSize: DEFAULT_BOARD_SIZE,
+    boardSize: { width: 350, height: 420 },
     highScore,
     setHighScore,
   });
@@ -55,11 +44,6 @@ export default function GamePlay({
     return () => clearTimeout(timer);
   }, [countdown, setCountdown]);
 
-  // Handle board size changes
-  useEffect(() => {
-    onBoardSizeChange(DEFAULT_BOARD_SIZE);
-  }, [onBoardSizeChange]);
-
   // Play again button handler
   const handlePlayAgain = () => {
     incrementGameVersion();
@@ -67,7 +51,7 @@ export default function GamePlay({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto flex flex-col items-center justify-between h-full py-4">
+    <div className="w-full max-w-md mx-auto flex flex-col items-center justify-between h-full">
       {/* Countdown Overlay */}
       {showCountdown && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-10">
@@ -113,14 +97,7 @@ export default function GamePlay({
 
       {/* Game Header */}
       <div className="w-full mb-4">
-        <h1 className="text-2xl font-bold text-center text-cyan-400">
-          Wordle Rush
-        </h1>
-        <div className="text-center text-sm text-indigo-300">
-          Difficulty:{" "}
-          {currentSettings.difficulty.charAt(0).toUpperCase() +
-            currentSettings.difficulty.slice(1)}
-        </div>
+        {/* Game board space - title and difficulty removed */}
       </div>
 
       {/* Game Board */}
@@ -131,7 +108,6 @@ export default function GamePlay({
           currentColIndex={currentColIndex}
           stats={stats}
           gameVersion={gameVersion}
-          debug={debugMode}
         />
       </div>
 

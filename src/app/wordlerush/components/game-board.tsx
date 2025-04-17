@@ -9,7 +9,6 @@ export default function GameBoard({
   currentColIndex,
   stats,
   gameVersion,
-  debug = false,
 }: GameBoardProps) {
   return (
     <div className="flex flex-col items-center">
@@ -83,16 +82,6 @@ export default function GameBoard({
           </div>
         ))}
       </div>
-
-      {/* Debug info */}
-      {debug && (
-        <div className="mt-4 text-xs text-gray-500 bg-gray-100 p-2 rounded-md">
-          <p>
-            Debug Mode: Current Row: {currentRowIndex}, Current Col:{" "}
-            {currentColIndex}
-          </p>
-        </div>
-      )}
     </div>
   );
 }

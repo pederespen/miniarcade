@@ -11,7 +11,7 @@ export const GAME_SETTINGS: Record<GameDifficulty, GameSettings> = {
   },
   [GameDifficulty.MEDIUM]: {
     difficulty: GameDifficulty.MEDIUM,
-    initialTime: 45, // seconds
+    initialTime: 120, // seconds
     timeAddedPerWord: 10, // seconds
     wordLength: 5,
     maxAttempts: 6,

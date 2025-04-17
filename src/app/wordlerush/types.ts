@@ -1,18 +1,15 @@
-export interface GameBoardSize {
-  width: number;
-  height: number;
-}
-
 export type GameSetupProps = Record<string, never>;
 
 export interface GamePlayProps {
-  onBoardSizeChange: (size: GameBoardSize) => void;
   highScore: number;
   setHighScore: (score: number) => void;
 }
 
 export interface UseGameLogicProps {
-  boardSize: GameBoardSize;
+  boardSize: {
+    width: number;
+    height: number;
+  };
   setHighScore: (score: number) => void;
   highScore: number;
 }
@@ -22,9 +19,6 @@ export interface GameContextType {
   setGameStarted: (started: boolean) => void;
   highScore: number;
   setHighScore: (score: number) => void;
-  handleBoardSizeChange: (size: GameBoardSize) => void;
-  debugMode: boolean;
-  setDebugMode: (mode: boolean) => void;
   countdown: number;
   setCountdown: (count: number) => void;
   gameVersion: number;
@@ -58,7 +52,6 @@ export interface GameBoardProps {
   currentColIndex: number;
   stats: GameStats;
   gameVersion: number;
-  debug?: boolean;
 }
 
 export interface KeyboardProps {
