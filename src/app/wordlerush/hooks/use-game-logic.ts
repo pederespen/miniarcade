@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import {
   GameBoard,
   UseGameLogicProps,
@@ -13,7 +13,7 @@ import {
   ENTER_KEY,
   GAME_SETTINGS,
   WORD_LIST_5,
-  WORD_LIST_6,
+  WORD_LIST_5 as WORD_LIST_6,
 } from "../constants";
 
 export function useGameLogic({
@@ -41,6 +41,11 @@ export function useGameLogic({
     },
   });
   const [isPlaying, setIsPlaying] = useState(false);
+  // State for invalid word feedback
+  const [showInvalidWord, setShowInvalidWord] = useState(false);
+
+  // Use ref instead of state for tracking used words to avoid re-renders
+  const usedWordsRef = useRef<Set<string>>(new Set());
 
   // Initialize or reset the game board
   const initializeBoard = useCallback(() => {
@@ -61,8 +66,21 @@ export function useGameLogic({
   // Get a random word
   const getRandomWord = useCallback(() => {
     const wordList = settings.wordLength === 5 ? WORD_LIST_5 : WORD_LIST_6;
-    const randomIndex = Math.floor(Math.random() * wordList.length);
-    const selectedWord = wordList[randomIndex];
+
+    // Filter out words that have already been used
+    const availableWords = wordList.filter(
+      (word: string) => !usedWordsRef.current.has(word)
+    );
+
+    // If we've used all words, reset the used words set
+    if (availableWords.length === 0) {
+      console.log("[DEBUG] All words used, resetting used words set");
+      usedWordsRef.current = new Set();
+      return wordList[Math.floor(Math.random() * wordList.length)];
+    }
+
+    const randomIndex = Math.floor(Math.random() * availableWords.length);
+    const selectedWord = availableWords[randomIndex];
     console.log("[DEBUG] Current word:", selectedWord);
     return selectedWord;
   }, [settings.wordLength]);
@@ -70,6 +88,7 @@ export function useGameLogic({
   // Reset the game state
   const resetGame = useCallback(() => {
     setSettings(GAME_SETTINGS);
+    usedWordsRef.current = new Set(); // Reset used words when starting a new game
     const initialWord = getRandomWord();
     setCurrentWord(initialWord);
     console.log("[DEBUG] Game reset with word:", initialWord);
@@ -141,6 +160,20 @@ export function useGameLogic({
       return false;
     }
 
+    // Check if the word is in our word list
+    const wordList = settings.wordLength === 5 ? WORD_LIST_5 : WORD_LIST_6;
+    if (!wordList.includes(currentRowLetters)) {
+      // Show invalid word feedback
+      setShowInvalidWord(true);
+
+      // Hide feedback after 1.5 seconds
+      setTimeout(() => {
+        setShowInvalidWord(false);
+      }, 1500);
+
+      return false;
+    }
+
     // Check the word against the target word
     const targetWordChars = currentWord.split("");
     const newBoard = [...board];
@@ -185,9 +218,18 @@ export function useGameLogic({
     const isCorrect = currentRowLetters === currentWord;
 
     if (isCorrect) {
-      // Word solved! Update stats, add time, and set a new target word
+      // Word solved! Update stats, add 20 seconds, and set a new target word
       const pointsGained = settings.wordLength * 10;
       const timeAdded = settings.timeAddedPerWord;
+
+      // Add the current word to used words
+      usedWordsRef.current.add(currentWord);
+
+      // If we've used most words, reset the used words list
+      if (usedWordsRef.current.size >= wordList.length * 0.8) {
+        console.log("[DEBUG] Most words used, resetting used words set");
+        usedWordsRef.current = new Set([currentWord]); // Keep only the current word
+      }
 
       setStats((prev) => ({
         ...prev,
@@ -241,6 +283,7 @@ export function useGameLogic({
   }, [
     board,
     currentRowIndex,
+    currentColIndex,
     currentWord,
     getRandomWord,
     initializeBoard,
@@ -323,5 +366,6 @@ export function useGameLogic({
     handleKeyPress,
     resetGame,
     currentSettings: settings,
+    showInvalidWord,
   };
 }

@@ -22,6 +22,7 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
     stats,
     handleKeyPress,
     resetGame,
+    showInvalidWord,
   } = useGameLogic({
     boardSize: { width: 350, height: 420 },
     highScore,
@@ -101,6 +102,7 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
           currentColIndex={currentColIndex}
           stats={stats}
           gameVersion={gameVersion}
+          showInvalidWord={showInvalidWord}
         />
       </div>
 

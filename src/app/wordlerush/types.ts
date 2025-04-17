@@ -57,6 +57,7 @@ export interface GameBoardProps {
   currentColIndex: number;
   stats: GameStats;
   gameVersion: number;
+  showInvalidWord: boolean;
 }
 
 export interface KeyboardProps {
@@ -86,4 +87,5 @@ export interface GameLogicReturn {
   handleKeyPress: (key: string) => void;
   resetGame: () => void;
   currentSettings: GameSettings;
+  showInvalidWord: boolean;
 }
