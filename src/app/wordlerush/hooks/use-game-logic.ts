@@ -183,32 +183,59 @@ export function useGameLogic({
     const newRow: WordRow = [...newBoard[currentRowIndex]];
     const newKeyboardState = { ...keyboardState };
 
-    // First pass: check for exact matches
-    targetWordChars.forEach((char, index) => {
-      if (newRow[index].char === char) {
+    // Create a letter frequency map for the target word
+    const targetLetterCount: Record<string, number> = {};
+    targetWordChars.forEach((char) => {
+      targetLetterCount[char] = (targetLetterCount[char] || 0) + 1;
+    });
+
+    // First pass: Mark correct positions and count them
+    const correctPositions: Record<string, number> = {};
+    newRow.forEach((letterObj, index) => {
+      const char = letterObj.char;
+      if (char === targetWordChars[index]) {
         newRow[index].status = "correct";
         newKeyboardState[char] = "correct";
+        correctPositions[char] = (correctPositions[char] || 0) + 1;
+      } else {
+        // Reset status for second pass
+        newRow[index].status = "unused";
       }
     });
 
-    // Second pass: check for wrong positions
-    targetWordChars.forEach((char, index) => {
+    // Second pass: Mark wrong positions or incorrect
+    newRow.forEach((letterObj, index) => {
+      const char = letterObj.char;
+
+      // Skip letters already marked as correct
       if (newRow[index].status === "correct") {
-        return; // Skip letters already marked as correct
+        return;
       }
 
-      if (
-        currentRowLetters.includes(char) &&
-        targetWordChars.includes(newRow[index].char)
-      ) {
-        newRow[index].status = "wrong-position";
-        if (newKeyboardState[newRow[index].char] !== "correct") {
-          newKeyboardState[newRow[index].char] = "wrong-position";
+      // Check if this letter exists in the target word
+      if (targetLetterCount[char]) {
+        // Check if we have remaining instances of this letter to mark
+        const usedCount = correctPositions[char] || 0;
+        if (usedCount < targetLetterCount[char]) {
+          newRow[index].status = "wrong-position";
+          correctPositions[char] = usedCount + 1;
+
+          // Update keyboard state if not already marked as correct
+          if (newKeyboardState[char] !== "correct") {
+            newKeyboardState[char] = "wrong-position";
+          }
+        } else {
+          // All instances of this letter have been accounted for
+          newRow[index].status = "incorrect";
+          if (!newKeyboardState[char]) {
+            newKeyboardState[char] = "incorrect";
+          }
         }
       } else {
+        // Letter doesn't exist in target word
         newRow[index].status = "incorrect";
-        if (!newKeyboardState[newRow[index].char]) {
-          newKeyboardState[newRow[index].char] = "incorrect";
+        if (!newKeyboardState[char]) {
+          newKeyboardState[char] = "incorrect";
         }
       }
     });

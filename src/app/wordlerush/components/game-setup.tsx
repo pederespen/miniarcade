@@ -32,7 +32,7 @@ export default function GameSetup() {
         </div>
 
         <button
-          className="w-full py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-md transition-colors shadow-md disabled:bg-gray-500 disabled:cursor-not-allowed"
+          className="w-full py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-md transition-colors shadow-md disabled:bg-gray-500 disabled:cursor-not-allowed cursor-pointer"
           onClick={handleStartGame}
           disabled={!wordsLoaded}
         >

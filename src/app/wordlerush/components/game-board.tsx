@@ -1,6 +1,6 @@
 "use client";
 
-import { LETTER_COLORS } from "../utils/constants";
+import { LETTER_COLORS, formatTime } from "../utils/constants";
 import { GameBoardProps } from "../types";
 
 export default function GameBoard({
@@ -32,12 +32,12 @@ export default function GameBoard({
               stats.timeLeft < 10 ? "text-red-400" : ""
             }`}
           >
-            {Math.ceil(stats.timeLeft)}s
+            {formatTime(stats.timeLeft)}
           </span>
           {/* Time feedback */}
           {stats.feedback.showCorrect && (
             <div className="absolute top-1/2 left-[105%] text-cyan-300 font-bold text-lg whitespace-nowrap opacity-80 transition-all duration-1500 animate-fade-up">
-              +{stats.feedback.timeAdded}s
+              +{formatTime(stats.feedback.timeAdded)}
             </div>
           )}
         </div>
@@ -53,7 +53,7 @@ export default function GameBoard({
           <div className="text-green-400 font-bold text-4xl animate-pulse px-6 py-3 bg-gray-900 bg-opacity-70 rounded-lg shadow-lg text-center">
             Correct!
             <div className="text-cyan-300 text-2xl mt-1">
-              +{stats.feedback.timeAdded}s
+              +{formatTime(stats.feedback.timeAdded)}
             </div>
           </div>
         </div>

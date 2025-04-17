@@ -1,8 +1,8 @@
 import { GameSettings } from "../types";
 
 export const GAME_SETTINGS: GameSettings = {
-  initialTime: 120, // seconds
-  timeAddedPerWord: 20, // seconds
+  initialTime: 300, // 5 minutes in seconds
+  timeAddedPerWord: 60, // 1 minute in seconds
   wordLength: 5,
   maxAttempts: 5,
 };
@@ -30,3 +30,12 @@ export const LETTER_COLORS = {
 
 // Word list that will be populated from the text file
 export const WORD_LIST: string[] = [];
+
+/**
+ * Format seconds to MM:SS format
+ */
+export function formatTime(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+}

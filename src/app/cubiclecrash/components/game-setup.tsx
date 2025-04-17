@@ -87,7 +87,7 @@ export default function GameSetup() {
 
       <button
         onClick={onStartGame}
-        className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-lg text-xl transition-all transform hover:scale-105"
+        className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-lg text-xl transition-all transform hover:scale-105 cursor-pointer"
       >
         Start Game
       </button>
