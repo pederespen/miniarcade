@@ -12,13 +12,14 @@ export default function Home() {
     },
     {
       id: "cubiclecrash",
-      title: "Cubicle Crash",
+      title: "CubicleCrash",
       description:
         "Navigate your paper airplane through office obstacles! How far can you fly?",
+      imageUrl: "./cubiclecrash/screenshot.png",
     },
     {
       id: "wordlerush",
-      title: "Wordle Rush",
+      title: "WordleRush",
       description:
         "Race against time to solve as many word puzzles as you can! Each correct word adds more time.",
       imageUrl: "./wordlerush/screenshot.png",
