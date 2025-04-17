@@ -123,11 +123,7 @@ export function useGameLogic({
         if (newTimeLeft <= 0) {
           clearInterval(timer);
 
-          // If current score > high score, update high score
-          if (prevStats.score > highScore) {
-            setHighScore(prevStats.score);
-          }
-
+          // We'll handle the high score update in another effect
           return {
             ...prevStats,
             timeLeft: 0,
@@ -143,7 +139,18 @@ export function useGameLogic({
     }, 100);
 
     return () => clearInterval(timer);
-  }, [isPlaying, stats.gameOver, highScore, setHighScore]);
+  }, [isPlaying, stats.gameOver]);
+
+  // Separate effect to handle updating the high score when game is over
+  useEffect(() => {
+    if (stats.gameOver && stats.score > highScore) {
+      // Use setTimeout to push this update to the next tick
+      const timeoutId = setTimeout(() => {
+        setHighScore(stats.score);
+      }, 0);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [stats.gameOver, stats.score, highScore, setHighScore]);
 
   // Function to check the current word attempt
   const checkWordAttempt = useCallback(() => {
