@@ -1,8 +1,5 @@
 import { WORD_LIST } from "./constants";
 
-/**
- * Loads words from the JSON file and updates the word list
- */
 export async function loadWordsFromFile(): Promise<string[]> {
   try {
     const response = await fetch("./wordlerush/words.json");
