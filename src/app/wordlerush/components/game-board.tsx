@@ -11,14 +11,20 @@ export default function GameBoard({
   gameVersion,
 }: GameBoardProps) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center relative">
       {/* Stats display */}
       <div className="w-full flex justify-between mb-4 px-2 rounded-lg bg-indigo-800 p-3 text-white">
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center relative">
           <span className="text-xs uppercase text-indigo-300">Score</span>
           <span className="text-xl font-bold">{stats.score}</span>
+          {/* Points feedback */}
+          {stats.feedback.showCorrect && (
+            <div className="absolute top-1/2 left-[105%] text-yellow-300 font-bold text-lg whitespace-nowrap opacity-80 transition-all duration-1500 animate-fade-up">
+              +{stats.feedback.pointsGained}
+            </div>
+          )}
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center relative">
           <span className="text-xs uppercase text-indigo-300">Time</span>
           <span
             className={`text-xl font-bold ${
@@ -27,12 +33,27 @@ export default function GameBoard({
           >
             {Math.ceil(stats.timeLeft)}s
           </span>
+          {/* Time feedback */}
+          {stats.feedback.showCorrect && (
+            <div className="absolute top-1/2 left-[105%] text-cyan-300 font-bold text-lg whitespace-nowrap opacity-80 transition-all duration-1500 animate-fade-up">
+              +{stats.feedback.timeAdded}s
+            </div>
+          )}
         </div>
         <div className="flex flex-col items-center">
           <span className="text-xs uppercase text-indigo-300">Words</span>
           <span className="text-xl font-bold">{stats.wordsCompleted}</span>
         </div>
       </div>
+
+      {/* Correct feedback overlay */}
+      {stats.feedback.showCorrect && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+          <div className="text-green-400 font-bold text-4xl animate-pulse px-6 py-3 bg-gray-900 bg-opacity-70 rounded-lg shadow-lg">
+            Correct!
+          </div>
+        </div>
+      )}
 
       {/* Game board grid */}
       <div className="grid grid-rows-6 gap-1 w-full max-w-sm mx-auto">
@@ -82,6 +103,26 @@ export default function GameBoard({
           </div>
         ))}
       </div>
+
+      {/* Custom animation class for the keyframes */}
+      <style jsx>{`
+        @keyframes fadeUp {
+          0% {
+            opacity: 0;
+            transform: translateY(0);
+          }
+          20% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+        }
+        .animate-fade-up {
+          animation: fadeUp 1.5s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 }

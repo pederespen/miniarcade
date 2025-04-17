@@ -44,6 +44,11 @@ export interface GameStats {
   wordsCompleted: number;
   timeLeft: number;
   gameOver: boolean;
+  feedback: {
+    showCorrect: boolean;
+    pointsGained: number;
+    timeAdded: number;
+  };
 }
 
 export interface GameBoardProps {

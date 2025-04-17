@@ -36,6 +36,11 @@ export function useGameLogic({
     wordsCompleted: 0,
     timeLeft: settings.initialTime,
     gameOver: false,
+    feedback: {
+      showCorrect: false,
+      pointsGained: 0,
+      timeAdded: 0,
+    },
   });
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -59,14 +64,18 @@ export function useGameLogic({
   const getRandomWord = useCallback(() => {
     const wordList = settings.wordLength === 5 ? WORD_LIST_5 : WORD_LIST_6;
     const randomIndex = Math.floor(Math.random() * wordList.length);
-    return wordList[randomIndex];
+    const selectedWord = wordList[randomIndex];
+    console.log("[DEBUG] Current word:", selectedWord);
+    return selectedWord;
   }, [settings.wordLength]);
 
   // Reset the game state
   const resetGame = useCallback(() => {
     const newSettings = GAME_SETTINGS[difficulty];
     setSettings(newSettings);
-    setCurrentWord(getRandomWord());
+    const initialWord = getRandomWord();
+    setCurrentWord(initialWord);
+    console.log("[DEBUG] Game reset with word:", initialWord);
     setBoard(initializeBoard());
     setCurrentRowIndex(0);
     setCurrentColIndex(0);
@@ -76,6 +85,11 @@ export function useGameLogic({
       wordsCompleted: 0,
       timeLeft: newSettings.initialTime,
       gameOver: false,
+      feedback: {
+        showCorrect: false,
+        pointsGained: 0,
+        timeAdded: 0,
+      },
     });
     setIsPlaying(true);
   }, [difficulty, getRandomWord, initializeBoard]);
@@ -175,16 +189,40 @@ export function useGameLogic({
 
     if (isCorrect) {
       // Word solved! Update stats, add time, and set a new target word
+      const pointsGained = settings.wordLength * 10;
+      const timeAdded = settings.timeAddedPerWord;
+
       setStats((prev) => ({
         ...prev,
-        score: prev.score + settings.wordLength * 10,
+        score: prev.score + pointsGained,
         wordsCompleted: prev.wordsCompleted + 1,
-        timeLeft: prev.timeLeft + settings.timeAddedPerWord,
+        timeLeft: prev.timeLeft + timeAdded,
+        feedback: {
+          showCorrect: true,
+          pointsGained: pointsGained,
+          timeAdded: timeAdded,
+        },
       }));
-      setCurrentWord(getRandomWord());
+
+      // Reset feedback after 1.5 seconds
+      setTimeout(() => {
+        setStats((prev) => ({
+          ...prev,
+          feedback: {
+            showCorrect: false,
+            pointsGained: 0,
+            timeAdded: 0,
+          },
+        }));
+      }, 1500);
+
+      console.log("[DEBUG] Word completed:", currentWord);
+      const newWord = getRandomWord();
+      setCurrentWord(newWord);
       setBoard(initializeBoard());
       setCurrentRowIndex(0);
       setCurrentColIndex(0);
+      setKeyboardState({}); // Reset keyboard state for the new word
     } else {
       // Move to next row if not the last attempt
       if (currentRowIndex < settings.maxAttempts - 1) {
@@ -192,10 +230,13 @@ export function useGameLogic({
         setCurrentColIndex(0);
       } else {
         // Failed all attempts for this word, move to next word
-        setCurrentWord(getRandomWord());
+        console.log("[DEBUG] Failed all attempts for word:", currentWord);
+        const newWord = getRandomWord();
+        setCurrentWord(newWord);
         setBoard(initializeBoard());
         setCurrentRowIndex(0);
         setCurrentColIndex(0);
+        setKeyboardState({}); // Reset keyboard state for the new word
       }
     }
 
@@ -208,7 +249,6 @@ export function useGameLogic({
     initializeBoard,
     keyboardState,
     settings,
-    currentColIndex,
   ]);
 
   // Handle key press
