@@ -1,6 +1,6 @@
 "use client";
 
-import { LETTER_COLORS } from "../constants";
+import { LETTER_COLORS } from "../utils/constants";
 import { GameBoardProps } from "../types";
 
 export default function GameBoard({

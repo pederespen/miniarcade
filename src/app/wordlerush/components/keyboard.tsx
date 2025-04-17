@@ -1,6 +1,6 @@
 "use client";
 
-import { KEYBOARD_LAYOUT, LETTER_COLORS } from "../constants";
+import { KEYBOARD_LAYOUT, LETTER_COLORS } from "../utils/constants";
 import { KeyboardProps } from "../types";
 
 export default function Keyboard({ keyboardState, onKeyPress }: KeyboardProps) {

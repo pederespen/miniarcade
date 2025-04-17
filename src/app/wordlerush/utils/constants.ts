@@ -1,4 +1,4 @@
-import { GameSettings } from "./types";
+import { GameSettings } from "../types";
 
 export const GAME_SETTINGS: GameSettings = {
   initialTime: 120, // seconds
@@ -29,4 +29,4 @@ export const LETTER_COLORS = {
 };
 
 // Word list that will be populated from the text file
-export const WORD_LIST_5: string[] = [];
+export const WORD_LIST: string[] = [];

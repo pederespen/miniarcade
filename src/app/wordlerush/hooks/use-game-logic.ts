@@ -12,8 +12,8 @@ import {
   BACKSPACE_KEY,
   ENTER_KEY,
   GAME_SETTINGS,
-  WORD_LIST_5,
-} from "../constants";
+  WORD_LIST,
+} from "../utils/constants";
 
 export function useGameLogic({
   setHighScore,
@@ -65,7 +65,7 @@ export function useGameLogic({
   // Get a random word
   const getRandomWord = useCallback(() => {
     // Filter out words that have already been used
-    const availableWords = WORD_LIST_5.filter(
+    const availableWords = WORD_LIST.filter(
       (word: string) => !usedWordsRef.current.has(word)
     );
 
@@ -73,7 +73,7 @@ export function useGameLogic({
     if (availableWords.length === 0) {
       console.log("[DEBUG] All words used, resetting used words set");
       usedWordsRef.current = new Set();
-      return WORD_LIST_5[Math.floor(Math.random() * WORD_LIST_5.length)];
+      return WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
     }
 
     const randomIndex = Math.floor(Math.random() * availableWords.length);
@@ -165,7 +165,7 @@ export function useGameLogic({
     }
 
     // Check if the word is in our word list
-    if (!WORD_LIST_5.includes(currentRowLetters)) {
+    if (!WORD_LIST.includes(currentRowLetters)) {
       // Show invalid word feedback
       setShowInvalidWord(true);
 
@@ -229,7 +229,7 @@ export function useGameLogic({
       usedWordsRef.current.add(currentWord);
 
       // If we've used most words, reset the used words list
-      if (usedWordsRef.current.size >= WORD_LIST_5.length * 0.8) {
+      if (usedWordsRef.current.size >= WORD_LIST.length * 0.8) {
         console.log("[DEBUG] Most words used, resetting used words set");
         usedWordsRef.current = new Set([currentWord]); // Keep only the current word
       }

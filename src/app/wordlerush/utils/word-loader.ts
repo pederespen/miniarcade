@@ -1,4 +1,4 @@
-import { WORD_LIST_5 } from "../constants";
+import { WORD_LIST } from "./constants";
 
 /**
  * Loads words from the text file and updates the word list
@@ -18,15 +18,15 @@ export async function loadWordsFromFile(): Promise<string[]> {
       .filter((word) => word.length === 5);
 
     // Clear the existing array and add the new words
-    WORD_LIST_5.length = 0;
+    WORD_LIST.length = 0;
 
     // Add all the new words
     words.forEach((word) => {
-      WORD_LIST_5.push(word);
+      WORD_LIST.push(word);
     });
 
-    console.log(`Loaded ${WORD_LIST_5.length} 5-letter words for the game`);
-    return WORD_LIST_5;
+    console.log(`Loaded ${WORD_LIST.length} 5-letter words for the game`);
+    return WORD_LIST;
   } catch (error) {
     console.error("Error loading word list:", error);
     throw error; // Rethrow to let the calling code handle it

@@ -51,7 +51,8 @@ export function drawBackground(
       backgroundImages[backgroundKey]!.src =
         "./cubiclecrash/background-level2.svg";
     } else {
-      backgroundImages[backgroundKey]!.src = "./cubiclecrash/background.svg";
+      backgroundImages[backgroundKey]!.src =
+        "./cubiclecrash/background-level1.svg";
     }
   }
 
