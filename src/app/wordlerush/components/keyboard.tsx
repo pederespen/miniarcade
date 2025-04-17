@@ -5,7 +5,7 @@ import { KeyboardProps } from "../types";
 
 export default function Keyboard({ keyboardState, onKeyPress }: KeyboardProps) {
   return (
-    <div className="w-full max-w-md mx-auto mt-4">
+    <div className="w-full max-w-md mx-auto">
       {KEYBOARD_LAYOUT.map((row, rowIndex) => (
         <div key={rowIndex} className="flex justify-center mb-2">
           {row.map((key) => {

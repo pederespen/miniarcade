@@ -94,7 +94,7 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
       </div>
 
       {/* Game Board */}
-      <div className="flex-grow w-full">
+      <div className="w-full">
         <GameBoard
           board={board}
           currentRowIndex={currentRowIndex}
@@ -108,6 +108,9 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
       <div className="w-full mt-4">
         <Keyboard keyboardState={keyboardState} onKeyPress={handleKeyPress} />
       </div>
+
+      {/* Spacer to push content up */}
+      <div className="flex-grow"></div>
     </div>
   );
 }

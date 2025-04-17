@@ -1,28 +1,11 @@
-import { GameDifficulty, GameSettings } from "./types";
+import { GameSettings } from "./types";
 
-// Game defaults based on difficulty
-export const GAME_SETTINGS: Record<GameDifficulty, GameSettings> = {
-  [GameDifficulty.EASY]: {
-    difficulty: GameDifficulty.EASY,
-    initialTime: 60, // seconds
-    timeAddedPerWord: 15, // seconds
-    wordLength: 5,
-    maxAttempts: 6,
-  },
-  [GameDifficulty.MEDIUM]: {
-    difficulty: GameDifficulty.MEDIUM,
-    initialTime: 120, // seconds
-    timeAddedPerWord: 10, // seconds
-    wordLength: 5,
-    maxAttempts: 6,
-  },
-  [GameDifficulty.HARD]: {
-    difficulty: GameDifficulty.HARD,
-    initialTime: 30, // seconds
-    timeAddedPerWord: 8, // seconds
-    wordLength: 6,
-    maxAttempts: 6,
-  },
+// Unified game settings (no difficulty levels)
+export const GAME_SETTINGS: GameSettings = {
+  initialTime: 120, // seconds
+  timeAddedPerWord: 10, // seconds
+  wordLength: 5,
+  maxAttempts: 5,
 };
 
 // Default game board dimensions

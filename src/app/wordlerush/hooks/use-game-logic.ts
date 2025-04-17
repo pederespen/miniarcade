@@ -6,7 +6,6 @@ import {
   UseGameLogicProps,
   GameLogicReturn,
   GameStats,
-  GameDifficulty,
   WordRow,
 } from "../types";
 import {
@@ -22,8 +21,7 @@ export function useGameLogic({
   highScore,
 }: UseGameLogicProps): GameLogicReturn {
   // Game state
-  const [difficulty] = useState<GameDifficulty>(GameDifficulty.MEDIUM);
-  const [settings, setSettings] = useState(GAME_SETTINGS[difficulty]);
+  const [settings, setSettings] = useState(GAME_SETTINGS);
   const [currentWord, setCurrentWord] = useState<string>("");
   const [board, setBoard] = useState<GameBoard>([]);
   const [currentRowIndex, setCurrentRowIndex] = useState(0);
@@ -60,7 +58,7 @@ export function useGameLogic({
     return newBoard;
   }, [settings]);
 
-  // Get a random word based on difficulty
+  // Get a random word
   const getRandomWord = useCallback(() => {
     const wordList = settings.wordLength === 5 ? WORD_LIST_5 : WORD_LIST_6;
     const randomIndex = Math.floor(Math.random() * wordList.length);
@@ -71,8 +69,7 @@ export function useGameLogic({
 
   // Reset the game state
   const resetGame = useCallback(() => {
-    const newSettings = GAME_SETTINGS[difficulty];
-    setSettings(newSettings);
+    setSettings(GAME_SETTINGS);
     const initialWord = getRandomWord();
     setCurrentWord(initialWord);
     console.log("[DEBUG] Game reset with word:", initialWord);
@@ -83,7 +80,7 @@ export function useGameLogic({
     setStats({
       score: 0,
       wordsCompleted: 0,
-      timeLeft: newSettings.initialTime,
+      timeLeft: GAME_SETTINGS.initialTime,
       gameOver: false,
       feedback: {
         showCorrect: false,
@@ -92,7 +89,7 @@ export function useGameLogic({
       },
     });
     setIsPlaying(true);
-  }, [difficulty, getRandomWord, initializeBoard]);
+  }, [getRandomWord, initializeBoard]);
 
   // Initialize the game on component mount
   useEffect(() => {

@@ -56,7 +56,7 @@ export default function GameBoard({
       )}
 
       {/* Game board grid */}
-      <div className="grid grid-rows-6 gap-1 w-full max-w-sm mx-auto">
+      <div className="grid grid-rows-5 gap-1 w-full max-w-sm mx-auto">
         {board.map((row, rowIdx) => (
           <div
             key={`row-${rowIdx}-${gameVersion}`}

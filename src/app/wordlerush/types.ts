@@ -67,14 +67,7 @@ export interface KeyboardProps {
   onKeyPress: (key: string) => void;
 }
 
-export enum GameDifficulty {
-  EASY = "easy",
-  MEDIUM = "medium",
-  HARD = "hard",
-}
-
 export interface GameSettings {
-  difficulty: GameDifficulty;
   initialTime: number;
   timeAddedPerWord: number;
   wordLength: number;
