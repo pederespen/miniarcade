@@ -13,7 +13,7 @@ export default function GameSetup() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full max-w-lg mx-auto px-4">
+    <div className="flex flex-col h-full max-w-lg mx-auto px-4 pt-8">
       <div className="bg-indigo-800 p-6 rounded-lg shadow-lg w-full">
         <h2 className="text-2xl text-center font-semibold text-white mb-6">
           How to Play
