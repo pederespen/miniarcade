@@ -17,7 +17,7 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 export function GameProvider({ children }: { children: ReactNode }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [highScore, setHighScore] = useState(0);
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(0);
   const [gameVersion, setGameVersion] = useState(1);
 
   // Function to increment game version - used on game reset

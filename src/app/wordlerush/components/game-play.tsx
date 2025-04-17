@@ -10,7 +10,8 @@ import Keyboard from "./keyboard";
 export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
   const { countdown, setCountdown, gameVersion, incrementGameVersion } =
     useGameContext();
-  const [showCountdown, setShowCountdown] = useState(countdown > 0);
+  // Always set showCountdown to false to skip the countdown overlay
+  const [showCountdown, setShowCountdown] = useState(false);
 
   // Set up the game logic
   const {
@@ -27,21 +28,13 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
     setHighScore,
   });
 
-  // Handle countdown before starting the game
+  // Handle countdown before starting the game - modified to skip countdown
   useEffect(() => {
-    if (countdown <= 0) {
-      setShowCountdown(false);
-      return;
+    // Ensure countdown is 0 and showCountdown is false
+    if (countdown > 0) {
+      setCountdown(0);
     }
-
-    const timer = setTimeout(() => {
-      setCountdown(countdown - 1);
-      if (countdown === 1) {
-        setShowCountdown(false);
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    setShowCountdown(false);
   }, [countdown, setCountdown]);
 
   // Play again button handler
@@ -52,7 +45,7 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
 
   return (
     <div className="w-full max-w-md mx-auto flex flex-col items-center justify-between h-full">
-      {/* Countdown Overlay */}
+      {/* Countdown Overlay - now hidden */}
       {showCountdown && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-10">
           <div className="text-6xl font-bold text-white animate-pulse">

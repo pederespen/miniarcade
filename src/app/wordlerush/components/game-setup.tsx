@@ -6,9 +6,9 @@ export default function GameSetup() {
   const { setGameStarted, setCountdown } = useGameContext();
 
   const handleStartGame = () => {
-    // Set countdown to show countdown before game starts
-    setCountdown(3);
-    // Set the game as started, which will trigger the countdown in the game play component
+    // Set countdown to 0 to skip the countdown
+    setCountdown(0);
+    // Set the game as started
     setGameStarted(true);
   };
 
