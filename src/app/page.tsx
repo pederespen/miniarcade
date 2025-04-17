@@ -17,9 +17,10 @@ export default function Home() {
       imageUrl: "/images/cubiclecrash.png",
     },
     {
-      id: "game2",
-      title: "Coming Soon",
-      description: "🚧 🏗️ 👷",
+      id: "wordlerush",
+      title: "Wordle Rush",
+      description:
+        "Race against time to solve as many word puzzles as you can! Each correct word adds more time.",
       imageUrl: "/images/game2.png",
     },
   ];
