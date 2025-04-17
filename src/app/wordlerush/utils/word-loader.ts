@@ -1,27 +1,26 @@
 import { WORD_LIST } from "./constants";
 
 /**
- * Loads words from the text file and updates the word list
+ * Loads words from the JSON file and updates the word list
  */
 export async function loadWordsFromFile(): Promise<string[]> {
   try {
-    const response = await fetch("/wordlerush/words.txt");
+    const response = await fetch("./wordlerush/words.json");
     if (!response.ok) {
       throw new Error(`Failed to load words: ${response.status}`);
     }
 
-    const text = await response.text();
+    const data = await response.json();
     // Convert to uppercase and filter for 5-letter words only
-    const words = text
-      .split("\n")
-      .map((word) => word.trim().toUpperCase())
-      .filter((word) => word.length === 5);
+    const words = data.words
+      .map((word: string) => word.trim().toUpperCase())
+      .filter((word: string) => word.length === 5);
 
     // Clear the existing array and add the new words
     WORD_LIST.length = 0;
 
     // Add all the new words
-    words.forEach((word) => {
+    words.forEach((word: string) => {
       WORD_LIST.push(word);
     });
 
