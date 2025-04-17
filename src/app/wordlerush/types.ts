@@ -23,6 +23,7 @@ export interface GameContextType {
   setCountdown: (count: number) => void;
   gameVersion: number;
   incrementGameVersion: () => void;
+  wordsLoaded: boolean;
 }
 
 export interface Letter {

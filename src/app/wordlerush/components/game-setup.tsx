@@ -3,7 +3,7 @@
 import { useGameContext } from "../context/game-context";
 
 export default function GameSetup() {
-  const { setGameStarted, setCountdown } = useGameContext();
+  const { setGameStarted, setCountdown, wordsLoaded } = useGameContext();
 
   const handleStartGame = () => {
     // Set countdown to 0 to skip the countdown
@@ -32,10 +32,11 @@ export default function GameSetup() {
         </div>
 
         <button
-          className="w-full py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-md transition-colors shadow-md"
+          className="w-full py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-md transition-colors shadow-md disabled:bg-gray-500 disabled:cursor-not-allowed"
           onClick={handleStartGame}
+          disabled={!wordsLoaded}
         >
-          START GAME
+          {wordsLoaded ? "START GAME" : "LOADING WORDS..."}
         </button>
       </div>
     </div>

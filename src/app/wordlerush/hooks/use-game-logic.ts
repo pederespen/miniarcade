@@ -13,7 +13,6 @@ import {
   ENTER_KEY,
   GAME_SETTINGS,
   WORD_LIST_5,
-  WORD_LIST_5 as WORD_LIST_6,
 } from "../constants";
 
 export function useGameLogic({
@@ -65,10 +64,8 @@ export function useGameLogic({
 
   // Get a random word
   const getRandomWord = useCallback(() => {
-    const wordList = settings.wordLength === 5 ? WORD_LIST_5 : WORD_LIST_6;
-
     // Filter out words that have already been used
-    const availableWords = wordList.filter(
+    const availableWords = WORD_LIST_5.filter(
       (word: string) => !usedWordsRef.current.has(word)
     );
 
@@ -76,14 +73,14 @@ export function useGameLogic({
     if (availableWords.length === 0) {
       console.log("[DEBUG] All words used, resetting used words set");
       usedWordsRef.current = new Set();
-      return wordList[Math.floor(Math.random() * wordList.length)];
+      return WORD_LIST_5[Math.floor(Math.random() * WORD_LIST_5.length)];
     }
 
     const randomIndex = Math.floor(Math.random() * availableWords.length);
     const selectedWord = availableWords[randomIndex];
     console.log("[DEBUG] Current word:", selectedWord);
     return selectedWord;
-  }, [settings.wordLength]);
+  }, []);
 
   // Reset the game state
   const resetGame = useCallback(() => {
@@ -161,8 +158,7 @@ export function useGameLogic({
     }
 
     // Check if the word is in our word list
-    const wordList = settings.wordLength === 5 ? WORD_LIST_5 : WORD_LIST_6;
-    if (!wordList.includes(currentRowLetters)) {
+    if (!WORD_LIST_5.includes(currentRowLetters)) {
       // Show invalid word feedback
       setShowInvalidWord(true);
 
@@ -226,7 +222,7 @@ export function useGameLogic({
       usedWordsRef.current.add(currentWord);
 
       // If we've used most words, reset the used words list
-      if (usedWordsRef.current.size >= wordList.length * 0.8) {
+      if (usedWordsRef.current.size >= WORD_LIST_5.length * 0.8) {
         console.log("[DEBUG] Most words used, resetting used words set");
         usedWordsRef.current = new Set([currentWord]); // Keep only the current word
       }
@@ -283,7 +279,6 @@ export function useGameLogic({
   }, [
     board,
     currentRowIndex,
-    currentColIndex,
     currentWord,
     getRandomWord,
     initializeBoard,

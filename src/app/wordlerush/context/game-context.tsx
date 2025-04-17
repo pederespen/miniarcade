@@ -9,6 +9,7 @@ import {
   useCallback,
 } from "react";
 import { GameContextType } from "../types";
+import { loadWordsFromFile } from "../utils/word-loader";
 
 // Create the context with default values
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -19,10 +20,34 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [highScore, setHighScore] = useState(0);
   const [countdown, setCountdown] = useState(0);
   const [gameVersion, setGameVersion] = useState(1);
+  const [wordsLoaded, setWordsLoaded] = useState(false);
 
   // Function to increment game version - used on game reset
   const incrementGameVersion = useCallback(() => {
     setGameVersion((prev) => prev + 1);
+  }, []);
+
+  // Load words from the file when the component mounts
+  useEffect(() => {
+    async function loadWords() {
+      try {
+        const words = await loadWordsFromFile();
+        if (words.length === 0) {
+          console.error("No 5-letter words found in the word list");
+          setWordsLoaded(false);
+        } else {
+          setWordsLoaded(true);
+          console.log(
+            `Words loaded successfully: ${words.length} 5-letter words available`
+          );
+        }
+      } catch (error) {
+        console.error("Failed to load words:", error);
+        setWordsLoaded(false);
+      }
+    }
+
+    loadWords();
   }, []);
 
   // Add a viewport meta tag to ensure proper scaling on mobile
@@ -57,6 +82,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setCountdown,
         gameVersion,
         incrementGameVersion,
+        wordsLoaded,
       }}
     >
       {children}
