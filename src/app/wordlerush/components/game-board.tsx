@@ -69,11 +69,11 @@ export default function GameBoard({
       )}
 
       {/* Game board grid */}
-      <div className="grid grid-rows-5 gap-1.5 mx-auto w-[16.5rem]">
+      <div className="grid grid-rows-5 gap-1.5 sm:gap-2 mx-auto w-[16.5rem] sm:w-[19rem] md:w-[21rem] lg:w-[22.5rem]">
         {board.map((row, rowIdx) => (
           <div
             key={`row-${rowIdx}-${gameVersion}`}
-            className="grid grid-cols-5 gap-1.5"
+            className="grid grid-cols-5 gap-1.5 sm:gap-2"
           >
             {row.map((letter, colIdx) => {
               // Determine if this cell is the current cursor position
@@ -87,6 +87,12 @@ export default function GameBoard({
                   className={`
                     h-12 
                     w-12
+                    sm:h-14
+                    sm:w-14
+                    md:h-15
+                    md:w-15
+                    lg:h-16
+                    lg:w-16
                     flex 
                     items-center 
                     justify-center 
@@ -99,7 +105,9 @@ export default function GameBoard({
                     } 
                     rounded-sm
                     font-bold 
-                    text-2xl 
+                    text-2xl
+                    sm:text-3xl
+                    md:text-3xl
                     text-white
                     ${
                       rowIdx < currentRowIndex ||
