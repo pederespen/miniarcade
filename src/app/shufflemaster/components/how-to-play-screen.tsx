@@ -2,7 +2,7 @@ import React from "react";
 
 export function HowToPlayScreen({ onContinue }: { onContinue: () => void }) {
   return (
-    <div className="bg-sky-950 rounded-lg p-6 shadow-lg">
+    <div className="bg-sky-950 rounded-lg p-6 shadow-lg border border-sky-600">
       <div className="mx-auto">
         <h2 className="text-2xl font-semibold text-sky-600 mb-6 text-center">
           How to Play

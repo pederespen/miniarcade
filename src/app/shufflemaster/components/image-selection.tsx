@@ -133,7 +133,7 @@ export function GridSizeSelector({
   onGridSizeChange: (size: number) => void;
 }) {
   return (
-    <div className="mb-6">
+    <div className="mb-6 ">
       <label className="block text-indigo-100 mb-2">Grid Size</label>
       <div className="flex flex-row flex-wrap justify-center gap-1 sm:gap-2 justify-start">
         {[3, 4, 5, 6, 7].map((size) => (

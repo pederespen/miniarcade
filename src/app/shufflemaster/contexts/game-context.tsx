@@ -98,9 +98,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGameStarted(false);
     setUserImage(null);
     setSelectedPresetId(null);
-    setSelectingImage(false);
+    setSelectingImage(true);
     setIsCustomImage(false);
-    setShowingHowToPlay(true);
+    setShowingHowToPlay(false);
   };
 
   const selectDifferentImage = () => {

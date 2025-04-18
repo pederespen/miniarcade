@@ -5,7 +5,6 @@ interface WinModalProps {
   startTime: number | null;
   endTime: number | null;
   elapsedTime: number;
-  onShuffle: () => void;
   onNewGame: () => void;
 }
 
@@ -14,7 +13,6 @@ export default function WinModal({
   startTime,
   endTime,
   elapsedTime,
-  onShuffle,
   onNewGame,
 }: WinModalProps) {
   return (
@@ -38,18 +36,12 @@ export default function WinModal({
             </div>
           </div>
 
-          <div className="flex justify-center space-x-4">
-            <button
-              onClick={onShuffle}
-              className="px-6 py-2 bg-indigo-700 hover:bg-indigo-600 text-white rounded-lg font-bold cursor-pointer"
-            >
-              Shuffle
-            </button>
+          <div className="flex justify-center">
             <button
               onClick={onNewGame}
-              className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg font-bold cursor-pointer"
+              className="px-8 py-3 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg font-bold cursor-pointer"
             >
-              New Game
+              Play Again
             </button>
           </div>
         </div>

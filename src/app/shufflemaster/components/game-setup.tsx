@@ -21,7 +21,7 @@ export function GameSetup() {
   } = useGameContext();
 
   return (
-    <div className="bg-black rounded-lg p-6 shadow-lg w-full">
+    <div className="bg-sky-950 rounded-lg p-6 shadow-lg w-full border border-sky-600">
       <GridSizeSelector
         gridSize={gridSize}
         onGridSizeChange={onGridSizeChange}
