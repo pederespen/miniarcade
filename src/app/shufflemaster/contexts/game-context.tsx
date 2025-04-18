@@ -19,6 +19,7 @@ type GameContextType = {
   gameStarted: boolean;
   selectingImage: boolean;
   selectedPresetId: number | null;
+  showingHowToPlay: boolean;
   setGridSize: (size: number) => void;
 
   // Board size
@@ -29,6 +30,7 @@ type GameContextType = {
   resetGame: () => void;
   selectDifferentImage: () => void;
   handlePresetSelect: (imageUrl: string, id: number) => void;
+  continueToImageSelection: () => void;
 
   // Tooltip references and functions
   howToPlayTooltipRef: React.RefObject<HTMLDivElement | null>;
@@ -55,7 +57,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [gridSize, setGridSize] = useState(3); // Default 3x3
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
-  const [selectingImage, setSelectingImage] = useState(true);
+  const [selectingImage, setSelectingImage] = useState(false);
+  const [showingHowToPlay, setShowingHowToPlay] = useState(true);
   const [gameBoardSize, setGameBoardSize] = useState<number>(500);
   const [isCustomImage, setIsCustomImage] = useState(false);
 
@@ -95,8 +98,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGameStarted(false);
     setUserImage(null);
     setSelectedPresetId(null);
-    setSelectingImage(true);
+    setSelectingImage(false);
     setIsCustomImage(false);
+    setShowingHowToPlay(true);
   };
 
   const selectDifferentImage = () => {
@@ -104,6 +108,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setSelectedPresetId(null);
     setSelectingImage(true);
     setIsCustomImage(false);
+    setShowingHowToPlay(false);
+  };
+
+  const continueToImageSelection = () => {
+    setShowingHowToPlay(false);
+    setSelectingImage(true);
   };
 
   // Context value object
@@ -116,6 +126,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     gameStarted,
     selectingImage,
     selectedPresetId,
+    showingHowToPlay,
     setGridSize,
 
     // Functions
@@ -124,6 +135,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     resetGame,
     selectDifferentImage,
     handlePresetSelect,
+    continueToImageSelection,
 
     // Tooltip refs and functions
     howToPlayTooltipRef,

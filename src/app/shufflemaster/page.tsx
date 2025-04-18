@@ -4,6 +4,7 @@ import { GameProvider } from "./contexts/game-context";
 import { GameSetup } from "./components/game-setup";
 import { GamePlay } from "./components/game-play";
 import { useGameContext } from "./contexts/game-context";
+import { HowToPlayScreen } from "./components/how-to-play-screen";
 
 // Main component with provider
 export default function ShuffleMaster() {
@@ -16,12 +17,19 @@ export default function ShuffleMaster() {
 
 // Content component that consumes the context
 function ShuffleMasterContent() {
-  // Just need to know if game started and if there's an image
-  const { gameStarted, userImage } = useGameContext();
+  // Get the context values for game flow
+  const { gameStarted, userImage, showingHowToPlay, continueToImageSelection } =
+    useGameContext();
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
-      {!gameStarted ? <GameSetup /> : userImage && <GamePlay />}
+      {gameStarted ? (
+        userImage && <GamePlay />
+      ) : showingHowToPlay ? (
+        <HowToPlayScreen onContinue={continueToImageSelection} />
+      ) : (
+        <GameSetup />
+      )}
     </div>
   );
 }

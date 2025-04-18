@@ -13,9 +13,6 @@ export function GamePlay() {
     onBoardSizeChange,
     resetGame: onReset,
     howToPlayTooltipRef,
-    howToPlayButtonRef,
-    toggleHowToPlayTooltip,
-    hideHowToPlayTooltip,
     helpTooltipRef,
     helpButtonRef,
     toggleHelpTooltip,
@@ -41,16 +38,13 @@ export function GamePlay() {
           isCustomImage={isCustomImage}
         />
         <GameplayControls
-          howToPlayTooltipRef={howToPlayTooltipRef}
-          howToPlayButtonRef={howToPlayButtonRef}
-          toggleHowToPlayTooltip={toggleHowToPlayTooltip}
-          hideHowToPlayTooltip={hideHowToPlayTooltip}
           helpTooltipRef={helpTooltipRef}
           helpButtonRef={helpButtonRef}
           toggleHelpTooltip={toggleHelpTooltip}
           hideHelpTooltip={hideHelpTooltip}
           gameBoardSize={gameBoardSize}
           userImage={userImage}
+          howToPlayTooltipRef={howToPlayTooltipRef}
         />
       </div>
     </div>

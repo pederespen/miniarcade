@@ -64,7 +64,7 @@ export function ImageSelector({
 
       {/* Content */}
       {activeTab === "presets" ? (
-        <div>
+        <div className="mt-2">
           <div className="flex overflow-x-auto pb-4 sm:grid sm:grid-cols-3 gap-4">
             {presetImages.map((image) => (
               <div
