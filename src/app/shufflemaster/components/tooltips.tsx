@@ -22,7 +22,7 @@ export function HelpTooltip({
     <div className="relative inline-block">
       <button
         ref={buttonRef}
-        className="text-cyan-400 underline cursor-pointer text-sm hover:text-cyan-300 focus:outline-none"
+        className="text-sky-600 underline cursor-pointer text-sm hover:text-cyan-600 focus:outline-none"
         onClick={(e) => {
           e.preventDefault();
           toggleTooltip(otherTooltipRef);
@@ -39,11 +39,11 @@ export function HelpTooltip({
           onClick={hideTooltip}
         ></div>
         <div
-          className="relative bg-indigo-900/80 backdrop-blur-sm text-white p-5 rounded-lg shadow-lg mx-auto border border-cyan-500/30 z-10"
+          className="relative bg-sky-950 backdrop-blur-sm text-white p-5 rounded-lg shadow-lg mx-auto border border-sky-600 z-10"
           style={{ width: "90%", maxWidth: "450px" }}
         >
           <button
-            className="absolute top-2 right-2 text-white hover:text-cyan-300 focus:outline-none cursor-pointer"
+            className="absolute top-2 right-2 text-white hover:text-sky-600 focus:outline-none cursor-pointer"
             onClick={hideTooltip}
           >
             ✕

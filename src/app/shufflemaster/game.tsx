@@ -34,7 +34,7 @@ export default function ShuffleMasterGame({
   if (isLoading) {
     return (
       <div className="flex flex-col items-center w-full" ref={containerRef}>
-        <div className="text-white">Loading game...</div>
+        <div className="text-sky-600">Loading game...</div>
       </div>
     );
   }
@@ -43,7 +43,7 @@ export default function ShuffleMasterGame({
   if (!sizeCalculated || boardSize === 0) {
     return (
       <div className="flex flex-col items-center w-full" ref={containerRef}>
-        <div className="text-white">Calculating board size...</div>
+        <div className="text-sky-600">Calculating board size...</div>
       </div>
     );
   }

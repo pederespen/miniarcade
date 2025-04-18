@@ -43,7 +43,7 @@ export default function GameBoard({
 
   return (
     <div
-      className="relative bg-black rounded-lg overflow-hidden shadow-lg border-2 border-white mx-auto"
+      className="relative bg-sky-950 rounded-lg overflow-hidden shadow-lg border border-sky-600 mx-auto"
       style={{
         width: `${boardSize}px`,
         height: `${boardSize}px`,

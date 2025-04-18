@@ -130,10 +130,10 @@ export function ImageUpload({
     <div className="flex flex-col items-center">
       {!imgSrc ? (
         <div className="mb-4 w-full max-w-md">
-          <label className="flex flex-col items-center justify-center w-full h-44 border-2 border-indigo-400 border-dashed rounded-lg cursor-pointer bg-indigo-800/30 hover:bg-indigo-800/50">
+          <label className="flex flex-col items-center justify-center w-full h-44 border border-sky-600 border-dashed rounded-lg cursor-pointer bg-sky-900/30 hover:bg-sky-900/50">
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
               <svg
-                className="w-10 h-10 mb-3 text-indigo-300"
+                className="w-10 h-10 mb-3 text-sky-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -146,10 +146,10 @@ export function ImageUpload({
                   d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                 ></path>
               </svg>
-              <p className="mb-1 text-sm text-indigo-200">
+              <p className="mb-1 text-sm text-indigo-100">
                 Click to select an image
               </p>
-              <p className="text-xs text-indigo-300">PNG, JPG or GIF</p>
+              <p className="text-xs text-indigo-100">PNG, JPG or GIF</p>
             </div>
             <input
               type="file"
@@ -161,7 +161,7 @@ export function ImageUpload({
         </div>
       ) : (
         <div className="flex flex-col items-center mb-4 w-full">
-          <div className="max-w-md w-full mb-4 overflow-hidden bg-indigo-900/30 p-4 rounded-lg flex justify-center">
+          <div className="max-w-md w-full mb-4 overflow-hidden bg-sky-900/30 p-4 rounded-lg flex justify-center">
             <ReactCrop
               crop={crop}
               onChange={(c: Crop) => setCrop(c)}
@@ -184,7 +184,7 @@ export function ImageUpload({
             <button
               type="button"
               onClick={onCancel}
-              className="py-2 px-4 rounded bg-indigo-700 text-indigo-200 hover:bg-indigo-600"
+              className="py-2 px-4 rounded bg-sky-900 text-indigo-100 hover:bg-sky-800"
               disabled={isLoading}
             >
               Cancel
@@ -192,7 +192,7 @@ export function ImageUpload({
             <button
               type="button"
               onClick={getCroppedImg}
-              className="py-2 px-4 rounded bg-cyan-500 text-white hover:bg-cyan-600 disabled:opacity-50"
+              className="py-2 px-4 rounded bg-sky-600 text-white hover:bg-cyan-600 disabled:opacity-50"
               disabled={!completedCrop || isLoading}
             >
               {isLoading ? "Processing..." : "Select"}

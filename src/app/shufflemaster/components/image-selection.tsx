@@ -39,22 +39,22 @@ export function ImageSelector({
   return (
     <div className="mb-6">
       {/* Tabs */}
-      <div className="flex justify-center sm:justify-start border-b border-indigo-700 mb-4">
+      <div className="flex justify-center sm:justify-start border-b border-sky-700 mb-4">
         <button
-          className={`flex-1 sm:flex-initial py-2 px-3 sm:px-4 text-sm sm:text-base font-medium ${
+          className={`flex-1 sm:flex-initial py-2 px-3 sm:px-4 text-sm sm:text-base font-medium cursor-pointer ${
             activeTab === "presets"
-              ? "text-cyan-500 border-b-2 border-cyan-500"
-              : "text-indigo-300 hover:text-indigo-100"
+              ? "text-sky-600 border-b-2 border-sky-600"
+              : "text-indigo-100 hover:text-sky-600"
           }`}
           onClick={() => setActiveTab("presets")}
         >
           Preset Images
         </button>
         <button
-          className={`flex-1 sm:flex-initial py-2 px-3 sm:px-4 text-sm sm:text-base font-medium ${
+          className={`flex-1 sm:flex-initial py-2 px-3 sm:px-4 text-sm sm:text-base font-medium cursor-pointer ${
             activeTab === "upload"
-              ? "text-cyan-500 border-b-2 border-cyan-500"
-              : "text-indigo-300 hover:text-indigo-100"
+              ? "text-sky-600 border-b-2 border-sky-600"
+              : "text-indigo-100 hover:text-sky-600"
           }`}
           onClick={() => setActiveTab("upload")}
         >
@@ -71,7 +71,7 @@ export function ImageSelector({
                 key={image.id}
                 className={`relative cursor-pointer rounded-lg overflow-hidden transition-all hover:opacity-90 ${
                   selectedPresetId === image.id
-                    ? "ring-2 ring-cyan-400 transform scale-[1.02]"
+                    ? "ring-2 ring-sky-600 transform scale-[1.02]"
                     : ""
                 }`}
                 onClick={() => onImageSelect(image.url, image.id)}
@@ -109,7 +109,7 @@ export function SelectedImageDisplay({
 }) {
   return (
     <div className="mb-6 flex flex-col items-center justify-center">
-      <div className="w-auto h-auto max-w-[320px] max-h-[320px] mx-auto relative mb-4 rounded-lg overflow-hidden border-2 border-indigo-500">
+      <div className="w-auto h-auto max-w-[320px] max-h-[320px] mx-auto relative mb-4 rounded-lg overflow-hidden border border-sky-600">
         <Image
           src={imageUrl}
           alt="Selected image"
@@ -141,8 +141,8 @@ export function GridSizeSelector({
             key={size}
             className={`px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-base rounded cursor-pointer transition-colors ${
               gridSize === size
-                ? "bg-cyan-500 text-white"
-                : "bg-indigo-700 text-indigo-100 hover:bg-indigo-600"
+                ? "bg-sky-600 text-white"
+                : "bg-sky-900 text-indigo-100 hover:bg-sky-800"
             }`}
             onClick={() => onGridSizeChange(size)}
           >
@@ -166,13 +166,13 @@ export function GameControls({
     <div className="flex flex-col items-center space-y-4">
       <button
         onClick={onStartGame}
-        className="py-3 px-12 rounded-lg font-bold bg-cyan-500 hover:bg-cyan-600 text-white cursor-pointer"
+        className="py-3 px-12 rounded-lg font-bold bg-sky-600 hover:bg-cyan-600 text-white cursor-pointer"
       >
         Start Game
       </button>
       <button
         onClick={onSelectDifferentImage}
-        className="text-indigo-300 hover:text-indigo-100 underline text-sm cursor-pointer"
+        className="text-sky-600 hover:text-cyan-600 underline text-sm cursor-pointer"
       >
         Select different image
       </button>
