@@ -10,6 +10,8 @@ export default function GameBoard({
   stats,
   gameVersion,
   showInvalidWord,
+  showFailedAttempt,
+  failedWord,
 }: GameBoardProps) {
   return (
     <div className="flex flex-col items-center relative">
@@ -50,7 +52,7 @@ export default function GameBoard({
       {/* Correct feedback overlay */}
       {stats.feedback.showCorrect && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-          <div className="text-green-400 font-bold text-4xl animate-pulse px-6 py-3 bg-sky-950 bg-opacity-90 rounded-lg shadow-lg text-center border border-sky-600">
+          <div className="text-green-400 font-bold text-4xl px-6 py-3 bg-sky-950 rounded-lg shadow-lg text-center border border-sky-600">
             Correct!
             <div className="text-sky-600 text-2xl mt-1">
               +{formatTime(stats.feedback.timeAdded)}
@@ -62,8 +64,20 @@ export default function GameBoard({
       {/* Invalid word feedback overlay */}
       {showInvalidWord && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-          <div className="text-red-400 font-bold text-3xl animate-pulse px-6 py-3 bg-sky-950 bg-opacity-90 rounded-lg shadow-lg text-center border border-sky-600">
+          <div className="text-red-400 font-bold text-3xl px-6 py-3 bg-sky-950 rounded-lg shadow-lg text-center border border-sky-600">
             Not in word list!
+          </div>
+        </div>
+      )}
+
+      {/* Failed attempt feedback overlay */}
+      {showFailedAttempt && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+          <div className="text-orange-400 font-bold text-2xl px-6 py-3 bg-sky-950 rounded-lg shadow-lg text-center border border-sky-600">
+            Not solved! Word was:
+            <div className="text-sky-600 text-3xl mt-1 uppercase">
+              {failedWord}
+            </div>
           </div>
         </div>
       )}

@@ -1,7 +1,7 @@
 import { GameSettings } from "../types";
 
 export const GAME_SETTINGS: GameSettings = {
-  initialTime: 300, // 5 minutes in seconds
+  initialTime: 20, // 5 minutes in seconds
   timeAddedPerWord: 60, // 1 minute in seconds
   wordLength: 5,
   maxAttempts: 5,

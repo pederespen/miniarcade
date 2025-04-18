@@ -40,8 +40,13 @@ export function useGameLogic({
     },
   });
   const [isPlaying, setIsPlaying] = useState(false);
-  // State for invalid word feedback
+  // State for feedback messages
   const [showInvalidWord, setShowInvalidWord] = useState(false);
+  const [showFailedAttempt, setShowFailedAttempt] = useState(false);
+  // Store the word that wasn't guessed correctly
+  const [failedWord, setFailedWord] = useState("");
+  // Ref to track if we're transitioning between words to prevent race conditions
+  const isTransitioning = useRef(false);
 
   // Use ref instead of state for tracking used words to avoid re-renders
   const usedWordsRef = useRef<Set<string>>(new Set());
@@ -299,14 +304,24 @@ export function useGameLogic({
         setCurrentColIndex(0);
         return true; // Explicitly return true to indicate the input was handled
       } else {
-        // Failed all attempts for this word, move to next word
-        console.log("[DEBUG] Failed all attempts for word:", currentWord);
-        const newWord = getRandomWord();
-        setCurrentWord(newWord);
-        setBoard(initializeBoard());
-        setCurrentRowIndex(0);
-        setCurrentColIndex(0);
-        setKeyboardState({}); // Reset keyboard state for the new word
+        // Failed all attempts for this word, show message before moving to next word
+        isTransitioning.current = true;
+        setFailedWord(currentWord);
+        setShowFailedAttempt(true);
+
+        // Hide message and move to next word after a delay
+        setTimeout(() => {
+          setShowFailedAttempt(false);
+          // Get a new word
+          const newWord = getRandomWord();
+          setCurrentWord(newWord);
+          setBoard(initializeBoard());
+          setCurrentRowIndex(0);
+          setCurrentColIndex(0);
+          setKeyboardState({}); // Reset keyboard state for the new word
+          isTransitioning.current = false;
+        }, 2000);
+
         return true; // Explicitly return true to indicate the input was handled
       }
     }
@@ -325,7 +340,15 @@ export function useGameLogic({
   // Handle key press
   const handleKeyPress = useCallback(
     (key: string) => {
-      if (stats.gameOver || !isPlaying) return;
+      // Don't handle input if game is over, not playing, showing the failed attempt message,
+      // or transitioning between words
+      if (
+        stats.gameOver ||
+        !isPlaying ||
+        showFailedAttempt ||
+        isTransitioning.current
+      )
+        return;
 
       const keyUpper = key.toUpperCase();
 
@@ -368,6 +391,7 @@ export function useGameLogic({
       isPlaying,
       settings.wordLength,
       stats.gameOver,
+      showFailedAttempt,
     ]
   );
 
@@ -399,5 +423,7 @@ export function useGameLogic({
     resetGame,
     currentSettings: settings,
     showInvalidWord,
+    showFailedAttempt,
+    failedWord,
   };
 }

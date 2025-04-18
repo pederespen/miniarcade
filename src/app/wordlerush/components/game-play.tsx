@@ -23,6 +23,8 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
     handleKeyPress,
     resetGame,
     showInvalidWord,
+    showFailedAttempt,
+    failedWord,
   } = useGameLogic({
     boardSize: { width: 350, height: 420 },
     highScore,
@@ -57,8 +59,8 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
 
       {/* Game Over Screen */}
       {stats.gameOver && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-10">
-          <div className="bg-sky-950 rounded-lg p-8 max-w-sm w-full text-center border border-sky-600 shadow-lg">
+        <div className="fixed inset-0 bg-sky-950/30 backdrop-blur-sm flex items-center justify-center z-10 px-4">
+          <div className="bg-sky-950 rounded-lg p-6 sm:p-8 max-w-xs sm:max-w-sm w-full text-center border border-sky-600 shadow-lg">
             <h2 className="text-3xl font-bold text-sky-600 mb-4">Game Over!</h2>
 
             <div className="mb-6">
@@ -80,7 +82,7 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
             </div>
 
             <button
-              className="w-full py-3 bg-sky-600 hover:bg-cyan-600 text-white font-bold rounded-md transition-colors"
+              className="w-full py-3 bg-sky-600 hover:bg-cyan-600 text-white font-bold rounded-md transition-colors cursor-pointer"
               onClick={handlePlayAgain}
             >
               Play Again
@@ -103,6 +105,8 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
           stats={stats}
           gameVersion={gameVersion}
           showInvalidWord={showInvalidWord}
+          showFailedAttempt={showFailedAttempt}
+          failedWord={failedWord}
         />
       </div>
 

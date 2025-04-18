@@ -59,6 +59,8 @@ export interface GameBoardProps {
   stats: GameStats;
   gameVersion: number;
   showInvalidWord: boolean;
+  showFailedAttempt: boolean;
+  failedWord: string;
 }
 
 export interface KeyboardProps {
@@ -89,4 +91,6 @@ export interface GameLogicReturn {
   resetGame: () => void;
   currentSettings: GameSettings;
   showInvalidWord: boolean;
+  showFailedAttempt: boolean;
+  failedWord: string;
 }
