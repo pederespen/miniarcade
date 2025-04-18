@@ -14,7 +14,7 @@ export default function Home() {
       id: "cubiclecrash",
       title: "CubicleCrash",
       description:
-        "Navigate your paper airplane through office obstacles! How far can you fly?",
+        "Navigate your paper airplane through office obstacles and collect powerups! How far can you fly?",
       imageUrl: "./cubiclecrash/screenshot.png",
     },
     {
@@ -31,7 +31,7 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow">
         {games.map((game) => (
           <Link key={game.id} href={`/${game.id}`} className="block h-full">
-            <div className="rounded-lg overflow-hidden shadow-lg hover:shadow-cyan-500/30 transition-all hover:scale-105 cursor-pointer h-full relative group">
+            <div className="rounded-lg overflow-hidden shadow-lg hover:shadow-cyan-500/30 transition-all hover:scale-105 cursor-pointer h-full relative group min-h-[250px] sm:min-h-[300px]">
               <div className="absolute inset-0 bg-sky-900/60">
                 <Image
                   src={game.imageUrl}
@@ -42,13 +42,16 @@ export default function Home() {
                 />
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-black/30"></div>
-              <div className="relative p-6 h-full flex flex-col justify-end">
-                <h3 className="text-2xl font-bold text-sky-600 mb-2">
-                  {game.title}
-                </h3>
-                <p className="text-white text-lg group-hover:text-sky-100 transition-colors">
-                  {game.description}
-                </p>
+              <div className="relative p-6 h-full flex flex-col justify-between">
+                <div className="flex-grow"></div>
+                <div>
+                  <h3 className="text-2xl font-bold text-sky-600 mb-2">
+                    {game.title}
+                  </h3>
+                  <p className="text-white text-lg group-hover:text-sky-100 transition-colors">
+                    {game.description}
+                  </p>
+                </div>
               </div>
             </div>
           </Link>
