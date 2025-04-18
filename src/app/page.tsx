@@ -31,27 +31,32 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow">
         {games.map((game) => (
           <Link key={game.id} href={`/${game.id}`} className="block h-full">
-            <div className="bg-sky-800 rounded-lg overflow-hidden shadow-lg hover:shadow-cyan-500/30 transition-all hover:scale-105 cursor-pointer flex flex-col h-full">
-              <div className="h-60 bg-sky-800 flex items-center justify-center overflow-hidden relative">
+            <div className="rounded-lg overflow-hidden shadow-lg hover:shadow-cyan-500/30 transition-all hover:scale-105 cursor-pointer h-full relative group">
+              <div className="absolute inset-0 bg-sky-800/50 z-0">
                 {game.imageUrl ? (
                   <Image
                     src={game.imageUrl}
                     alt={`${game.title} screenshot`}
                     fill
                     priority
-                    className="object-contain p-2"
+                    className="object-cover"
                   />
                 ) : (
-                  <div className="text-7xl text-cyan-400">{game.title[0]}</div>
+                  <div className="h-full w-full flex items-center justify-center">
+                    <div className="text-7xl text-cyan-400">
+                      {game.title[0]}
+                    </div>
+                  </div>
                 )}
               </div>
-              <div className="p-6 flex-grow flex flex-col justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-cyan-400 mb-3">
-                    {game.title}
-                  </h3>
-                  <p className="text-indigo-100 text-lg">{game.description}</p>
-                </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
+              <div className="relative z-20 p-6 h-full flex flex-col justify-end">
+                <h3 className="text-2xl font-bold text-cyan-400 mb-2">
+                  {game.title}
+                </h3>
+                <p className="text-white text-lg opacity-90 group-hover:opacity-100 transition-opacity">
+                  {game.description}
+                </p>
               </div>
             </div>
           </Link>

@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-gradient-to-b from-sky-900 to-sky-950 text-white">
-        <header className="fixed top-0 left-0 right-0 w-full p-3 z-10 bg-sky-900 backdrop-blur-sm">
+        <header className="fixed top-0 left-0 right-0 w-full p-3 z-50 bg-sky-900 backdrop-blur-sm">
           <div className="container mx-auto flex justify-center items-center">
             <Link href="/">
               <Image
@@ -32,7 +32,7 @@ export default function RootLayout({
         <main className="flex-grow flex flex-col pt-[70px]">{children}</main>
         <footer className="py-2 mt-auto">
           <div className="container mx-auto text-center">
-            <p className="text-indigo-300 text-sm">Peder Espen | © 2025</p>
+            <p className="text-white text-sm">Peder Espen | © 2025</p>
           </div>
         </footer>
       </body>
