@@ -65,11 +65,11 @@ export function ImageSelector({
       {/* Content */}
       {activeTab === "presets" ? (
         <div className="mt-2">
-          <div className="flex overflow-x-auto pb-4 sm:grid sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {presetImages.map((image) => (
               <div
                 key={image.id}
-                className={`relative flex-shrink-0 w-[150px] sm:w-auto cursor-pointer rounded-lg overflow-hidden transition-all hover:opacity-90 ${
+                className={`relative cursor-pointer rounded-lg overflow-hidden transition-all hover:opacity-90 ${
                   selectedPresetId === image.id
                     ? "ring-2 ring-cyan-400 transform scale-[1.02]"
                     : ""
@@ -109,14 +109,14 @@ export function SelectedImageDisplay({
 }) {
   return (
     <div className="mb-6 flex flex-col items-center justify-center">
-      <div className="w-auto h-auto max-w-[256px] max-h-[256px] mx-auto relative mb-4 rounded-lg overflow-hidden border-2 border-indigo-500">
+      <div className="w-auto h-auto max-w-[320px] max-h-[320px] mx-auto relative mb-4 rounded-lg overflow-hidden border-2 border-indigo-500">
         <Image
           src={imageUrl}
           alt="Selected image"
-          width={192}
-          height={192}
+          width={320}
+          height={320}
           className="object-contain"
-          sizes="256px"
+          sizes="320px"
           unoptimized={isCustomImage} // Skip Next.js optimization for data URLs
         />
       </div>

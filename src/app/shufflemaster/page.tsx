@@ -22,7 +22,11 @@ function ShuffleMasterContent() {
     useGameContext();
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div
+      className={`container mx-auto p-6 ${
+        showingHowToPlay ? "max-w-lg" : gameStarted ? "max-w-4xl" : "max-w-2xl"
+      }`}
+    >
       {gameStarted ? (
         userImage && <GamePlay />
       ) : showingHowToPlay ? (

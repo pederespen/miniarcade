@@ -2,9 +2,9 @@ import React from "react";
 
 export function HowToPlayScreen({ onContinue }: { onContinue: () => void }) {
   return (
-    <div className="bg-black rounded-lg p-6 shadow-lg">
-      <div className="max-w-md mx-auto">
-        <h2 className="text-2xl font-semibold text-cyan-400 mb-6 text-center">
+    <div className="bg-sky-950 rounded-lg p-6 shadow-lg">
+      <div className="mx-auto">
+        <h2 className="text-2xl font-semibold text-sky-600 mb-6 text-center">
           How to Play
         </h2>
 
@@ -18,7 +18,7 @@ export function HowToPlayScreen({ onContinue }: { onContinue: () => void }) {
         <div className="flex justify-center">
           <button
             onClick={onContinue}
-            className="py-3 px-10 rounded-lg font-bold bg-cyan-500 hover:bg-cyan-600 text-white cursor-pointer"
+            className="py-3 px-10 rounded-lg font-bold bg-sky-600 hover:bg-cyan-600 text-white cursor-pointer"
           >
             Continue
           </button>
