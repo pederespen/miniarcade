@@ -15,8 +15,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col">
-        <header className="fixed top-0 left-0 right-0 w-full p-3 shadow-lg z-10 bg-[#19232e] backdrop-blur-sm">
+      <body className="min-h-screen flex flex-col bg-gradient-to-b from-sky-900 to-sky-950 text-white">
+        <header className="fixed top-0 left-0 right-0 w-full p-3 z-10 bg-sky-900 backdrop-blur-sm">
           <div className="container mx-auto flex justify-center items-center">
             <Link href="/">
               <Image

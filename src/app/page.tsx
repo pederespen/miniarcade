@@ -31,8 +31,8 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow">
         {games.map((game) => (
           <Link key={game.id} href={`/${game.id}`} className="block h-full">
-            <div className="bg-indigo-800 rounded-lg overflow-hidden shadow-lg hover:shadow-cyan-500/30 transition-all hover:scale-105 cursor-pointer flex flex-col h-full">
-              <div className="h-60 bg-indigo-700 flex items-center justify-center overflow-hidden relative">
+            <div className="bg-sky-800 rounded-lg overflow-hidden shadow-lg hover:shadow-cyan-500/30 transition-all hover:scale-105 cursor-pointer flex flex-col h-full">
+              <div className="h-60 bg-sky-800 flex items-center justify-center overflow-hidden relative">
                 {game.imageUrl ? (
                   <Image
                     src={game.imageUrl}
