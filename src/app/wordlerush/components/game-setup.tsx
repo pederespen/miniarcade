@@ -19,17 +19,13 @@ export default function GameSetup() {
           How to Play
         </h2>
 
-        <div className="text-indigo-100 mb-6 space-y-3">
-          <p>Solve as many word puzzles as you can before time runs out!</p>
-          <p>
-            For each correct word, you&apos;ll get more time added to the clock.
-          </p>
-          <p>
-            Green tiles are letters in the correct position. Yellow tiles are
-            letters in the wrong position. Gray tiles are incorrect letters.
-          </p>
-          <p>You can use your keyboard or tap the on-screen buttons.</p>
-        </div>
+        <ul className="text-indigo-100 mb-6 space-y-2 list-disc pl-5">
+          <li>Solve the word puzzles before time runs out</li>
+          <li>Correct words give points and add time to the clock</li>
+          <li>Green tiles = correct position</li>
+          <li>Yellow tiles = wrong position</li>
+          <li>Gray tiles = incorrect letters</li>
+        </ul>
 
         <button
           className="w-full py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-md transition-colors shadow-md disabled:bg-gray-500 disabled:cursor-not-allowed cursor-pointer"
