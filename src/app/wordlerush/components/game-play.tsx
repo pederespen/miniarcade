@@ -58,16 +58,16 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
       {/* Game Over Screen */}
       {stats.gameOver && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-10">
-          <div className="bg-indigo-800 rounded-lg p-8 max-w-sm w-full text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Game Over!</h2>
+          <div className="bg-sky-950 rounded-lg p-8 max-w-sm w-full text-center border border-sky-600 shadow-lg">
+            <h2 className="text-3xl font-bold text-sky-600 mb-4">Game Over!</h2>
 
             <div className="mb-6">
-              <div className="text-indigo-200 mb-1">Final Score</div>
-              <div className="text-4xl font-bold text-cyan-400">
+              <div className="text-indigo-100 mb-1">Final Score</div>
+              <div className="text-4xl font-bold text-sky-600">
                 {stats.score}
               </div>
 
-              <div className="text-indigo-200 mt-4 mb-1">Words Completed</div>
+              <div className="text-indigo-100 mt-4 mb-1">Words Completed</div>
               <div className="text-3xl font-bold text-white">
                 {stats.wordsCompleted}
               </div>
@@ -80,7 +80,7 @@ export default function GamePlay({ highScore, setHighScore }: GamePlayProps) {
             </div>
 
             <button
-              className="w-full py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-md transition-colors"
+              className="w-full py-3 bg-sky-600 hover:bg-cyan-600 text-white font-bold rounded-md transition-colors"
               onClick={handlePlayAgain}
             >
               Play Again

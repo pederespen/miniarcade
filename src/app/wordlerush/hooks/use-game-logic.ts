@@ -297,6 +297,7 @@ export function useGameLogic({
       if (currentRowIndex < settings.maxAttempts - 1) {
         setCurrentRowIndex(currentRowIndex + 1);
         setCurrentColIndex(0);
+        return true; // Explicitly return true to indicate the input was handled
       } else {
         // Failed all attempts for this word, move to next word
         console.log("[DEBUG] Failed all attempts for word:", currentWord);
@@ -306,6 +307,7 @@ export function useGameLogic({
         setCurrentRowIndex(0);
         setCurrentColIndex(0);
         setKeyboardState({}); // Reset keyboard state for the new word
+        return true; // Explicitly return true to indicate the input was handled
       }
     }
 
@@ -329,8 +331,9 @@ export function useGameLogic({
 
       // Handle special keys
       if (keyUpper === ENTER_KEY) {
-        checkWordAttempt();
-        return;
+        const isHandled = checkWordAttempt();
+        // Don't proceed if the word attempt is being handled
+        if (isHandled) return;
       }
 
       if (keyUpper === BACKSPACE_KEY) {
