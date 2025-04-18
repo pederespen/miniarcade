@@ -32,29 +32,21 @@ export default function Home() {
         {games.map((game) => (
           <Link key={game.id} href={`/${game.id}`} className="block h-full">
             <div className="rounded-lg overflow-hidden shadow-lg hover:shadow-cyan-500/30 transition-all hover:scale-105 cursor-pointer h-full relative group">
-              <div className="absolute inset-0 bg-sky-800/50 z-0">
-                {game.imageUrl ? (
-                  <Image
-                    src={game.imageUrl}
-                    alt={`${game.title} screenshot`}
-                    fill
-                    priority
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center">
-                    <div className="text-7xl text-cyan-400">
-                      {game.title[0]}
-                    </div>
-                  </div>
-                )}
+              <div className="absolute inset-0 bg-sky-900/60">
+                <Image
+                  src={game.imageUrl}
+                  alt={`${game.title} screenshot`}
+                  fill
+                  priority
+                  className="object-cover opacity-75 mix-blend-normal"
+                />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
-              <div className="relative z-20 p-6 h-full flex flex-col justify-end">
-                <h3 className="text-2xl font-bold text-cyan-400 mb-2">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-black/30"></div>
+              <div className="relative p-6 h-full flex flex-col justify-end">
+                <h3 className="text-2xl font-bold text-sky-600 mb-2">
                   {game.title}
                 </h3>
-                <p className="text-white text-lg opacity-90 group-hover:opacity-100 transition-opacity">
+                <p className="text-white text-lg group-hover:text-sky-100 transition-colors">
                   {game.description}
                 </p>
               </div>
