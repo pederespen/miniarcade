@@ -174,7 +174,7 @@ export default function GameBoard({
       ref={canvasRef}
       width={boardSize.width}
       height={boardSize.height}
-      className="rounded-lg shadow-lg"
+      className="rounded-lg shadow-lg border border-sky-600"
       style={{
         touchAction: "none",
         maxWidth: "100%",

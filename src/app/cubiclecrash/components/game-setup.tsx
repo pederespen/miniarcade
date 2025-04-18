@@ -11,8 +11,8 @@ export default function GameSetup() {
 
   return (
     <div className="flex flex-col items-center space-y-8 mt-10">
-      <div className="bg-indigo-800 p-6 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 className="text-2xl font-semibold text-cyan-400 mb-4">
+      <div className="bg-sky-950 p-6 rounded-lg shadow-lg w-full max-w-lg border border-sky-600">
+        <h2 className="text-2xl font-semibold text-sky-600 mb-4">
           How to Play
         </h2>
         <ul className="list-disc pl-5 text-indigo-100 space-y-2">
@@ -24,11 +24,11 @@ export default function GameSetup() {
         </ul>
 
         {/* Powerups section */}
-        <div className="mt-6 border-t border-indigo-600 pt-4">
-          <h3 className="text-xl font-semibold text-cyan-400 mb-3">Powerups</h3>
+        <div className="mt-6 border-t border-sky-700 pt-4">
+          <h3 className="text-xl font-semibold text-sky-600 mb-3">Powerups</h3>
           <div className="flex flex-row gap-3">
             {/* Double Points Powerup - Gold orb with 2× */}
-            <div className="flex items-center gap-2 bg-indigo-700/50 p-2 rounded-md flex-1">
+            <div className="flex items-center gap-2 bg-sky-900/50 p-2 rounded-md flex-1">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shrink-0 relative">
                 {/* Gold gradient background */}
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#FFF9C4] via-[#FFC107] to-[#FF8F00]"></div>
@@ -45,7 +45,7 @@ export default function GameSetup() {
             </div>
 
             {/* Invincibility Powerup - Blue shield orb */}
-            <div className="flex items-center gap-2 bg-indigo-700/50 p-2 rounded-md flex-1">
+            <div className="flex items-center gap-2 bg-sky-900/50 p-2 rounded-md flex-1">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shrink-0 relative">
                 {/* Blue gradient background */}
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#E3F2FD] via-[#2196F3] to-[#1565C0]"></div>
@@ -67,7 +67,7 @@ export default function GameSetup() {
         <div className="mt-6 pt-4 flex justify-center">
           <button
             onClick={onStartGame}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-lg text-xl transition-all transform hover:scale-105 cursor-pointer"
+            className="bg-sky-600 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-lg text-xl transition-all transform hover:scale-105 cursor-pointer"
           >
             Start Game
           </button>
@@ -75,8 +75,8 @@ export default function GameSetup() {
       </div>
 
       {highScore > 0 && (
-        <div className="bg-indigo-900 p-4 rounded-lg text-center">
-          <h2 className="text-xl font-semibold text-cyan-400">
+        <div className="bg-sky-950 p-4 rounded-lg text-center border border-sky-600">
+          <h2 className="text-xl font-semibold text-sky-600">
             High Score: {highScore}
           </h2>
         </div>

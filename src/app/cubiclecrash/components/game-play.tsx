@@ -167,7 +167,7 @@ export default function GamePlay({
   if (!sizeCalculated) {
     return (
       <div className="flex flex-col items-center w-full" ref={gameContainerRef}>
-        <div className="text-white">Loading game...</div>
+        <div className="text-sky-600">Loading game...</div>
       </div>
     );
   }
@@ -237,12 +237,12 @@ export default function GamePlay({
           {!isPlaying && !gameOver && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
               <div className="text-center p-6 rounded-lg">
-                <h2 className="text-2xl font-bold text-white mb-4">
+                <h2 className="text-2xl font-bold text-sky-600 mb-4">
                   Cubicle Crash
                 </h2>
                 <button
                   onClick={handleJump}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full"
+                  className="bg-sky-600 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full"
                 >
                   Start Flying
                 </button>
@@ -251,24 +251,22 @@ export default function GamePlay({
           )}
 
           {gameOver && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-lg">
-              <div className="text-center p-6 rounded-lg">
-                <h2 className="text-2xl font-bold text-cyan-400 mb-4">
-                  Game Over!
+            <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-lg">
+              <div className="text-center bg-sky-950 p-6 rounded-lg border border-sky-600 shadow-lg max-w-[80%]">
+                <h2 className="text-2xl font-bold text-sky-600 mb-2">
+                  Game Over
                 </h2>
-                <div className="mb-6 text-white">
-                  <p className="text-xl mb-2">Score: {score}</p>
-                  <p className="text-lg">High Score: {highScore}</p>
+                <div className="mb-4">
+                  <p className="text-xl text-white mb-1">Score: {score}</p>
+                  <p className="text-lg text-indigo-100">
+                    High Score: {highScore}
+                  </p>
                 </div>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent event bubbling
-                    // Use the same approach for both desktop and mobile
-                    handleReset();
-                  }}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full cursor-pointer"
+                  onClick={handleReset}
+                  className="bg-sky-600 hover:bg-cyan-600 text-white font-bold py-2 px-6 rounded-lg cursor-pointer"
                 >
-                  Try Again
+                  Play Again
                 </button>
               </div>
             </div>
